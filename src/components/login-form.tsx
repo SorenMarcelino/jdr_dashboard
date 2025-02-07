@@ -1,23 +1,78 @@
+"use client"
+
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {useRouter} from "next/navigation";
+import React, {FormEvent, useState} from "react";
+import axios from 'axios';
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const router = useRouter();
+  const [inputValue, setInputValue] = useState({
+    email: "",
+    password: "",
+  });
+  const { email, password } = inputValue;
+  const handleOnChange = (e) => {
+    const { name, value } = e.target;
+    setInputValue({
+      ...inputValue,
+      [name]: value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const { data } = await axios.post(
+          "http://192.168.1.154:5050/auth/login",
+          {
+            email,
+            password
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            withCredentials: true
+          }
+      );
+      console.log("data", data);
+      const { success, message } = data;
+      if(success) {
+        console.log("success", success);
+        setTimeout(() => {
+          router.push("/");
+        }, 1000);
+      } else {
+        console.log("error", message);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    setInputValue({
+      ...inputValue,
+      email: "",
+      password: "",
+    });
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+          <form className="p-6 md:p-8" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
                 <p className="text-balance text-muted-foreground">
-                  Login to your account
+                  Login to your Acme Inc account
                 </p>
               </div>
               <div className="grid gap-2">
@@ -25,7 +80,10 @@ export function LoginForm({
                 <Input
                   id="email"
                   type="email"
+                  name="email"
                   placeholder="m@example.com"
+                  value={email}
+                  onChange={handleOnChange}
                   required
                 />
               </div>
@@ -39,7 +97,12 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input id="password"
+                       type="password"
+                       name="password"
+                       value={password}
+                       onChange={handleOnChange}
+                       required />
               </div>
               <Button type="submit" className="w-full">
                 Login
@@ -80,7 +143,7 @@ export function LoginForm({
               </div>
               <div className="text-center text-sm">
                 Don&apos;t have an account?{" "}
-                <a href="#" className="underline underline-offset-4">
+                <a href="/signup" className="underline underline-offset-4">
                   Sign up
                 </a>
               </div>
