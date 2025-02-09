@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {useRouter} from "next/navigation";
-import React, {FormEvent, useState} from "react";
+import React, {useState} from "react";
 import axios from 'axios';
 
 export function LoginForm({
@@ -19,7 +19,7 @@ export function LoginForm({
     password: "",
   });
   const { email, password } = inputValue;
-  const handleOnChange = (e) => {
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setInputValue({
       ...inputValue,
@@ -27,8 +27,10 @@ export function LoginForm({
     });
   };
 
-  const handleSubmit = async (e) => {
+  const [error, setError] = useState("");
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError("");
     try {
       const { data } = await axios.post(
           "http://192.168.1.154:5050/auth/login",
@@ -43,25 +45,25 @@ export function LoginForm({
             withCredentials: true
           }
       );
-      console.log("data", data);
-      const { success, message } = data;
-      if(success) {
-        console.log("success", success);
+
+      if (data.success) {
+        // Réinitialiser les champs uniquement en cas de succès
+        setInputValue({
+          email: "",
+          password: "",
+        });
         setTimeout(() => {
           router.push("/");
         }, 1000);
       } else {
-        console.log("error", message);
+        setError(data.message || "Email or password incorrect");
       }
     } catch (error) {
       console.error(error);
+      setError("Email or password incorrect");
     }
-    setInputValue({
-      ...inputValue,
-      email: "",
-      password: "",
-    });
   };
+
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -104,6 +106,11 @@ export function LoginForm({
                        onChange={handleOnChange}
                        required />
               </div>
+              {error && (
+                  <div className="rounded-md bg-destructive/15 px-4 py-3 text-sm text-destructive">
+                    {error}
+                  </div>
+              )}
               <Button type="submit" className="w-full">
                 Login
               </Button>
