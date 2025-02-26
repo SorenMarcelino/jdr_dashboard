@@ -50,10 +50,12 @@ export const Login = async (req, res, next) => {
         res.cookie("token", token, {
             withCredentials: true,
             httpOnly: false,
+            maxAge: 24 * 60 * 60 * 1000 // 24 heures
         });
-        res.status(201).json({ message: "User logged in successfully", success: true });
+        res.status(201).json({ message: "User logged in successfully", success: true, user: user.username });
         next();
     } catch (error) {
         console.error(error);
+        res.status(500).json({ message: "Server error", success: false });
     }
 }

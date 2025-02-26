@@ -53,7 +53,7 @@ export function LoginForm({
           password: "",
         });
         setTimeout(() => {
-          router.push("/");
+          router.push("/user");
         }, 1000);
       } else {
         setError(data.message || "Email or password incorrect");
