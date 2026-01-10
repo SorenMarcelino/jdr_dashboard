@@ -1,7 +1,6 @@
-import  { User } from '../models/UserModel.mjs';
 import { createSecretToken } from '../utils/SecretToken.mjs';
-import bcrypt from 'bcryptjs';
-import { validateEmail, validatePassword } from '../utils/validators.mjs';
+import { validateEmail } from '../utils/validators.mjs';
+import {findUserByEmail, registerUser, verifyPassword} from "../services/authService.mjs";
 
 const { NODE_ENV } = process.env;
 
@@ -11,46 +10,11 @@ export const Signup = async (req, res) => {
 
         // Validation des champs requis
         if (!email || !password || !username) {
-            return res.status(400).json({
-                message: 'All fields are required.',
-                success: false
-            });
+            return res.status(400).json({ message: 'All fields are required.', success: false });
         }
 
-        // Validation du format email
-        if (!validateEmail(email)) {
-            return res.status(400).json({
-                message: 'Invalid email format',
-                success: false
-            });
-        }
-
-        // Validation de la complexité du mot de passe
-        const passwordValidation = validatePassword(password);
-        if (!passwordValidation.isValid) {
-            return res.status(400).json({
-                message: passwordValidation.message,
-                success: false
-            });
-        }
-
-        // Vérification si l'utilisateur existe déjà
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(409).json({
-                message: "User already exist",
-                success: false
-            });
-        }
-
-        // Création de l'utilisateur
-        const user = await User.create({
-            email,
-            password,
-            username,
-            createdAt: new Date()
-        });
-
+        // Validation
+        const user = await registerUser(email, password, username);
         // Création du token
         const token = createSecretToken(user._id);
 
@@ -74,8 +38,12 @@ export const Signup = async (req, res) => {
         });
     } catch (error) {
         console.error('Signup error:', error);
-        res.status(500).json({
-            message: 'Internal server error',
+
+        const status = error.status || 500;
+        const message = error.message || 'Internal server error';
+
+        res.status(status).json({
+            message: message,
             success: false
         });
     }
@@ -93,7 +61,6 @@ export const Login = async (req, res) => {
             });
         }
 
-        // Validation du format email
         if (!validateEmail(email)) {
             return res.status(400).json({
                 message: "Invalid email format",
@@ -102,22 +69,8 @@ export const Login = async (req, res) => {
         }
 
         // Recherche de l'utilisateur
-        const user = await User.findOne({ email });
-        if(!user) {
-            return res.status(401).json({
-                message: "Invalid credentials",
-                success: false
-            });
-        }
-
-        // Vérification du mot de passe
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-            return res.status(401).json({
-                message: "Invalid credentials",
-                success: false
-            });
-        }
+        const user = await findUserByEmail(email);
+        await verifyPassword(user, password);
 
         // Création du token
         const token = createSecretToken(user._id);
@@ -142,8 +95,9 @@ export const Login = async (req, res) => {
         });
     } catch (error) {
         console.error('Login error:', error);
-        res.status(500).json({
-            message: "Internal server error",
+        const status = error.status || 500;
+        res.status(status).json({
+            message: error.message || "Internal server error",
             success: false
         });
     }

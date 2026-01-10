@@ -6,7 +6,8 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import authRoute from './routes/AuthRoute.mjs';
 import api from "./routes/api.mjs";
-import './utils/loadEnvironment.mjs'; // Configuration dotenv centralisée
+import './utils/loadEnvironment.mjs';
+import {errorHandler} from "./middlewares/ErrorHandler.mjs"; // Configuration dotenv centralisée
 
 const app = express();
 const { MONGODB_URI, PORT, CORS_ORIGIN, NODE_ENV } = process.env;
@@ -60,6 +61,8 @@ app.use((req, res, next) => {
 // Routes
 app.use("/auth", authRoute);
 app.use("/api", api);
+
+app.use(errorHandler);
 
 // Connexion MongoDB avec gestion d'erreurs
 mongoose

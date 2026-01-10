@@ -1,7 +1,7 @@
 import { User } from '../models/UserModel.mjs';
 import jwt from 'jsonwebtoken';
 
-const { TOKEN_KEY } = process.env;
+// const { TOKEN_KEY } = process.env;
 
 export const userVerification = (req, res) => {
     try {
@@ -9,6 +9,8 @@ export const userVerification = (req, res) => {
         if (!token) {
             return res.json({status: false, message: 'No token provided'});
         }
+
+        const TOKEN_KEY = process.env.TOKEN_KEY;
 
         jwt.verify(token, TOKEN_KEY, async (err, data) => {
             if (err) {
@@ -58,6 +60,8 @@ export const requireAuth = async (req, res, next) => {
                 success: false
             });
         }
+
+        const TOKEN_KEY = process.env.TOKEN_KEY;
 
         jwt.verify(token, TOKEN_KEY, async (err, data) => {
             if (err) {

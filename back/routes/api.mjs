@@ -1,13 +1,13 @@
 import express from "express";
-import { User } from "../models/UserModel.mjs";
 import { requireAuth } from "../middlewares/AuthMiddleware.mjs";
+import {getAllUsers, searchUsers, updateUserProfile} from "../services/userService.mjs";
 
 const router = express.Router();
 
 // Route protégée - Liste de tous les utilisateurs (nécessite authentification)
 router.get("/users", requireAuth, async (req, res) => {
     try {
-        const users = await User.find({}).select('-password'); // Exclure les mots de passe
+        const users = await getAllUsers();
         return res.status(200).json({
             success: true,
             users
@@ -49,11 +49,7 @@ router.put("/profile", requireAuth, async (req, res) => {
             });
         }
 
-        const updatedUser = await User.findByIdAndUpdate(
-           req.user._id,
-           { username, updatedAt: new Date() },
-           { new: true, runValidators: true}
-        ).select('-password');
+        const updatedUser = await updateUserProfile(req.user._id, { username });
 
         return res.status(200).json({
             success: true,
@@ -62,10 +58,37 @@ router.put("/profile", requireAuth, async (req, res) => {
         });
     } catch (error) {
         console.error('Error updating profile:', error);
-        return res.status(500).json({
-            message: 'Internal server error',
+        const status = error.status || 500;
+        return res.status(status).json({
+            message: error.message || 'Internal server error',
             success: false
         })
+    }
+});
+
+router.get("/users/search", requireAuth, async (req, res) => {
+    try {
+        const { q } = req.query;
+        if (!q) {
+            return res.status(400).json({
+                message: "Search query is required",
+                success: false
+            });
+        }
+
+        const users = await searchUsers(q);
+
+        return res.status(200).json({
+            success: true,
+            users
+        });
+    } catch (error) {
+        console.error('Error searching users:', error);
+        const status = error.status || 500;
+        return res.status(status).json({
+            message: error.message || 'Internal server error',
+            success: false
+        });
     }
 });
 
