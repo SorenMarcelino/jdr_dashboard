@@ -1,33 +1,67 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
-
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import authRoute from './routes/AuthRoute.mjs';
-import dotenv from 'dotenv';
-dotenv.config();
 import api from "./routes/api.mjs";
+import './utils/loadEnvironment.mjs'; // Configuration dotenv centralisée
 
 const app = express();
-const { MONGODB_URI, PORT } = process.env;
+const { MONGODB_URI, PORT, CORS_ORIGIN, NODE_ENV } = process.env;
 
-app.use(express.json());
+// Sécurité avec Helmet
+app.use(helmet());
+
+// Rate limiting pour prévenir les attaques par brute force
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limite de 100 requêtes par IP
+    message: 'Too many requests from this IP, please try again later.'
+});
+
+app.use('/auth', rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5, // Limite plus stricte pour l'authentification
+    message: 'Too many authentification attempts, please try again later.'
+}));
+
+app.use(limiter);
+
+// Middlewares
+app.use(express.json({ limit: '10mb' })); // Limite la taille des requêtes
 app.use(cookieParser());
+
+// Configuration CORS sécurisées
+const allowedOrigins = CORS_ORIGIN ? CORS_ORIGIN.split(',') : ['http://localhost:3000'];
+
 app.use(
     cors({
-        origin: ["http://localhost:3000", "http://192.168.1.154:3000", "http://192.168.1.112:3000"],
+        origin: (origin, callback) => {
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error('Not allowed by CORS'));
+            }
+        },
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         credentials: true,
-        allowedHeaders: ["Content-Type", "Authorization", "x-Requested-With", "Accept"]
+        allowedHeaders: ["Content-Type", "Authorization"]
     })
 );
+
+// Logging des requêtes
 app.use((req, res, next) => {
-    console.log(`Requete recue: ${req.method} ${req.url}`);
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
     next();
 });
+
+// Routes
 app.use("/auth", authRoute);
 app.use("/api", api);
 
+// Connexion MongoDB avec gestion d'erreurs
 mongoose
     .connect(MONGODB_URI, {
         dbName: 'jdr_dashboard',
@@ -35,43 +69,22 @@ mongoose
     .then(() => {
         app.listen(PORT, '0.0.0.0', () => {
             console.log(`Server is listening on port ${PORT}`);
+            console.log(`Environment: ${NODE_ENV}`);
             console.log("MongoDB is connected successfully");
         });
     })
-    .catch((err) => console.error(err));
+    .catch((error) => {
+        console.error('MongoDB connection error:', error);
+        process.exit(1);
+    });
 
-/*import './loadEnvironment.mjs'
-import express from "express";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-
-import api from "./routes/api.mjs";
-import authRoute from "./routes/AuthRoute.mjs";
-
-const PORT = process.env.PORT || 5050;
-const app = express();
-
-app.get("/", (req, res) => {
-    res.send("API is running");
+// Gestion des erreurs non gérées
+process.on('unhandledRejection', (error) => {
+    console.error('Unhandled Rejection:', error);
+    process.exit(1);
 });
 
-app.use("/api", api);
-
-// Start the Express server
-app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
-});
-
-app.use(
-    cors({
-        origin: ["http://localhost:5050"],
-        methods: ["GET", "POST", "PUT", "DELETE"],
-        credentials: true,
-    })
-);
-
-app.use(cookieParser());
-
-app.use(express.json());
-
-app.use("/", authRoute);*/
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+    process.exit(1);
+})

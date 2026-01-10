@@ -18,7 +18,7 @@ export function Navbar() {
             if (cookies.token) {
                 try {
                     const { data } = await axios.post(
-                        "http://192.168.1.154:5050/auth",
+                        "http://127.0.0.1:5050/auth/verify",
                         {},
                         { withCredentials: true }
                     );
@@ -34,7 +34,7 @@ export function Navbar() {
     }, [cookies.token]);
 
     const handleLogout = () => {
-        removeCookie("token");
+        removeCookie("token", { path: "/"});
         router.push("/login");
     };
 

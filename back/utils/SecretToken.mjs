@@ -1,11 +1,31 @@
-import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 
-dotenv.config();
-
 export const createSecretToken = (id) => {
-    console.log("id:", id);
-    return jwt.sign({ id }, process.env.TOKEN_KEY, {
-        expiresIn: 3 * 24 * 60 * 60,
+    if (!id) {
+        throw new Error('User ID is required to create secret token');
+    }
+
+    const TOKEN_KEY = process.env.TOKEN_KEY;
+
+    if (!TOKEN_KEY) {
+        throw new Error('TOKEN_KEY environment variable is not set');
+    }
+
+    return jwt.sign({ id }, TOKEN_KEY, {
+        expiresIn: '3d', // 3 jours
     });
+};
+
+export const verifyToken = (token) => {
+    try {
+        const TOKEN_KEY = process.env.TOKEN_KEY;
+
+        if (!TOKEN_KEY) {
+            throw new Error('TOKEN_KEY environment variable is not set');
+        }
+
+        return jwt.verify(token, TOKEN_KEY);
+    } catch (error) {
+        return null;
+    }
 };
