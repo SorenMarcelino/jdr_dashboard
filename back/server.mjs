@@ -66,9 +66,7 @@ app.use(errorHandler);
 
 // Connexion MongoDB avec gestion d'erreurs
 mongoose
-    .connect(MONGODB_URI, {
-        dbName: 'jdr_dashboard',
-    })
+    .connect(MONGODB_URI)
     .then(() => {
         app.listen(PORT, '0.0.0.0', () => {
             console.log(`Server is listening on port ${PORT}`);
@@ -80,6 +78,14 @@ mongoose
         console.error('MongoDB connection error:', error);
         process.exit(1);
     });
+
+mongoose.connection.on('connected', () => {
+    console.log('MongoDB is connected successfully');
+    console.log('🔍 Debug - Database info:');
+    console.log('   Database name:', mongoose.connection.name);
+    console.log('   Host:', mongoose.connection.host);
+    console.log('');
+});
 
 // Gestion des erreurs non gérées
 process.on('unhandledRejection', (error) => {
