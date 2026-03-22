@@ -1,6 +1,26 @@
+@import "react-grid-layout/css/styles.css";
+@import "react-resizable/css/styles.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Masquer le handle de resize par défaut, on utilise le nôtre */
+.react-resizable-handle {
+  @apply opacity-0 transition-opacity;
+}
+.react-grid-item:hover .react-resizable-handle {
+  @apply opacity-100;
+}
+.react-resizable-handle::after {
+  border-color: hsl(var(--border)) !important;
+}
+
+/* Placeholder de drag */
+.react-grid-item.react-grid-placeholder {
+  @apply bg-primary/10 rounded-xl border-2 border-dashed border-primary/40;
+  opacity: 1 !important;
+}
 
 body {
   font-family: Arial, Helvetica, sans-serif;

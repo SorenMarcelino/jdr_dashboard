@@ -48,13 +48,8 @@ export function LoginForm({
 
       if (data.success) {
         // Réinitialiser les champs uniquement en cas de succès
-        setInputValue({
-          email: "",
-          password: "",
-        });
-        setTimeout(() => {
-          router.push("/user");
-        }, 1000);
+        setInputValue({ email: "", password: "" });
+        router.push("/user");
       } else {
         setError(data.message || "Email or password incorrect");
       }

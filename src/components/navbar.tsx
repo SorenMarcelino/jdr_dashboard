@@ -31,8 +31,13 @@ export function Navbar() {
         fetchUser();
     }, []);
 
-    const handleLogout = () => {
-        removeCookie("token", { path: "/"});
+    const handleLogout = async () => {
+        try {
+            await axios.post("http://localhost:5050/auth/logout", {}, { withCredentials: true });
+        } catch {
+            // ignore
+        }
+        removeCookie("token", { path: "/" });
         router.push("/login");
     };
 

@@ -7,8 +7,10 @@ import rateLimit from 'express-rate-limit';
 import authRoute from './routes/AuthRoute.mjs';
 import api from "./routes/api.mjs";
 import gamesRoute from "./routes/GamesRoute.mjs";
+import characterSheetRoute from "./routes/CharacterSheetRoute.mjs";
 import './utils/loadEnvironment.mjs';
 import {errorHandler} from "./middlewares/ErrorHandler.mjs"; // Configuration dotenv centralisée
+import { seedMagnusArchives } from "./seeds/magnusArchivesSeed.mjs";
 
 const app = express();
 const { MONGODB_URI, PORT, CORS_ORIGIN, NODE_ENV } = process.env;
@@ -65,13 +67,15 @@ app.use((req, res, next) => {
 app.use("/auth", authRoute);
 app.use("/api", api);
 app.use("/games", gamesRoute);
+app.use("/character-sheets", characterSheetRoute);
 
 app.use(errorHandler);
 
 // Connexion MongoDB avec gestion d'erreurs
 mongoose
     .connect(MONGODB_URI)
-    .then(() => {
+    .then(async () => {
+        await seedMagnusArchives();
         app.listen(PORT, '0.0.0.0', () => {
             console.log(`Server is listening on port ${PORT}`);
             console.log(`Environment: ${NODE_ENV}`);

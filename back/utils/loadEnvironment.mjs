@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Détecte quel fichier .env utiliser
-const projectRoot = join(__dirname, '..', '..');
+const projectRoot = join(__dirname, '..');
 const envFile = process.env.NODE_ENV === 'test' ? '.env.test' : '.env';
 const envPath = join(projectRoot, envFile);
 

@@ -22,7 +22,7 @@ const getRefreshTokenKey = () => {
 export const createAccessToken = (id) => {
     if (!id) throw new Error('User ID is required');
 
-    return jwt.sign({ id }, getTokenKey(), { expiresIn: process.env.ACCESS_TOKEN_EXPIRY });
+    return jwt.sign({ id }, getTokenKey(), { expiresIn: parseInt(process.env.ACCESS_TOKEN_EXPIRY) || 1800 });
 }
 
 // Check Access Token
@@ -44,7 +44,7 @@ export const verifyAccessToken = (token) => {
 export const createRefreshToken = (id) => {
     if (!id) throw new Error('User ID is required');
 
-    return jwt.sign({ id }, getRefreshTokenKey(), { expiresIn: process.env.REFRESH_TOKEN_EXPIRY });
+    return jwt.sign({ id }, getRefreshTokenKey(), { expiresIn: parseInt(process.env.REFRESH_TOKEN_EXPIRY) || 1209600 });
 }
 
 export const verifyRefreshToken = (token) => {

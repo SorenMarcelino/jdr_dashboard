@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { useRouter } from "next/navigation";
+import axios, { AxiosError } from "axios";
 import { Card, CardContent } from "@/components/ui/card";
 
 type Game = {
@@ -17,6 +18,7 @@ type Game = {
 export function CurrentGamesCards() {
     const [games, setGames] = useState<Game[]>([]);
     const [loading, setLoading] = useState(true);
+    const router = useRouter();
 
     useEffect(() => {
         const fetchGames = async () => {
@@ -28,7 +30,11 @@ export function CurrentGamesCards() {
                     setGames(data.games);
                 }
             } catch (error) {
-                console.error("Erreur lors du chargement des parties:", error);
+                if ((error as AxiosError).response?.status === 401) {
+                    router.push("/login");
+                } else {
+                    console.error("Erreur lors du chargement des parties:", error);
+                }
             } finally {
                 setLoading(false);
             }
@@ -47,7 +53,7 @@ export function CurrentGamesCards() {
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
             {games.map((game) => (
-                <Card key={game._id} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
+                <Card key={game._id} onClick={() => router.push(`/game/${game._id}`)} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
                     <div className="h-32 bg-muted flex items-center justify-center">
                         {game.thumbnail ? (
                             <img

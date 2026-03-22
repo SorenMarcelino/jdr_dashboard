@@ -4,7 +4,7 @@ import {verifyAccessToken} from "../utils/SecretToken.mjs";
 
 export const userVerification = (req, res) => {
     try {
-        const token = req.cookies.token;
+        const token = req.cookies.accessToken;
         if (!token) {
             return res.json({status: false, message: 'No token provided'});
         }

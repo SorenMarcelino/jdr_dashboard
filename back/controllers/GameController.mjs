@@ -38,7 +38,7 @@ export const getUserGames = async (req, res) => {
         const userId = req.user._id;
         const games = await Game.find({
             $or: [{ createdBy: userId }, { players: userId }]
-        }).populate("createdBy", "username");
+        }).populate("createdBy", "username").populate("players", "username email");
         return res.status(200).json({
             success: true,
             games,
