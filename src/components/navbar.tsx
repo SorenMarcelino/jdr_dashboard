@@ -9,29 +9,27 @@ import {useRouter} from "next/navigation";
 import axios from "axios";
 
 export function Navbar() {
-    const [cookies, removeCookie] = useCookies(['token']);
+    const [, removeCookie] = useCookies(['token']);
     const router = useRouter();
     const [username, setUsername] = useState("");
 
     useEffect(() => {
         const fetchUser = async () => {
-            if (cookies.token) {
-                try {
-                    const { data } = await axios.post(
-                        "http://127.0.0.1:5050/auth/verify",
-                        {},
-                        { withCredentials: true }
-                    );
-                    if (data.status) {
-                        setUsername(data.user);
-                    }
-                } catch (error) {
-                    console.error(error);
+            try {
+                const { data } = await axios.post(
+                    "http://localhost:5050/auth/verify",
+                    {},
+                    { withCredentials: true }
+                );
+                if (data.status) {
+                    setUsername(data.user.username);
                 }
+            } catch (error) {
+                console.error(error);
             }
         };
         fetchUser();
-    }, [cookies.token]);
+    }, []);
 
     const handleLogout = () => {
         removeCookie("token", { path: "/"});

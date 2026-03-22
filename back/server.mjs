@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import authRoute from './routes/AuthRoute.mjs';
 import api from "./routes/api.mjs";
+import gamesRoute from "./routes/GamesRoute.mjs";
 import './utils/loadEnvironment.mjs';
 import {errorHandler} from "./middlewares/ErrorHandler.mjs"; // Configuration dotenv centralisée
 
@@ -15,26 +16,7 @@ const { MONGODB_URI, PORT, CORS_ORIGIN, NODE_ENV } = process.env;
 // Sécurité avec Helmet
 app.use(helmet());
 
-// Rate limiting pour prévenir les attaques par brute force
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limite de 100 requêtes par IP
-    message: 'Too many requests from this IP, please try again later.'
-});
-
-app.use('/auth', rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 5, // Limite plus stricte pour l'authentification
-    message: 'Too many authentification attempts, please try again later.'
-}));
-
-app.use(limiter);
-
-// Middlewares
-app.use(express.json({ limit: '10mb' })); // Limite la taille des requêtes
-app.use(cookieParser());
-
-// Configuration CORS sécurisées
+// Configuration CORS sécurisées (doit être avant les rate limiters)
 const allowedOrigins = CORS_ORIGIN ? CORS_ORIGIN.split(',') : ['http://localhost:3000'];
 
 app.use(
@@ -52,6 +34,27 @@ app.use(
     })
 );
 
+// Rate limiting pour prévenir les attaques par brute force
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limite de 100 requêtes par IP
+    message: 'Too many requests from this IP, please try again later.'
+});
+
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 20, // Limite stricte pour login/signup uniquement
+    message: 'Too many authentification attempts, please try again later.'
+});
+app.use('/auth/login', authLimiter);
+app.use('/auth/signup', authLimiter);
+
+app.use(limiter);
+
+// Middlewares
+app.use(express.json({ limit: '10mb' })); // Limite la taille des requêtes
+app.use(cookieParser());
+
 // Logging des requêtes
 app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
@@ -61,6 +64,7 @@ app.use((req, res, next) => {
 // Routes
 app.use("/auth", authRoute);
 app.use("/api", api);
+app.use("/games", gamesRoute);
 
 app.use(errorHandler);
 

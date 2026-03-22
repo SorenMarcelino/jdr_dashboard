@@ -33,7 +33,7 @@ export function LoginForm({
     setError("");
     try {
       const { data } = await axios.post(
-          "http://127.0.0.1:5050/auth/login",
+          "http://localhost:5050/auth/login",
           {
             email,
             password
