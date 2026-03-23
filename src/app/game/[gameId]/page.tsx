@@ -2,11 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { use } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { Navbar } from "@/components/navbar";
 import { CharacterSheetViewer } from "@/components/character-sheet/CharacterSheetViewer";
 import { BentoGrid } from "@/components/bento/BentoGrid";
+import { SocketProvider } from "@/contexts/SocketContext";
+import { ChatPanel } from "@/components/chat/ChatPanel";
+
+const DiceScene = dynamic(() => import("@/components/dice/DiceScene").then((m) => m.DiceScene), { ssr: false });
 
 const API = "http://localhost:5050";
 
@@ -168,38 +173,43 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
             id: "chat",
             title: "Chat / Dés",
             defaultLayout: { x: 8, y: 5, w: 4, h: 5, minW: 2, minH: 2 },
-            content: <PlaceholderContent label="Chat & lancers de dés" />,
+            content: <ChatPanel gameId={gameId} currentUserId={currentUser._id} />,
         },
     ];
 
     return (
-        <div className="flex flex-col h-svh overflow-hidden bg-muted">
-            <Navbar />
+        <SocketProvider>
+            <div className="flex flex-col h-svh overflow-hidden bg-muted">
+                <Navbar />
 
-            {/* Barre de contexte */}
-            <div className="shrink-0 flex items-center justify-between px-4 py-2 border-b bg-background">
-                <div className="flex items-center gap-3">
-                    <h1 className="text-sm font-bold">{game.name}</h1>
-                    {isMJ && (
-                        <span className="text-xs bg-primary text-primary-foreground rounded-full px-2 py-0.5 font-semibold">MJ</span>
-                    )}
-                    <span className="text-xs text-muted-foreground">{game.characterSheet}</span>
-                </div>
-                {isMJ && (
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <span>Code :</span>
-                        <span className="font-mono font-bold tracking-widest bg-muted px-2 py-0.5 rounded">{game.inviteCode}</span>
+                {/* Barre de contexte */}
+                <div className="shrink-0 flex items-center justify-between px-4 py-2 border-b bg-background">
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-sm font-bold">{game.name}</h1>
+                        {isMJ && (
+                            <span className="text-xs bg-primary text-primary-foreground rounded-full px-2 py-0.5 font-semibold">MJ</span>
+                        )}
+                        <span className="text-xs text-muted-foreground">{game.characterSheet}</span>
                     </div>
-                )}
-            </div>
+                    {isMJ && (
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <span>Code :</span>
+                            <span className="font-mono font-bold tracking-widest bg-muted px-2 py-0.5 rounded">{game.inviteCode}</span>
+                        </div>
+                    )}
+                </div>
 
-            {/* Bento dashboard */}
-            <div className="flex-1 overflow-hidden p-3">
-                <BentoGrid
-                    items={bentoItems}
-                    storageKey={`bento-layout-${gameId}-${isMJ ? "mj" : "player"}`}
-                />
+                {/* Bento dashboard */}
+                <div className="flex-1 overflow-hidden p-3">
+                    <BentoGrid
+                        items={bentoItems}
+                        storageKey={`bento-layout-${gameId}-${isMJ ? "mj" : "player"}`}
+                    />
+                </div>
+
+                {/* 3D Dice overlay */}
+                <DiceScene gameId={gameId} currentUserId={currentUser._id} />
             </div>
-        </div>
+        </SocketProvider>
     );
 }

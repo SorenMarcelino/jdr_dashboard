@@ -1,9 +1,11 @@
+import http from 'node:http';
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import { Server as SocketIOServer } from 'socket.io';
 import authRoute from './routes/AuthRoute.mjs';
 import api from "./routes/api.mjs";
 import gamesRoute from "./routes/GamesRoute.mjs";
@@ -11,15 +13,27 @@ import characterSheetRoute from "./routes/CharacterSheetRoute.mjs";
 import './utils/loadEnvironment.mjs';
 import {errorHandler} from "./middlewares/ErrorHandler.mjs"; // Configuration dotenv centralisée
 import { seedMagnusArchives } from "./seeds/magnusArchivesSeed.mjs";
+import { setupSocketHandlers } from "./socket/socketHandler.mjs";
 
 const app = express();
+const server = http.createServer(app);
 const { MONGODB_URI, PORT, CORS_ORIGIN, NODE_ENV } = process.env;
 
 // Sécurité avec Helmet
 app.use(helmet());
 
 // Configuration CORS sécurisées (doit être avant les rate limiters)
-const allowedOrigins = CORS_ORIGIN ? CORS_ORIGIN.split(',') : ['http://localhost:3000'];
+const allowedOrigins = CORS_ORIGIN ? CORS_ORIGIN.split(',') : ['http://localhost:3000', 'http://localhost:3001'];
+
+// Socket.io
+const io = new SocketIOServer(server, {
+    cors: {
+        origin: allowedOrigins,
+        methods: ["GET", "POST"],
+        credentials: true,
+    },
+});
+setupSocketHandlers(io);
 
 app.use(
     cors({
@@ -76,10 +90,11 @@ mongoose
     .connect(MONGODB_URI)
     .then(async () => {
         await seedMagnusArchives();
-        app.listen(PORT, '0.0.0.0', () => {
+        server.listen(PORT, '0.0.0.0', () => {
             console.log(`Server is listening on port ${PORT}`);
             console.log(`Environment: ${NODE_ENV}`);
             console.log("MongoDB is connected successfully");
+            console.log("Socket.io is ready");
         });
     })
     .catch((error) => {
