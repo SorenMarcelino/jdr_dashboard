@@ -47,7 +47,7 @@ export function DiceScene({ gameId, currentUserId }: Props) {
                     texture: "marble",
                     material: "metal",
                 },
-                light_intensity: 1,
+                light_intensity: 2,
                 gravity_multiplier: 600,
                 baseScale: 100,
                 strength: 2,
