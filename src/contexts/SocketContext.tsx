@@ -27,6 +27,8 @@ export type DiceRollStartData = {
     username: string;
     diceType: string;
     quantity: number;
+    results: number[];
+    total: number;
 };
 
 type SocketContextValue = {

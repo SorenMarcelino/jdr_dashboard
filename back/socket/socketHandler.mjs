@@ -2,7 +2,7 @@ import { verifyAccessToken } from "../utils/SecretToken.mjs";
 import { User } from "../models/UserModel.mjs";
 import { Game } from "../models/GameModel.mjs";
 import { Message } from "../models/MessageModel.mjs";
-import { DICE_REGISTRY } from "../config/diceRegistry.mjs";
+import { DICE_REGISTRY, rollDice } from "../config/diceRegistry.mjs";
 
 function parseCookies(cookieHeader) {
     const cookies = {};
@@ -104,7 +104,7 @@ export function setupSocketHandlers(io) {
             }
         });
 
-        // Dice roll request — broadcast start to room, no results yet
+        // Dice roll — server generates results, broadcasts animation to all players
         socket.on("dice-roll", async ({ gameId, diceType, quantity }) => {
             try {
                 const config = DICE_REGISTRY[diceType];
@@ -114,13 +114,18 @@ export function setupSocketHandlers(io) {
 
                 const qty = Math.max(1, Math.min(quantity || 1, config.maxQuantity));
 
-                // Tell everyone a roll is starting (the roller's client will determine the result)
+                // Generate results server-side so all players get the same outcome
+                const { results, total } = rollDice(diceType, qty);
+
+                // Broadcast animation start with server results to ALL players
                 io.to(`game:${gameId}`).emit("dice-roll-start", {
                     gameId,
                     userId: socket.user._id.toString(),
                     username: socket.user.username,
                     diceType,
                     quantity: qty,
+                    results,
+                    total,
                 });
             } catch (err) {
                 console.error("[Socket] dice-roll error:", err);
@@ -128,7 +133,7 @@ export function setupSocketHandlers(io) {
             }
         });
 
-        // Dice roll complete — client sends physics-determined results
+        // Dice roll complete — roller sends back server results after animation
         socket.on("dice-roll-complete", async ({ gameId, diceType, quantity, results, total }) => {
             try {
                 const config = DICE_REGISTRY[diceType];

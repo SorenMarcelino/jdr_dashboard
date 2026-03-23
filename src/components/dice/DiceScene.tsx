@@ -9,25 +9,34 @@ type Props = {
     currentUserId: string;
 };
 
-type DiceRollResult = {
-    notation: string;
-    sets: Array<{
-        num: number;
-        type: string;
-        sides: number;
-        rolls: Array<{ type: string; sides: number; id: number; value: number }>;
-        total: number;
-    }>;
-    modifier: number;
-    total: number;
-};
+/**
+ * Convert a server-generated d100 total (1-100) into the two face values
+ * expected by the 3D dice library: [d100_tens, d10_units].
+ * d100 die faces: 10,20,...,90,100(="00")
+ * d10  die faces: 1,2,...,9,10(="0")
+ */
+function d100ToFaces(total: number): [number, number] {
+    if (total === 100) return [100, 10];
+    const units = total % 10;
+    const tens = total - units;
+    return [
+        tens === 0 ? 100 : tens,
+        units === 0 ? 10 : units,
+    ];
+}
 
 export function DiceScene({ gameId, currentUserId }: Props) {
     const { onDiceRollStart, completeDiceRoll } = useSocket();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const boxRef = useRef<any>(null);
     const [visible, setVisible] = useState(false);
-    const rollMetaRef = useRef<{ diceType: DiceType; gameId: string } | null>(null);
+    const rollMetaRef = useRef<{
+        diceType: DiceType;
+        gameId: string;
+        isRoller: boolean;
+        results: number[];
+        total: number;
+    } | null>(null);
     const completeDiceRollRef = useRef(completeDiceRoll);
     completeDiceRollRef.current = completeDiceRoll;
 
@@ -52,33 +61,20 @@ export function DiceScene({ gameId, currentUserId }: Props) {
                 baseScale: 100,
                 strength: 2,
                 sounds: false,
-                onRollComplete: (results: DiceRollResult) => {
+                onRollComplete: () => {
                     const meta = rollMetaRef.current;
                     if (!meta) return;
 
-                    const rolls: number[] = [];
-                    for (const set of results.sets) {
-                        for (const roll of set.rolls) {
-                            rolls.push(roll.value);
-                        }
+                    // Only the roller sends the server-generated results to finalize the roll
+                    if (meta.isRoller) {
+                        completeDiceRollRef.current(
+                            meta.gameId,
+                            meta.diceType,
+                            meta.results.length,
+                            meta.results,
+                            meta.total,
+                        );
                     }
-
-                    let total = results.total;
-
-                    // d100: d100 returns 10-100 (100="00"), d10 returns 1-10 (10="0")
-                    if (meta.diceType === "d100" && rolls.length === 2) {
-                        const tens = rolls[0] % 100;  // 100 → 0 (face "00"), 10-90 stay
-                        const units = rolls[1] % 10;  // 10 → 0 (face "0"), 1-9 stay
-                        total = tens + units || 100;   // 0+0 = 100
-                    }
-
-                    completeDiceRollRef.current(
-                        meta.gameId,
-                        meta.diceType,
-                        rolls.length,
-                        rolls,
-                        total,
-                    );
 
                     setTimeout(() => {
                         setVisible(false);
@@ -98,28 +94,55 @@ export function DiceScene({ gameId, currentUserId }: Props) {
         };
     }, []);
 
-    // Handle incoming dice roll events
+    // Handle incoming dice roll events — ALL players see the animation
     const handleRollStart = useCallback(
         (data: DiceRollStartData) => {
-            if (data.userId !== currentUserId || data.gameId !== gameId) return;
+            if (data.gameId !== gameId) return;
 
             const box = boxRef.current;
             if (!box) return;
 
             const dType = data.diceType as DiceType;
-            rollMetaRef.current = { diceType: dType, gameId: data.gameId };
+
+            // Store server results + whether this user is the roller
+            rollMetaRef.current = {
+                diceType: dType,
+                gameId: data.gameId,
+                isRoller: data.userId === currentUserId,
+                results: data.results,
+                total: data.total,
+            };
 
             // Build dice notation
             let notation: string;
             if (dType === "d100") {
-                // d100 (tens: 00-90) + d10 (units: 0-9)
                 notation = "1d100+1d10";
             } else {
                 notation = `${data.quantity}${dType}`;
             }
 
+            // Build the face values the 3D dice must land on
+            let faceValues: number[];
+            if (dType === "d100") {
+                faceValues = d100ToFaces(data.total);
+            } else {
+                faceValues = data.results;
+            }
+
+            // Roll with forced values:
+            // 1. startClickThrow generates random physics vectors
+            // 2. We inject .result so the lib swaps dice faces after physics
+            // 3. rollDice runs simulation + animation with correct faces
             setVisible(true);
-            box.roll(notation);
+            box.notationVectors = box.startClickThrow(notation);
+            if (box.notationVectors) {
+                box.notationVectors.result = faceValues;
+                box.rollDice(() => {
+                    const results = box.getDiceResults();
+                    box.onRollComplete(results);
+                    document.dispatchEvent(new CustomEvent("rollComplete", { detail: results }));
+                });
+            }
         },
         [gameId, currentUserId],
     );
