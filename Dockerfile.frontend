@@ -1,0 +1,14 @@
+FROM node:20-slim
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY src/ ./src/
+COPY public/ ./public/
+COPY next.config.ts tsconfig.json tailwind.config.ts postcss.config.mjs components.json ./
+
+EXPOSE 3000
+
+CMD ["npx", "next", "dev", "--turbopack"]

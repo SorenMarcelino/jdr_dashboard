@@ -1,0 +1,37 @@
+services:
+  mongodb:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: jdr_dashboard
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "5050:5050"
+    depends_on:
+      - mongodb
+    environment:
+      NODE_ENV: development
+      PORT: 5050
+      MONGODB_URI: mongodb://mongodb:27017/jdr_dashboard
+      TOKEN_KEY: ${TOKEN_KEY:-change_me_secret_key}
+      REFRESH_TOKEN_KEY: ${REFRESH_TOKEN_KEY:-change_me_refresh_secret_key}
+      CORS_ORIGIN: http://localhost:3000
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:

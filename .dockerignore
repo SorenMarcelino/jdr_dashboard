@@ -1,0 +1,15 @@
+node_modules
+.next
+.git
+.gitignore
+.env
+.env.test
+back/.env
+back/.env.test
+.DS_Store
+.idea
+.vercel
+coverage
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
