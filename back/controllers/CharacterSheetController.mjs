@@ -111,7 +111,7 @@ export async function updateSheet(req, res, next) {
 
         const game = await Game.findById(gameId);
         const isMJ = game && game.createdBy.toString() === userId.toString();
-        const isOwner = sheet.playerId.toString() === userId.toString();
+        const isOwner = sheet.playerId && sheet.playerId.toString() === userId.toString();
 
         if (!isMJ && !isOwner) {
             return res.status(403).json({ success: false, message: "Accès refusé." });
@@ -121,6 +121,107 @@ export async function updateSheet(req, res, next) {
         await sheet.save();
 
         res.json({ success: true, sheet });
+    } catch (err) {
+        next(err);
+    }
+}
+
+// ──────────────────────────────────────
+// PNJ (NPC) sheets — MJ only
+// ──────────────────────────────────────
+
+async function assertMJ(gameId, userId) {
+    const game = await Game.findById(gameId);
+    if (!game) {
+        const err = new Error("Partie introuvable.");
+        err.statusCode = 404;
+        throw err;
+    }
+    if (game.createdBy.toString() !== userId.toString()) {
+        const err = new Error("Réservé au MJ.");
+        err.statusCode = 403;
+        throw err;
+    }
+    return game;
+}
+
+// GET /games/:gameId/npc-sheets
+export async function getNpcSheets(req, res, next) {
+    try {
+        const { gameId } = req.params;
+        await assertMJ(gameId, req.user._id);
+
+        const sheets = await CharacterSheetInstance.find({ gameId, isNpc: true });
+        res.json({ success: true, sheets });
+    } catch (err) {
+        next(err);
+    }
+}
+
+// POST /games/:gameId/npc-sheets
+export async function createNpcSheet(req, res, next) {
+    try {
+        const { gameId } = req.params;
+        const { npcName, values } = req.body;
+
+        const game = await assertMJ(gameId, req.user._id);
+
+        if (!npcName || !npcName.trim()) {
+            return res.status(400).json({ success: false, message: "Le nom du PNJ est requis." });
+        }
+
+        const systemId = req.body.systemId || game.characterSheet;
+        const sheet = await CharacterSheetInstance.create({
+            gameId,
+            playerId: null,
+            systemId,
+            isNpc: true,
+            npcName: npcName.trim(),
+            values: values || {},
+        });
+        res.status(201).json({ success: true, sheet });
+    } catch (err) {
+        next(err);
+    }
+}
+
+// PUT /games/:gameId/npc-sheets/:sheetId
+export async function updateNpcSheet(req, res, next) {
+    try {
+        const { gameId, sheetId } = req.params;
+        const { values, npcName } = req.body;
+
+        await assertMJ(gameId, req.user._id);
+
+        const sheet = await CharacterSheetInstance.findById(sheetId);
+        if (!sheet || !sheet.isNpc || sheet.gameId.toString() !== gameId) {
+            return res.status(404).json({ success: false, message: "Fiche PNJ introuvable." });
+        }
+
+        if (values !== undefined) sheet.values = values;
+        if (npcName !== undefined) sheet.npcName = npcName;
+        await sheet.save();
+
+        res.json({ success: true, sheet });
+    } catch (err) {
+        next(err);
+    }
+}
+
+// DELETE /games/:gameId/npc-sheets/:sheetId
+export async function deleteNpcSheet(req, res, next) {
+    try {
+        const { gameId, sheetId } = req.params;
+
+        await assertMJ(gameId, req.user._id);
+
+        const sheet = await CharacterSheetInstance.findById(sheetId);
+        if (!sheet || !sheet.isNpc || sheet.gameId.toString() !== gameId) {
+            return res.status(404).json({ success: false, message: "Fiche PNJ introuvable." });
+        }
+
+        await sheet.deleteOne();
+        res.json({ success: true });
     } catch (err) {
         next(err);
     }

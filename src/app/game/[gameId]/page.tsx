@@ -10,6 +10,8 @@ import { CharacterSheetViewer } from "@/components/character-sheet/CharacterShee
 import { BentoGrid } from "@/components/bento/BentoGrid";
 import { SocketProvider } from "@/contexts/SocketContext";
 import { ChatPanel } from "@/components/chat/ChatPanel";
+import Link from "next/link";
+import { resolveSystemId } from "@/lib/system-id";
 
 const DiceScene = dynamic(() => import("@/components/dice/DiceScene").then((m) => m.DiceScene), { ssr: false });
 
@@ -29,15 +31,6 @@ type Game = {
     players: User[];
     inviteCode: string;
 };
-
-const SYSTEM_ID_MAP: Record<string, string> = {
-    "Magnus Archives": "magnus_archives",
-    "magnus_archives": "magnus_archives",
-};
-
-function resolveSystemId(characterSheet: string): string {
-    return SYSTEM_ID_MAP[characterSheet] ?? characterSheet.toLowerCase().replace(/\s+/g, "_");
-}
 
 function PlaceholderContent({ label }: { label: string }) {
     return (
@@ -192,9 +185,17 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
                         <span className="text-xs text-muted-foreground">{game.characterSheet}</span>
                     </div>
                     {isMJ && (
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <span>Code :</span>
-                            <span className="font-mono font-bold tracking-widest bg-muted px-2 py-0.5 rounded">{game.inviteCode}</span>
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                            <Link
+                                href={`/game/${gameId}/scenario`}
+                                className="px-2.5 py-1 rounded-md bg-muted hover:bg-accent text-foreground font-medium transition-colors"
+                            >
+                                Scénarios
+                            </Link>
+                            <div className="flex items-center gap-2">
+                                <span>Code :</span>
+                                <span className="font-mono font-bold tracking-widest bg-muted px-2 py-0.5 rounded">{game.inviteCode}</span>
+                            </div>
                         </div>
                     )}
                 </div>

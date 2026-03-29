@@ -7,6 +7,10 @@ import {
     getMySheet,
     createSheet,
     updateSheet,
+    getNpcSheets,
+    createNpcSheet,
+    updateNpcSheet,
+    deleteNpcSheet,
 } from "../controllers/CharacterSheetController.mjs";
 
 const router = express.Router();
@@ -23,3 +27,9 @@ gameSheetRouter.get("/character-sheets", requireAuth, getAllSheetsForGame);
 gameSheetRouter.get("/character-sheets/me", requireAuth, getMySheet);
 gameSheetRouter.post("/character-sheets", requireAuth, createSheet);
 gameSheetRouter.put("/character-sheets/:sheetId", requireAuth, updateSheet);
+
+// NPC sheets (MJ only)
+gameSheetRouter.get("/npc-sheets", requireAuth, getNpcSheets);
+gameSheetRouter.post("/npc-sheets", requireAuth, createNpcSheet);
+gameSheetRouter.put("/npc-sheets/:sheetId", requireAuth, updateNpcSheet);
+gameSheetRouter.delete("/npc-sheets/:sheetId", requireAuth, deleteNpcSheet);

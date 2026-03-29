@@ -53,7 +53,7 @@ app.use(
 // Rate limiting pour prévenir les attaques par brute force
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limite de 100 requêtes par IP
+    max: NODE_ENV === 'production' ? 100 : 500,
     message: 'Too many requests from this IP, please try again later.'
 });
 

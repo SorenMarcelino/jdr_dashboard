@@ -52,7 +52,7 @@ export function MagnusArchivesSheet({ template, instance, isEditable, onSave }: 
     };
 
     const bySection = template.fields.reduce<Record<string, FieldDef[]>>((acc, f) => {
-        (acc[f.section] ??= []).push(f);
+        (acc[f.section ?? "other"] ??= []).push(f);
         return acc;
     }, {});
 

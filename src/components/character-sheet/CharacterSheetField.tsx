@@ -9,6 +9,7 @@ export type FieldDef = {
     id: string;
     label: string;
     type: "text" | "number" | "textarea" | "checkbox" | "damage-track";
+    section?: string;
     defaultValue?: unknown;
     options?: string[];
 };

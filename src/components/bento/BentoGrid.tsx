@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
-import GridLayout, { Layout } from "react-grid-layout";
+import { GridLayout, type Layout, type LayoutItem } from "react-grid-layout";
 
 type BentoItem = {
     id: string;
     title: string;
-    defaultLayout: Omit<Layout, "i">;
+    defaultLayout: Omit<LayoutItem, "i">;
     content: React.ReactNode;
     headerRight?: React.ReactNode;
 };
@@ -57,12 +57,12 @@ export function BentoGrid({ items, storageKey }: Props) {
     const [rowHeight, setRowHeight] = useState(60);
 
     // Charger le layout sauvegardé ou utiliser le défaut
-    const defaultLayout: Layout[] = items.map((item) => ({
+    const defaultLayout: LayoutItem[] = items.map((item) => ({
         i: item.id,
         ...item.defaultLayout,
     }));
 
-    const [layout, setLayout] = useState<Layout[]>(() => {
+    const [layout, setLayout] = useState<LayoutItem[]>(() => {
         if (!storageKey || typeof window === "undefined") return defaultLayout;
         try {
             const saved = localStorage.getItem(storageKey);
@@ -93,8 +93,8 @@ export function BentoGrid({ items, storageKey }: Props) {
     }, [layout]);
 
     const handleLayoutChange = useCallback(
-        (newLayout: Layout[]) => {
-            setLayout(newLayout);
+        (newLayout: Layout) => {
+            setLayout([...newLayout]);
             if (storageKey) {
                 localStorage.setItem(storageKey, JSON.stringify(newLayout));
             }
@@ -110,16 +110,20 @@ export function BentoGrid({ items, storageKey }: Props) {
         <div ref={containerRef} className="h-full w-full overflow-auto">
             <GridLayout
                 layout={layout}
-                cols={COLS}
-                rowHeight={rowHeight}
                 width={containerWidth}
-                margin={MARGIN}
-                containerPadding={[0, 0]}
-                draggableHandle=".drag-handle"
+                gridConfig={{
+                    cols: COLS,
+                    rowHeight,
+                    margin: MARGIN,
+                    containerPadding: [0, 0],
+                }}
+                dragConfig={{
+                    handle: ".drag-handle",
+                }}
+                resizeConfig={{
+                    handles: ["se", "sw", "ne", "nw", "e", "w", "n", "s"],
+                }}
                 onLayoutChange={handleLayoutChange}
-                resizeHandles={["se", "sw", "ne", "nw", "e", "w", "n", "s"]}
-                isResizable
-                isDraggable
             >
                 {items.map((item) => (
                     <div key={item.id}>

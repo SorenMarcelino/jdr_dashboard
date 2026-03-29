@@ -106,3 +106,59 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Scenario editor — annotation marks */
+.scenario-page-link {
+  @apply text-primary underline decoration-primary/50 cursor-pointer font-medium;
+  text-decoration-style: solid;
+}
+.scenario-page-link:hover {
+  @apply decoration-primary;
+}
+
+.scenario-npc-ref {
+  @apply text-chart-2 underline decoration-chart-2/50 cursor-pointer font-medium;
+  text-decoration-style: solid;
+}
+.scenario-npc-ref:hover {
+  @apply decoration-chart-2;
+}
+
+.scenario-annotation {
+  @apply border-b-2 border-dotted border-chart-4 cursor-help;
+}
+
+/* TipTap editor */
+.tiptap p.is-editor-empty:first-child::before {
+  @apply text-muted-foreground/50 float-left h-0 pointer-events-none;
+  content: attr(data-placeholder);
+}
+
+/* TipTap heading & list styles (reinforce prose) */
+.tiptap h1 {
+  @apply text-2xl font-bold mt-6 mb-3;
+}
+.tiptap h2 {
+  @apply text-xl font-semibold mt-5 mb-2;
+}
+.tiptap h3 {
+  @apply text-lg font-semibold mt-4 mb-2;
+}
+.tiptap ul {
+  @apply list-disc pl-6 my-2;
+}
+.tiptap ol {
+  @apply list-decimal pl-6 my-2;
+}
+.tiptap li {
+  @apply my-0.5;
+}
+.tiptap li p {
+  @apply my-0;
+}
+.tiptap blockquote {
+  @apply border-l-4 border-border pl-4 italic text-muted-foreground my-3;
+}
+.tiptap hr {
+  @apply border-border my-4;
+}

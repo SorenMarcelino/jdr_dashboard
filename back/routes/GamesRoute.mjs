@@ -3,6 +3,7 @@ import { requireAuth } from "../middlewares/AuthMiddleware.mjs";
 import { createGame, getUserGames, joinGame } from "../controllers/GameController.mjs";
 import { gameSheetRouter } from "./CharacterSheetRoute.mjs";
 import { chatRouter } from "./ChatRoute.mjs";
+import { scenarioRouter } from "./ScenarioRoute.mjs";
 
 const router = express.Router();
 
@@ -15,5 +16,8 @@ router.use("/:gameId", gameSheetRouter);
 
 // Routes chat / messages pour une partie
 router.use("/:gameId", chatRouter);
+
+// Routes scénarios pour une partie
+router.use("/:gameId", scenarioRouter);
 
 export default router;
