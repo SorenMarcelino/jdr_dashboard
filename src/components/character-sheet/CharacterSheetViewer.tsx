@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { MagnusArchivesSheet } from "./MagnusArchivesSheet";
+import { GenericCharacterSheet, Template as SheetTemplate } from "./GenericCharacterSheet";
 
-type Template = {
+type Template = SheetTemplate & {
     systemId: string;
-    fields: unknown[];
 };
 
 type Instance = {
@@ -90,16 +89,12 @@ export function CharacterSheetViewer({ systemId, gameId, playerId, isEditable = 
     if (error) return <p className="text-sm text-destructive">{error}</p>;
     if (!template) return <p className="text-sm text-muted-foreground">Template introuvable.</p>;
 
-    if (systemId === "magnus_archives") {
-        return (
-            <MagnusArchivesSheet
-                template={template as Parameters<typeof MagnusArchivesSheet>[0]["template"]}
-                instance={instance}
-                isEditable={isEditable}
-                onSave={handleSave}
-            />
-        );
-    }
-
-    return <p className="text-sm text-muted-foreground">Système de fiche non supporté : {systemId}</p>;
+    return (
+        <GenericCharacterSheet
+            template={template}
+            instance={instance}
+            isEditable={isEditable}
+            onSave={handleSave}
+        />
+    );
 }

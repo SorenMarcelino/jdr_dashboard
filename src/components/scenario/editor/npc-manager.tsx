@@ -6,8 +6,7 @@ import { Plus, Pencil, Trash2, ArrowLeft } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MagnusArchivesSheet } from "@/components/character-sheet/MagnusArchivesSheet";
-import type { FieldDef } from "@/components/character-sheet/CharacterSheetField";
+import { GenericCharacterSheet, type Template as SheetTemplate } from "@/components/character-sheet/GenericCharacterSheet";
 
 const API = "http://localhost:5050";
 
@@ -18,9 +17,8 @@ type NpcSheet = {
     values: Record<string, unknown>;
 };
 
-type Template = {
+type Template = SheetTemplate & {
     systemId: string;
-    fields: FieldDef[];
 };
 
 type Props = {
@@ -301,7 +299,7 @@ function EditView({
         return <p className="text-sm text-muted-foreground text-center py-8">Template introuvable.</p>;
     }
 
-    // Build instance object compatible with MagnusArchivesSheet
+    // Build instance object compatible with GenericCharacterSheet
     const instance = {
         _id: sheet._id,
         systemId: sheet.systemId,
@@ -321,16 +319,12 @@ function EditView({
                 />
             </div>
 
-            {systemId === "magnus_archives" ? (
-                <MagnusArchivesSheet
-                    template={template}
-                    instance={instance}
-                    isEditable={true}
-                    onSave={(values) => onSave(sheet._id, values)}
-                />
-            ) : (
-                <p className="text-sm text-muted-foreground">Système non supporté : {systemId}</p>
-            )}
+            <GenericCharacterSheet
+                template={template}
+                instance={instance}
+                isEditable={true}
+                onSave={(values) => onSave(sheet._id, values)}
+            />
         </div>
     );
 }

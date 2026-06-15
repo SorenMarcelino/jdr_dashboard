@@ -31,15 +31,11 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const CHARACTER_SHEETS = [
-    { value: "dnd5e", label: "Donjons & Dragons 5e" },
-    { value: "pathfinder2e", label: "Pathfinder 2e" },
-    { value: "callofcthulhu", label: "L'Appel de Cthulhu" },
-    { value: "magnus_archives", label: "The Magnus Archives" },
-    { value: "custom", label: "Personnalisée" },
-];
+const API = "http://localhost:5050";
+
+type SheetOption = { value: string; label: string };
 
 const formSchema = z.object({
     name: z.string().min(2, { message: "Le nom doit contenir au moins 2 caractères." }),
@@ -50,6 +46,24 @@ const formSchema = z.object({
 
 export function ProfileForm({ onCreated }: { onCreated?: () => void }) {
     const [open, setOpen] = useState(false);
+    const [sheets, setSheets] = useState<SheetOption[]>([]);
+
+    // Liste des systèmes de fiche disponibles, pilotée par les templates en base.
+    useEffect(() => {
+        axios
+            .get(`${API}/character-sheets/templates`, { withCredentials: true })
+            .then(({ data }) => {
+                if (data.success) {
+                    setSheets(
+                        data.templates.map((t: { systemId: string; name: string }) => ({
+                            value: t.systemId,
+                            label: t.name,
+                        }))
+                    );
+                }
+            })
+            .catch((err) => console.error("Erreur chargement templates:", err));
+    }, []);
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -136,11 +150,17 @@ export function ProfileForm({ onCreated }: { onCreated?: () => void }) {
                                     </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                    {CHARACTER_SHEETS.map((sheet) => (
-                                        <SelectItem key={sheet.value} value={sheet.value}>
-                                            {sheet.label}
+                                    {sheets.length === 0 ? (
+                                        <SelectItem value="__none" disabled>
+                                            Aucun système disponible
                                         </SelectItem>
-                                    ))}
+                                    ) : (
+                                        sheets.map((sheet) => (
+                                            <SelectItem key={sheet.value} value={sheet.value}>
+                                                {sheet.label}
+                                            </SelectItem>
+                                        ))
+                                    )}
                                 </SelectContent>
                             </Select>
                             <FormMessage />

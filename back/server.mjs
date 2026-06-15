@@ -13,6 +13,7 @@ import characterSheetRoute from "./routes/CharacterSheetRoute.mjs";
 import './utils/loadEnvironment.mjs';
 import {errorHandler} from "./middlewares/ErrorHandler.mjs"; // Configuration dotenv centralisée
 import { seedMagnusArchives } from "./seeds/magnusArchivesSeed.mjs";
+import { seedCallOfCthulhu } from "./seeds/callOfCthulhuSeed.mjs";
 import { setupSocketHandlers } from "./socket/socketHandler.mjs";
 
 const app = express();
@@ -90,6 +91,7 @@ mongoose
     .connect(MONGODB_URI)
     .then(async () => {
         await seedMagnusArchives();
+        await seedCallOfCthulhu();
         server.listen(PORT, '0.0.0.0', () => {
             console.log(`Server is listening on port ${PORT}`);
             console.log(`Environment: ${NODE_ENV}`);
