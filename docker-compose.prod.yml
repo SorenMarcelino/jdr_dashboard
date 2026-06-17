@@ -4,12 +4,15 @@
 # Différences avec docker-compose.yml (dev) :
 # - Pas de binding de ports sur backend/frontend : ils ne sont joignables que
 #   sur le réseau docker. Caddy est le seul point d'entrée internet.
-# - Caddy termine le TLS via Let's Encrypt pour $SITE_HOSTNAME (défini dans .env).
+# - Pas de service caddy ici : le Caddy de TelemetryAdvisor fait office de
+#   reverse-proxy partagé via le réseau proxy_net (créer avec :
+#   docker network create proxy_net).
 # - NODE_ENV=production (cookies secure, pas de seeds, messages d'erreur masqués).
 # - La base est MongoDB Atlas (MONGODB_URI dans .env), pas un conteneur local.
 
 services:
   backend:
+    container_name: jdr-backend
     build:
       context: .
       dockerfile: Dockerfile.backend
@@ -18,9 +21,13 @@ services:
       NODE_ENV: production
       PORT: 5050
       CORS_ORIGIN: https://${SITE_HOSTNAME}
+    networks:
+      - default
+      - proxy_net
     restart: unless-stopped
 
   frontend:
+    container_name: jdr-frontend
     build:
       context: .
       dockerfile: Dockerfile.frontend
@@ -31,24 +38,11 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+    networks:
+      - default
+      - proxy_net
     restart: unless-stopped
 
-  caddy:
-    image: caddy:2-alpine
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    environment:
-      SITE_HOSTNAME: ${SITE_HOSTNAME}
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
-    depends_on:
-      frontend:
-        condition: service_healthy
-
-volumes:
-  caddy_data:
-  caddy_config:
+networks:
+  proxy_net:
+    external: true
