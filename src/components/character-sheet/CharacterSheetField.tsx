@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
@@ -191,9 +192,9 @@ export function CharacterSheetField({ field, value, onChange, readOnly = false }
         return (
             <div className="flex flex-col gap-2">
                 <Label htmlFor={id} className="text-xs font-medium">{label}</Label>
-                <div className="w-full aspect-square rounded-lg overflow-hidden border bg-muted flex items-center justify-center max-w-[120px]">
+                <div className="relative w-full aspect-square rounded-lg overflow-hidden border bg-muted flex items-center justify-center max-w-[120px]">
                     {url
-                        ? <img src={url} alt={label} className="w-full h-full object-cover" />
+                        ? <Image src={url} alt={label} fill unoptimized sizes="120px" className="object-cover" />
                         : <span className="text-3xl text-muted-foreground">👤</span>
                     }
                 </div>

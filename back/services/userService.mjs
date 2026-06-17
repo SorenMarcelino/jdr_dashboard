@@ -64,14 +64,19 @@ export const deleteUser = async (userId) => {
     return user;
 };
 
+// Échappe les métacaractères regex pour éviter l'injection de motif / ReDoS
+const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 /**
  * Rechercher les utilisateurs par critères
  */
 export const searchUsers = async (searchTerm) => {
+    const safe = escapeRegex(String(searchTerm).trim());
+    if (!safe) return [];
     return await User.find({
         $or: [
-            {username: {$regex: searchTerm, $options: 'i'}},
-            {email: {$regex: searchTerm, $options: 'i'}}
+            {username: {$regex: safe, $options: 'i'}},
+            {email: {$regex: safe, $options: 'i'}}
         ]
     }).select('-password').limit(20);
 };

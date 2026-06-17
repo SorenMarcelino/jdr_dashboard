@@ -10,8 +10,9 @@ import { ScenarioReader } from "./reader/ScenarioReader";
 import { ScenarioGraph } from "./graph/ScenarioGraph";
 import { NpcManager } from "./editor/npc-manager";
 import { resolveSystemId } from "@/lib/system-id";
+import { API_URL } from "@/lib/api";
 
-const API = "http://localhost:5050";
+const API = API_URL;
 
 type Props = {
     gameId: string;

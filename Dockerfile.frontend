@@ -1,14 +1,43 @@
-FROM node:20-slim
-
+# Build Next.js en mode standalone, servi ensuite par le serveur Node généré.
+FROM node:20-alpine AS build
 WORKDIR /app
 
 COPY package.json package-lock.json ./
 RUN npm ci
 
-COPY src/ ./src/
-COPY public/ ./public/
-COPY next.config.ts tsconfig.json tailwind.config.ts postcss.config.mjs components.json ./
+COPY . .
+
+# En production, frontend et API sont same-origin (Caddy proxifie par chemin),
+# donc les URLs sont relatives : on laisse NEXT_PUBLIC_* vides par défaut.
+ARG NEXT_PUBLIC_API_URL=""
+ARG NEXT_PUBLIC_SOCKET_URL=""
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_SOCKET_URL=$NEXT_PUBLIC_SOCKET_URL
+ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN npm run build
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+# Next standalone lit HOSTNAME pour choisir son interface. Docker met sinon l'ID
+# du conteneur → écoute sur l'IP du conteneur uniquement (healthcheck localhost KO).
+# 0.0.0.0 = écoute sur toutes les interfaces.
+ENV HOSTNAME=0.0.0.0
+
+# Sortie standalone : serveur Node minimal + assets statiques.
+COPY --from=build /app/public ./public
+COPY --from=build /app/.next/standalone ./
+COPY --from=build /app/.next/static ./.next/static
+
+# Tourne en utilisateur non-root (présent dans l'image officielle node)
+USER node
 
 EXPOSE 3000
 
-CMD ["npx", "next", "dev", "--turbopack"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+    CMD node -e "fetch('http://localhost:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+
+CMD ["node", "server.js"]

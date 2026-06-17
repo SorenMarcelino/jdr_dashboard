@@ -13,8 +13,9 @@ import { AnnotationPopover } from "./AnnotationPopover";
 import { ScenarioPageLinkMark } from "./extensions/ScenarioPageLinkMark";
 import { NpcReferenceMark } from "./extensions/NpcReferenceMark";
 import { AnnotationMark } from "./extensions/AnnotationMark";
+import { API_URL } from "@/lib/api";
 
-const API = "http://localhost:5050";
+const API = API_URL;
 
 type Props = {
     gameId: string;

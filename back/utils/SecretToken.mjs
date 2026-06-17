@@ -1,10 +1,15 @@
 import jwt from 'jsonwebtoken';
+import crypto from 'node:crypto';
+
+// Hash du refresh token avant stockage en DB. Le token étant un JWT à haute
+// entropie (pas un mot de passe), un SHA-256 sans sel suffit : en cas de fuite
+// de la base, les tokens stockés ne sont pas rejouables.
+export const hashToken = (token) =>
+    crypto.createHash('sha256').update(token).digest('hex');
 
 const getTokenKey = () => {
     const key = process.env.TOKEN_KEY;
     if (!key) {
-        console.error('❌ TOKEN_KEY is missing!');
-        console.error('   Available env vars:', Object.keys(process.env).filter(k => k.includes('TOKEN')));
         throw new Error('TOKEN_KEY is required');
     }
     return key;

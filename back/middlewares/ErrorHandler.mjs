@@ -1,5 +1,7 @@
+import logger from "../utils/logger.mjs";
+
 export const errorHandler = (err, req, res, next) => {
-    console.error('Error:', err);
+    logger.error({ err, path: req.originalUrl, method: req.method }, "Request error");
 
     if (err.name === 'ValidationError') {
         const errors = Object.values(err.errors).map(e => e.message);
@@ -39,8 +41,17 @@ export const errorHandler = (err, req, res, next) => {
         });
     }
 
-    res.status(err.status || 500).json({
+    const status = err.status || err.statusCode || 500;
+
+    // En production, on ne divulgue pas les détails internes des erreurs 500.
+    const isProd = process.env.NODE_ENV === 'production';
+    const message =
+        status >= 500 && isProd
+            ? 'Internal server error'
+            : err.message || 'Internal server error';
+
+    res.status(status).json({
         success: false,
-        message: err.message || 'Internal server error'
+        message
     });
 };

@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Search } from "lucide-react";
+import { API_URL } from "@/lib/api";
 
-const API = "http://localhost:5050";
+const API = API_URL;
 
 type NpcSheet = {
     _id: string;

@@ -1,4 +1,17 @@
 import mongoose from "mongoose";
+import crypto from "node:crypto";
+
+// Génère un code d'invitation de 6 caractères, cryptographiquement aléatoire,
+// sans caractères ambigus (0/O, 1/I).
+const INVITE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+export const generateInviteCode = (length = 6) => {
+    const bytes = crypto.randomBytes(length);
+    let code = "";
+    for (let i = 0; i < length; i++) {
+        code += INVITE_ALPHABET[bytes[i] % INVITE_ALPHABET.length];
+    }
+    return code;
+};
 
 const gameSchema = new mongoose.Schema({
     name: {
@@ -39,7 +52,7 @@ const gameSchema = new mongoose.Schema({
 // Génère un code d'invitation unique avant la sauvegarde
 gameSchema.pre("save", function (next) {
     if (!this.inviteCode) {
-        this.inviteCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+        this.inviteCode = generateInviteCode();
     }
     next();
 });

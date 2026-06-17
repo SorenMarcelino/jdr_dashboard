@@ -81,16 +81,30 @@ export async function createSheet(req, res, next) {
     try {
         const { gameId } = req.params;
         const userId = req.user._id;
-        const { systemId, values } = req.body;
+        const { systemId, values, playerId } = req.body;
 
-        await assertGameAccess(gameId, userId);
+        const { game, isCreator } = await assertGameAccess(gameId, userId);
 
-        const existing = await CharacterSheetInstance.findOne({ gameId, playerId: userId });
-        if (existing) {
-            return res.status(409).json({ success: false, message: "Vous avez déjà une fiche pour cette partie." });
+        // Cible par défaut : soi-même. Le MJ peut créer la fiche d'un joueur
+        // de sa partie (édition depuis le panneau MJ).
+        let targetPlayerId = userId;
+        if (playerId && playerId.toString() !== userId.toString()) {
+            if (!isCreator) {
+                return res.status(403).json({ success: false, message: "Accès refusé." });
+            }
+            const isMember = game.players.some((p) => p.toString() === playerId.toString());
+            if (!isMember) {
+                return res.status(400).json({ success: false, message: "Ce joueur n'est pas membre de la partie." });
+            }
+            targetPlayerId = playerId;
         }
 
-        const sheet = await CharacterSheetInstance.create({ gameId, playerId: userId, systemId, values: values || {} });
+        const existing = await CharacterSheetInstance.findOne({ gameId, playerId: targetPlayerId });
+        if (existing) {
+            return res.status(409).json({ success: false, message: "Une fiche existe déjà pour ce joueur." });
+        }
+
+        const sheet = await CharacterSheetInstance.create({ gameId, playerId: targetPlayerId, systemId, values: values || {} });
         res.status(201).json({ success: true, sheet });
     } catch (err) {
         next(err);

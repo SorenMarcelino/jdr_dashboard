@@ -1,0 +1,14 @@
+# Caddy provisionne et renouvelle automatiquement un certificat Let's Encrypt
+# pour $SITE_HOSTNAME. Le HTTP (:80) est redirigé vers HTTPS automatiquement.
+{$SITE_HOSTNAME} {
+	encode gzip zstd
+
+	header Strict-Transport-Security "max-age=31536000"
+
+	# Routes servies par l'API Express (le reste va au frontend Next.js).
+	# Caddy gère le websocket de Socket.io de façon transparente.
+	@backend path /auth/* /api/* /games/* /character-sheets/* /socket.io/* /health
+	reverse_proxy @backend backend:5050
+
+	reverse_proxy frontend:3000
+}

@@ -12,10 +12,11 @@ import { SocketProvider } from "@/contexts/SocketContext";
 import { ChatPanel } from "@/components/chat/ChatPanel";
 import Link from "next/link";
 import { resolveSystemId } from "@/lib/system-id";
+import { API_URL } from "@/lib/api";
 
 const DiceScene = dynamic(() => import("@/components/dice/DiceScene").then((m) => m.DiceScene), { ssr: false });
 
-const API = "http://localhost:5050";
+const API = API_URL;
 
 type User = {
     _id: string;
@@ -53,15 +54,15 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
     useEffect(() => {
         const load = async () => {
             try {
-                const [userRes, gamesRes] = await Promise.all([
+                const [userRes, gameRes] = await Promise.all([
                     axios.get(`${API}/api/profile`, { withCredentials: true }),
-                    axios.get(`${API}/games/`, { withCredentials: true }),
+                    axios.get(`${API}/games/${gameId}`, { withCredentials: true }),
                 ]);
 
                 if (userRes.data.success) setCurrentUser(userRes.data.user);
 
-                if (gamesRes.data.success) {
-                    const found = gamesRes.data.games.find((g: Game) => g._id === gameId);
+                if (gameRes.data.success) {
+                    const found: Game = gameRes.data.game;
                     setGame(found ?? null);
                     if (found?.players?.length > 0) setSelectedPlayer(found.players[0]);
                 }
@@ -76,7 +77,7 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
             }
         };
         load();
-    }, [gameId]);
+    }, [gameId, router]);
 
     if (loading) {
         return (

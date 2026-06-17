@@ -31,11 +31,9 @@ export function DiceScene({ gameId, currentUserId }: Props) {
     const boxRef = useRef<any>(null);
     const [visible, setVisible] = useState(false);
     const rollMetaRef = useRef<{
-        diceType: DiceType;
+        messageId: string;
         gameId: string;
         isRoller: boolean;
-        results: number[];
-        total: number;
     } | null>(null);
     const completeDiceRollRef = useRef(completeDiceRoll);
     completeDiceRollRef.current = completeDiceRoll;
@@ -65,15 +63,10 @@ export function DiceScene({ gameId, currentUserId }: Props) {
                     const meta = rollMetaRef.current;
                     if (!meta) return;
 
-                    // Only the roller sends the server-generated results to finalize the roll
+                    // Only the roller tells the server the animation finished, so it
+                    // can broadcast the already-persisted result to the chat.
                     if (meta.isRoller) {
-                        completeDiceRollRef.current(
-                            meta.gameId,
-                            meta.diceType,
-                            meta.results.length,
-                            meta.results,
-                            meta.total,
-                        );
+                        completeDiceRollRef.current(meta.gameId, meta.messageId);
                     }
 
                     setTimeout(() => {
@@ -104,13 +97,11 @@ export function DiceScene({ gameId, currentUserId }: Props) {
 
             const dType = data.diceType as DiceType;
 
-            // Store server results + whether this user is the roller
+            // Store the persisted message id + whether this user is the roller
             rollMetaRef.current = {
-                diceType: dType,
+                messageId: data.messageId,
                 gameId: data.gameId,
                 isRoller: data.userId === currentUserId,
-                results: data.results,
-                total: data.total,
             };
 
             // Build dice notation

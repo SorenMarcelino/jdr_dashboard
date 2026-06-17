@@ -3,13 +3,11 @@
 import React, {useEffect, useState} from 'react';
 import Link from 'next/link';
 import { ModeToggle } from '@/components/dark-mode-toggle/mode-toggle';
-import {ThemeProvider} from "@/components/dark-mode-toggle/theme-provider";
-import {useCookies} from "react-cookie";
 import {useRouter} from "next/navigation";
 import axios from "axios";
+import { API_URL } from "@/lib/api";
 
 export function Navbar() {
-    const [, removeCookie] = useCookies(['token']);
     const router = useRouter();
     const [username, setUsername] = useState("");
 
@@ -17,7 +15,7 @@ export function Navbar() {
         const fetchUser = async () => {
             try {
                 const { data } = await axios.post(
-                    "http://localhost:5050/auth/verify",
+                    `${API_URL}/auth/verify`,
                     {},
                     { withCredentials: true }
                 );
@@ -33,11 +31,10 @@ export function Navbar() {
 
     const handleLogout = async () => {
         try {
-            await axios.post("http://localhost:5050/auth/logout", {}, { withCredentials: true });
+            await axios.post(`${API_URL}/auth/logout`, {}, { withCredentials: true });
         } catch {
             // ignore
         }
-        removeCookie("token", { path: "/" });
         router.push("/login");
     };
 
@@ -71,14 +68,7 @@ export function Navbar() {
                     </Link>
                 )}
 
-                <ThemeProvider
-                    attribute="class"
-                    defaultTheme="system"
-                    enableSystem
-                    disableTransitionOnChange
-                >
-                    <ModeToggle/>
-                </ThemeProvider>
+                <ModeToggle/>
             </div>
         </nav>
     );

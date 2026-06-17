@@ -5,8 +5,9 @@ import axios from "axios";
 import { Plus, Search } from "lucide-react";
 import { useScenario } from "@/contexts/ScenarioContext";
 import { PageListItem } from "./PageListItem";
+import { API_URL } from "@/lib/api";
 
-const API = "http://localhost:5050";
+const API = API_URL;
 
 type Props = {
     gameId: string;

@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { Navbar } from "@/components/navbar";
 import { ScenarioWorkspace } from "@/components/scenario/ScenarioWorkspace";
+import { API_URL } from "@/lib/api";
 
-const API = "http://localhost:5050";
+const API = API_URL;
 
 export default function ScenarioPage({
     params,

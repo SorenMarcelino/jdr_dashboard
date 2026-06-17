@@ -49,10 +49,11 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Ne jamais retourner les mots de passe dans les requêtes JSON
+// Ne jamais retourner le mot de passe ni le refresh token dans les réponses JSON
 userSchema.methods.toJSON = function () {
     const obj = this.toObject();
     delete obj.password;
+    delete obj.refreshToken;
     return obj;
 };
 

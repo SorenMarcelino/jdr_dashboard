@@ -12,6 +12,13 @@ import {
     updateNpcSheet,
     deleteNpcSheet,
 } from "../controllers/CharacterSheetController.mjs";
+import { validate } from "../middlewares/validate.mjs";
+import {
+    createSheetSchema,
+    updateSheetSchema,
+    createNpcSheetSchema,
+    updateNpcSheetSchema,
+} from "../validation/schemas.mjs";
 
 const router = express.Router();
 
@@ -25,11 +32,11 @@ export default router;
 export const gameSheetRouter = express.Router({ mergeParams: true });
 gameSheetRouter.get("/character-sheets", requireAuth, getAllSheetsForGame);
 gameSheetRouter.get("/character-sheets/me", requireAuth, getMySheet);
-gameSheetRouter.post("/character-sheets", requireAuth, createSheet);
-gameSheetRouter.put("/character-sheets/:sheetId", requireAuth, updateSheet);
+gameSheetRouter.post("/character-sheets", requireAuth, validate(createSheetSchema), createSheet);
+gameSheetRouter.put("/character-sheets/:sheetId", requireAuth, validate(updateSheetSchema), updateSheet);
 
 // NPC sheets (MJ only)
 gameSheetRouter.get("/npc-sheets", requireAuth, getNpcSheets);
-gameSheetRouter.post("/npc-sheets", requireAuth, createNpcSheet);
-gameSheetRouter.put("/npc-sheets/:sheetId", requireAuth, updateNpcSheet);
+gameSheetRouter.post("/npc-sheets", requireAuth, validate(createNpcSheetSchema), createNpcSheet);
+gameSheetRouter.put("/npc-sheets/:sheetId", requireAuth, validate(updateNpcSheetSchema), updateNpcSheet);
 gameSheetRouter.delete("/npc-sheets/:sheetId", requireAuth, deleteNpcSheet);

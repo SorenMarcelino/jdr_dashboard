@@ -15,8 +15,9 @@ import "@xyflow/react/dist/style.css";
 import axios from "axios";
 import { useScenario } from "@/contexts/ScenarioContext";
 import { ScenarioNode } from "./ScenarioNode";
+import { API_URL } from "@/lib/api";
 
-const API = "http://localhost:5050";
+const API = API_URL;
 
 const nodeTypes = { scenarioNode: ScenarioNode };
 

@@ -5,6 +5,7 @@ import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { API_URL } from "@/lib/api";
 import {
     Dialog,
     DialogContent,
@@ -25,7 +26,7 @@ export function JoinGameDialog({ onJoined }: { onJoined?: () => void }) {
         setLoading(true);
         try {
             const { data } = await axios.post(
-                "http://localhost:5050/games/join",
+                `${API_URL}/games/join`,
                 { inviteCode },
                 { withCredentials: true }
             );

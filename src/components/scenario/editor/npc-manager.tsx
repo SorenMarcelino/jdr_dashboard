@@ -7,8 +7,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GenericCharacterSheet, type Template as SheetTemplate } from "@/components/character-sheet/GenericCharacterSheet";
+import { API_URL } from "@/lib/api";
 
-const API = "http://localhost:5050";
+const API = API_URL;
 
 type NpcSheet = {
     _id: string;

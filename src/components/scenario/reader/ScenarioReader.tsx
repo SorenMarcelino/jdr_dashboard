@@ -10,8 +10,9 @@ import { NpcReferenceMark } from "../editor/extensions/NpcReferenceMark";
 import { AnnotationMark } from "../editor/extensions/AnnotationMark";
 import { AnnotationTooltip } from "./AnnotationTooltip";
 import { NpcSheetPopover } from "./NpcSheetPopover";
+import { API_URL } from "@/lib/api";
 
-const API = "http://localhost:5050";
+const API = API_URL;
 
 type Props = {
     gameId: string;

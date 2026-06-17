@@ -7,8 +7,9 @@ import { type DiceType } from "@/config/diceConfig";
 import { MessageList } from "./MessageList";
 import { ChatInput } from "./ChatInput";
 import { DiceBar } from "./DiceBar";
+import { API_URL } from "@/lib/api";
 
-const API = "http://localhost:5050";
+const API = API_URL;
 
 type Props = {
     gameId: string;

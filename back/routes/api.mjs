@@ -1,117 +1,45 @@
 import express from "express";
 import { requireAuth } from "../middlewares/AuthMiddleware.mjs";
-import {getAllUsers, searchUsers, updateUserProfile} from "../services/userService.mjs";
+import { getAllUsers, searchUsers, updateUserProfile } from "../services/userService.mjs";
+import { validate } from "../middlewares/validate.mjs";
+import { updateProfileSchema } from "../validation/schemas.mjs";
+import { asyncHandler } from "../utils/asyncHandler.mjs";
 
 const router = express.Router();
 
-// Route protégée - Liste de tous les utilisateurs (nécessite authentification)
-router.get("/users", requireAuth, async (req, res) => {
-    try {
-        const users = await getAllUsers();
-        return res.status(200).json({
-            success: true,
-            users
-        });
-    } catch (error) {
-        console.error('Error fetching users:', error);
-        return res.status(500).json({
-            message: 'Internal server error',
-            status: false
-        });
+// Liste de tous les utilisateurs (authentifié)
+router.get("/users", requireAuth, asyncHandler(async (req, res) => {
+    const users = await getAllUsers();
+    return res.status(200).json({ success: true, users });
+}));
+
+// Profil de l'utilisateur connecté
+router.get('/profile', requireAuth, asyncHandler(async (req, res) => {
+    return res.status(200).json({
+        success: true,
+        user: req.user, // attaché par requireAuth
+    });
+}));
+
+// Mise à jour du profil (username validé par Zod)
+router.put("/profile", requireAuth, validate(updateProfileSchema), asyncHandler(async (req, res) => {
+    const { username } = req.body;
+    const updatedUser = await updateUserProfile(req.user._id, { username });
+    return res.status(200).json({
+        success: true,
+        message: "Profile updated successfully",
+        user: updatedUser,
+    });
+}));
+
+// Recherche d'utilisateurs
+router.get("/users/search", requireAuth, asyncHandler(async (req, res) => {
+    const { q } = req.query;
+    if (!q) {
+        return res.status(400).json({ message: "Search query is required", success: false });
     }
-});
-
-// Route protégée - Obtenir le profil de l'utilisateur connecté
-router.get('/profile', requireAuth, async (req, res) => {
-    try {
-        return res.status(200).json({
-            success: true,
-            user: req.user // L'utilisateur est attaché par le middleware requireAuth
-        });
-    } catch (error) {
-        console.error('Error fetching profile:', error);
-        return res.status(500).json({
-            message: 'Internal server error',
-            success: false
-        })
-    }
-});
-
-// Route protégée - Mettre à jour le profil
-router.put("/profile", requireAuth, async (req, res) => {
-    try {
-        const { username } = req.body;
-
-        if (!username) {
-            return res.status(400).json({
-                message: "Username is required",
-                success: false
-            });
-        }
-
-        const updatedUser = await updateUserProfile(req.user._id, { username });
-
-        return res.status(200).json({
-            success: true,
-            message: "Profile updated successfully",
-            user: updatedUser
-        });
-    } catch (error) {
-        console.error('Error updating profile:', error);
-        const status = error.status || 500;
-        return res.status(status).json({
-            message: error.message || 'Internal server error',
-            success: false
-        })
-    }
-});
-
-router.get("/users/search", requireAuth, async (req, res) => {
-    try {
-        const { q } = req.query;
-        if (!q) {
-            return res.status(400).json({
-                message: "Search query is required",
-                success: false
-            });
-        }
-
-        const users = await searchUsers(q);
-
-        return res.status(200).json({
-            success: true,
-            users
-        });
-    } catch (error) {
-        console.error('Error searching users:', error);
-        const status = error.status || 500;
-        return res.status(status).json({
-            message: error.message || 'Internal server error',
-            success: false
-        });
-    }
-});
-
-// router.post("/login", requireAuth, async (req, res) => {
-//     try {
-//         const { email, password } = req.body;
-//         const user = await User.findOne({ email });
-
-//         if (!user) {
-//             return res.status(404).json({ message: "No record existed" });
-//         }
-
-//         const isPasswordValid = await bcrypt.compare(password, user.password);
-
-//         if (isPasswordValid) {
-//             return res.status(200).json({ message: "Successfully logged in" });
-//         } else {
-//             return res.status(401).json({ message: "The password is incorrect" });
-//         }
-//     } catch (error) {
-//         return res.status(500).json({ message: error.message });
-//     }
-// });
-
+    const users = await searchUsers(q);
+    return res.status(200).json({ success: true, users });
+}));
 
 export default router;

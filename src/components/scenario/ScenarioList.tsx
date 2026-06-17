@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Plus, BookText, Trash2 } from "lucide-react";
+import { API_URL } from "@/lib/api";
 
-const API = "http://localhost:5050";
+const API = API_URL;
 
 type Scenario = {
     _id: string;

@@ -1,0 +1,27 @@
+# Override pour TESTER la stack prod en LOCAL, sans modifier docker-compose.prod.yml
+# (qui, lui, vise MongoDB Atlas + un domaine réel sur le VPS).
+#
+# Ce fichier ajoute uniquement un MongoDB local. Le TLS est géré par Caddy :
+# avec SITE_HOSTNAME=localhost (.env), Caddy sert un certificat interne
+# auto-signé — aucune dépendance à Let's Encrypt.
+#
+# Lancer :
+#   docker compose -f docker-compose.prod.yml -f docker-compose.prod.local.yml up -d --build
+# Ouvrir : https://localhost  (avertissement de certificat attendu, l'accepter)
+# Arrêter : docker compose -f docker-compose.prod.yml -f docker-compose.prod.local.yml down
+
+services:
+  mongodb:
+    image: mongo:7
+    restart: unless-stopped
+    volumes:
+      - mongo_prodlocal_data:/data/db
+
+  backend:
+    # Attendre Mongo : le /health du backend renvoie 503 tant que la DB est down.
+    depends_on:
+      mongodb:
+        condition: service_started
+
+volumes:
+  mongo_prodlocal_data:

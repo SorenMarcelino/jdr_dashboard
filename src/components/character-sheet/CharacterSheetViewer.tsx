@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { GenericCharacterSheet, Template as SheetTemplate } from "./GenericCharacterSheet";
+import { API_URL } from "@/lib/api";
 
 type Template = SheetTemplate & {
     systemId: string;
@@ -23,7 +24,7 @@ type Props = {
     isEditable?: boolean;
 };
 
-const API = "http://localhost:5050";
+const API = API_URL;
 
 export function CharacterSheetViewer({ systemId, gameId, playerId, isEditable = false }: Props) {
     const [template, setTemplate] = useState<Template | null>(null);
@@ -74,7 +75,9 @@ export function CharacterSheetViewer({ systemId, gameId, playerId, isEditable = 
             } else {
                 const { data } = await axios.post(
                     `${API}/games/${gameId}/character-sheets`,
-                    { systemId, values },
+                    // playerId fourni quand le MJ crée la fiche d'un joueur ;
+                    // absent → le serveur crée la fiche de l'utilisateur courant.
+                    { systemId, values, playerId },
                     { withCredentials: true }
                 );
                 if (data.success) setInstance(data.sheet);

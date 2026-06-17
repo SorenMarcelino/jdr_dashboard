@@ -32,8 +32,9 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
+import { API_URL } from "@/lib/api";
 
-const API = "http://localhost:5050";
+const API = API_URL;
 
 type SheetOption = { value: string; label: string };
 
@@ -77,7 +78,7 @@ export function ProfileForm({ onCreated }: { onCreated?: () => void }) {
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
             const { data } = await axios.post(
-                "http://localhost:5050/games/create",
+                `${API_URL}/games/create`,
                 values,
                 { withCredentials: true }
             );

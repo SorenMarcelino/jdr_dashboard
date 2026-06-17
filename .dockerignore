@@ -1,5 +1,7 @@
 node_modules
 .next
+pdf_archives
+*.tsbuildinfo
 .git
 .gitignore
 .env

@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { X } from "lucide-react";
+import { API_URL } from "@/lib/api";
 
-const API = "http://localhost:5050";
+const API = API_URL;
 
 type Props = {
     gameId: string;

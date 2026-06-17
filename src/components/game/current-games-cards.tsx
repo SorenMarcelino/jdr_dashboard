@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import axios, { AxiosError } from "axios";
 import { Card, CardContent } from "@/components/ui/card";
+import { API_URL } from "@/lib/api";
 
 type Game = {
     _id: string;
@@ -23,7 +25,7 @@ export function CurrentGamesCards() {
     useEffect(() => {
         const fetchGames = async () => {
             try {
-                const { data } = await axios.get("http://localhost:5050/games/", {
+                const { data } = await axios.get(`${API_URL}/games/`, {
                     withCredentials: true,
                 });
                 if (data.success) {
@@ -40,7 +42,7 @@ export function CurrentGamesCards() {
             }
         };
         fetchGames();
-    }, []);
+    }, [router]);
 
     if (loading) {
         return <p className="text-muted-foreground text-sm">Chargement des parties...</p>;
@@ -54,12 +56,17 @@ export function CurrentGamesCards() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
             {games.map((game) => (
                 <Card key={game._id} onClick={() => router.push(`/game/${game._id}`)} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
-                    <div className="h-32 bg-muted flex items-center justify-center">
+                    <div className="relative h-32 bg-muted flex items-center justify-center">
                         {game.thumbnail ? (
-                            <img
+                            // Vignette fournie par l'utilisateur (URL arbitraire) :
+                            // non optimisée pour éviter d'autoriser des hôtes inconnus.
+                            <Image
                                 src={game.thumbnail}
                                 alt={game.name}
-                                className="h-full w-full object-cover"
+                                fill
+                                unoptimized
+                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                className="object-cover"
                             />
                         ) : (
                             <span className="text-4xl">🎲</span>

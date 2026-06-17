@@ -4,12 +4,13 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { Navbar } from '@/components/navbar';
+import { API_URL } from "@/lib/api";
 
 export default function Home() {
     const router = useRouter();
 
     useEffect(() => {
-        axios.post("http://localhost:5050/auth/verify", {}, { withCredentials: true })
+        axios.post(`${API_URL}/auth/verify`, {}, { withCredentials: true })
             .then(({ data }) => {
                 if (data.status) router.replace("/user");
             })

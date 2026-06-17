@@ -2,8 +2,7 @@
 
 import { createContext, useContext, useEffect, useRef, useState, useCallback, type ReactNode } from "react";
 import { io, type Socket } from "socket.io-client";
-
-const SOCKET_URL = "http://localhost:5050";
+import { SOCKET_URL } from "@/lib/api";
 
 export type ChatMessage = {
     _id: string;
@@ -22,6 +21,7 @@ export type ChatMessage = {
 };
 
 export type DiceRollStartData = {
+    messageId: string;
     gameId: string;
     userId: string;
     username: string;
@@ -38,7 +38,7 @@ type SocketContextValue = {
     leaveGame: (gameId: string) => void;
     sendMessage: (gameId: string, content: string) => void;
     rollDice: (gameId: string, diceType: string, quantity: number) => void;
-    completeDiceRoll: (gameId: string, diceType: string, quantity: number, results: number[], total: number) => void;
+    completeDiceRoll: (gameId: string, messageId: string) => void;
     onChatMessage: (cb: (msg: ChatMessage) => void) => () => void;
     onDiceRollStart: (cb: (data: DiceRollStartData) => void) => () => void;
     onDiceRollResult: (cb: (msg: ChatMessage) => void) => () => void;
@@ -51,7 +51,8 @@ export function SocketProvider({ children }: { children: ReactNode }) {
     const [connected, setConnected] = useState(false);
 
     useEffect(() => {
-        const socket = io(SOCKET_URL, {
+        // SOCKET_URL vide => même origine (cas production derrière le reverse proxy)
+        const socket = io(SOCKET_URL || undefined, {
             withCredentials: true,
             autoConnect: true,
         });
@@ -83,8 +84,8 @@ export function SocketProvider({ children }: { children: ReactNode }) {
         socketRef.current?.emit("dice-roll", { gameId, diceType, quantity });
     }, []);
 
-    const completeDiceRoll = useCallback((gameId: string, diceType: string, quantity: number, results: number[], total: number) => {
-        socketRef.current?.emit("dice-roll-complete", { gameId, diceType, quantity, results, total });
+    const completeDiceRoll = useCallback((gameId: string, messageId: string) => {
+        socketRef.current?.emit("dice-roll-complete", { gameId, messageId });
     }, []);
 
     const onChatMessage = useCallback((cb: (msg: ChatMessage) => void) => {

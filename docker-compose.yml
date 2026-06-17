@@ -28,6 +28,18 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.frontend
+      args:
+        # En dev (pas de Caddy), frontend et backend sont sur des origines
+        # distinctes : on cible explicitement le backend. En prod, ces args
+        # sont vides (same-origin via Caddy) — cf. docker-compose.prod.yml.
+        NEXT_PUBLIC_API_URL: http://localhost:5050
+        NEXT_PUBLIC_SOCKET_URL: http://localhost:5050
+    environment:
+      # Le build standalone tourne en NODE_ENV=production : la CSP par défaut
+      # est same-origin. Comme le backend est ici sur une autre origine, on
+      # autorise explicitement ses origines HTTP + WebSocket (lu au runtime
+      # par src/middleware.ts).
+      EXTRA_CONNECT_SRC: "http://localhost:5050 ws://localhost:5050"
     ports:
       - "3000:3000"
     depends_on:
