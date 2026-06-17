@@ -12,6 +12,8 @@ import { SocketProvider } from "@/contexts/SocketContext";
 import { ChatPanel } from "@/components/chat/ChatPanel";
 import Link from "next/link";
 import { resolveSystemId } from "@/lib/system-id";
+import { getGameTheme } from "@/config/gameThemes";
+import { useGameTheme } from "@/hooks/use-game-theme";
 import { API_URL } from "@/lib/api";
 
 const DiceScene = dynamic(() => import("@/components/dice/DiceScene").then((m) => m.DiceScene), { ssr: false });
@@ -78,6 +80,9 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
         };
         load();
     }, [gameId, router]);
+
+    // Thème visuel propre au système de jeu (posé sur <html> le temps de la partie)
+    useGameTheme(getGameTheme(game?.characterSheet));
 
     if (loading) {
         return (

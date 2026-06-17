@@ -96,6 +96,118 @@ body {
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
+  /* ───────────────────────────────────────────────────────────────
+     Thème de jeu — The Magnus Archives
+     Style « archives occultes » inspiré du logo : parchemin sépia,
+     encre brun foncé, accents rouge sang, vert de « l'Œil ».
+     Posé via data-game-theme sur <html> (cf. useGameTheme).
+     ─────────────────────────────────────────────────────────────── */
+  [data-game-theme="magnus_archives"] {
+    --background: 40 33% 89%;
+    --foreground: 28 30% 13%;
+    --card: 42 38% 93%;
+    --card-foreground: 28 30% 13%;
+    --popover: 42 40% 95%;
+    --popover-foreground: 28 30% 13%;
+    --primary: 4 58% 38%;
+    --primary-foreground: 40 40% 95%;
+    --secondary: 38 26% 82%;
+    --secondary-foreground: 28 30% 18%;
+    --muted: 38 24% 84%;
+    --muted-foreground: 30 16% 38%;
+    --accent: 36 35% 78%;
+    --accent-foreground: 28 35% 16%;
+    --destructive: 14 72% 43%;
+    --destructive-foreground: 40 40% 96%;
+    --border: 34 22% 68%;
+    --input: 34 22% 72%;
+    --ring: 4 58% 42%;
+    --chart-1: 4 58% 45%;
+    --chart-2: 150 30% 32%;
+    --chart-3: 28 45% 35%;
+    --chart-4: 38 65% 45%;
+    --chart-5: 268 25% 42%;
+    --radius: 0.3rem;
+    --sidebar-background: 36 30% 86%;
+    --sidebar-foreground: 28 30% 20%;
+    --sidebar-primary: 4 58% 38%;
+    --sidebar-primary-foreground: 40 40% 95%;
+    --sidebar-accent: 36 30% 80%;
+    --sidebar-accent-foreground: 28 35% 16%;
+    --sidebar-border: 34 22% 70%;
+    --sidebar-ring: 4 58% 42%;
+    /* Texture parchemin sali (taches sépia + grain) — cf. règles plus bas */
+    --paper-stains:
+      radial-gradient(ellipse at 18% 22%, rgba(110, 70, 30, 0.13), transparent 55%),
+      radial-gradient(circle at 85% 28%, rgba(90, 50, 25, 0.11), transparent 45%),
+      radial-gradient(circle at 72% 88%, rgba(70, 45, 20, 0.11), transparent 50%),
+      radial-gradient(circle at 28% 82%, rgba(120, 90, 50, 0.09), transparent 45%);
+    --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+    --paper-vignette: radial-gradient(ellipse at center, transparent 52%, rgba(45, 28, 12, 0.30) 100%);
+  }
+  .dark[data-game-theme="magnus_archives"],
+  .dark [data-game-theme="magnus_archives"] {
+    --background: 26 16% 8%;
+    --foreground: 40 28% 84%;
+    --card: 26 16% 11%;
+    --card-foreground: 40 28% 84%;
+    --popover: 26 18% 10%;
+    --popover-foreground: 40 28% 84%;
+    --primary: 4 62% 47%;
+    --primary-foreground: 40 35% 92%;
+    --secondary: 28 12% 17%;
+    --secondary-foreground: 40 28% 84%;
+    --muted: 28 12% 16%;
+    --muted-foreground: 38 16% 60%;
+    --accent: 28 14% 20%;
+    --accent-foreground: 40 30% 86%;
+    --destructive: 12 65% 42%;
+    --destructive-foreground: 40 35% 92%;
+    --border: 28 14% 19%;
+    --input: 28 14% 22%;
+    --ring: 4 62% 50%;
+    --chart-1: 4 62% 50%;
+    --chart-2: 150 35% 45%;
+    --chart-3: 30 40% 50%;
+    --chart-4: 40 70% 55%;
+    --chart-5: 268 30% 58%;
+    --sidebar-background: 26 16% 10%;
+    --sidebar-foreground: 40 26% 82%;
+    --sidebar-primary: 4 62% 47%;
+    --sidebar-primary-foreground: 40 35% 92%;
+    --sidebar-accent: 28 14% 18%;
+    --sidebar-accent-foreground: 40 28% 84%;
+    --sidebar-border: 28 14% 19%;
+    --sidebar-ring: 4 62% 50%;
+    --paper-stains:
+      radial-gradient(ellipse at 18% 22%, rgba(30, 18, 8, 0.50), transparent 55%),
+      radial-gradient(circle at 85% 28%, rgba(20, 12, 6, 0.45), transparent 45%),
+      radial-gradient(circle at 72% 88%, rgba(45, 26, 12, 0.45), transparent 50%),
+      radial-gradient(circle at 28% 82%, rgba(60, 40, 20, 0.30), transparent 45%);
+    --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+    --paper-vignette: radial-gradient(ellipse at center, transparent 48%, rgba(0, 0, 0, 0.45) 100%);
+  }
+
+  /* ───────────────────────────────────────────────────────────────
+     Application de la texture parchemin aux surfaces du thème Magnus.
+     Les classes Tailwind posent la background-color ; on ajoute par
+     dessus les taches + le grain (background-image) sans y toucher.
+     Sélecteurs compound (élément portant lui-même data-game-theme, ex.
+     carte du game picker) ET descendant (thème pleine page sur <html>).
+     ─────────────────────────────────────────────────────────────── */
+  [data-game-theme="magnus_archives"] .bg-card,
+  [data-game-theme="magnus_archives"].bg-card,
+  [data-game-theme="magnus_archives"] .bg-background,
+  [data-game-theme="magnus_archives"] .bg-muted {
+    background-image: var(--paper-stains), var(--paper-grain);
+  }
+  /* Fond de page : taches + grain + vignette qui assombrit les bords */
+  [data-game-theme="magnus_archives"] body,
+  body[data-game-theme="magnus_archives"] {
+    background-image: var(--paper-vignette), var(--paper-stains), var(--paper-grain);
+    background-attachment: fixed;
+  }
 }
 
 @layer base {

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import axios, { AxiosError } from "axios";
 import { Card, CardContent } from "@/components/ui/card";
+import { getGameTheme } from "@/config/gameThemes";
 import { API_URL } from "@/lib/api";
 
 type Game = {
@@ -55,7 +56,12 @@ export function CurrentGamesCards() {
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
             {games.map((game) => (
-                <Card key={game._id} onClick={() => router.push(`/game/${game._id}`)} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
+                <Card
+                    key={game._id}
+                    data-game-theme={getGameTheme(game.characterSheet) ?? undefined}
+                    onClick={() => router.push(`/game/${game._id}`)}
+                    className="overflow-hidden border hover:shadow-md transition-shadow cursor-pointer"
+                >
                     <div className="relative h-32 bg-muted flex items-center justify-center">
                         {game.thumbnail ? (
                             // Vignette fournie par l'utilisateur (URL arbitraire) :

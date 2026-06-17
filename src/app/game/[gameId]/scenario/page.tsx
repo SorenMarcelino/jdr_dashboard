@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { Navbar, type NavbarGame } from "@/components/navbar";
 import { ScenarioList } from "@/components/scenario/ScenarioList";
+import { getGameTheme } from "@/config/gameThemes";
+import { useGameTheme } from "@/hooks/use-game-theme";
 import { API_URL } from "@/lib/api";
 
 const API = API_URL;
@@ -27,6 +29,9 @@ export default function ScenarioListPage({ params }: { params: Promise<{ gameId:
                 }
             });
     }, [gameId, router]);
+
+    // Thème visuel propre au système de jeu (posé sur <html> le temps de la consultation)
+    useGameTheme(getGameTheme(game?.characterSheet));
 
     return (
         <div className="flex flex-col min-h-svh bg-muted">

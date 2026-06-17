@@ -10,6 +10,8 @@ import { ScenarioReader } from "./reader/ScenarioReader";
 import { ScenarioGraph } from "./graph/ScenarioGraph";
 import { NpcManager } from "./editor/npc-manager";
 import { resolveSystemId } from "@/lib/system-id";
+import { getGameTheme } from "@/config/gameThemes";
+import { useGameTheme } from "@/hooks/use-game-theme";
 import { API_URL } from "@/lib/api";
 
 const API = API_URL;
@@ -61,6 +63,9 @@ function WorkspaceContent({ gameId, scenarioId }: Props) {
             .catch((err) => console.error("Erreur chargement scénario:", err))
             .finally(() => setLoading(false));
     }, [gameId, scenarioId, setScenario, setPages, navigateToPage]);
+
+    // Thème visuel propre au système de jeu (posé sur <html> le temps de l'édition)
+    useGameTheme(getGameTheme(systemId));
 
     if (loading) {
         return (
