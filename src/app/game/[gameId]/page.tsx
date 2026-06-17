@@ -174,7 +174,7 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
     return (
         <SocketProvider>
             <div className="flex flex-col h-svh overflow-hidden bg-muted">
-                <Navbar />
+                <Navbar game={game} />
 
                 {/* Barre de contexte */}
                 <div className="shrink-0 flex items-center justify-between px-4 py-2 border-b bg-background">

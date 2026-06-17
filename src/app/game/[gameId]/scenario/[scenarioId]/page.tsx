@@ -1,10 +1,10 @@
 "use client";
 
 import { use } from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { Navbar } from "@/components/navbar";
+import { Navbar, type NavbarGame } from "@/components/navbar";
 import { ScenarioWorkspace } from "@/components/scenario/ScenarioWorkspace";
 import { API_URL } from "@/lib/api";
 
@@ -17,16 +17,24 @@ export default function ScenarioPage({
 }) {
     const { gameId, scenarioId } = use(params);
     const router = useRouter();
+    const [game, setGame] = useState<NavbarGame | null>(null);
 
     useEffect(() => {
         axios
-            .post(`${API}/auth/verify`, {}, { withCredentials: true })
-            .catch(() => router.push("/login"));
-    }, [router]);
+            .get(`${API}/games/${gameId}`, { withCredentials: true })
+            .then((res) => {
+                if (res.data.success && res.data.game) setGame(res.data.game);
+            })
+            .catch((err) => {
+                if (axios.isAxiosError(err) && err.response?.status === 401) {
+                    router.push("/login");
+                }
+            });
+    }, [gameId, router]);
 
     return (
         <div className="flex flex-col h-svh bg-muted">
-            <Navbar />
+            <Navbar game={game ?? undefined} />
             <ScenarioWorkspace gameId={gameId} scenarioId={scenarioId} />
         </div>
     );
