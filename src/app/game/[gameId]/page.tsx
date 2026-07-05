@@ -10,6 +10,7 @@ import { CharacterSheetViewer } from "@/components/character-sheet/CharacterShee
 import { BentoGrid } from "@/components/bento/BentoGrid";
 import { SocketProvider } from "@/contexts/SocketContext";
 import { ChatPanel } from "@/components/chat/ChatPanel";
+import { StagePanel } from "@/components/stage/StagePanel";
 import Link from "next/link";
 import { resolveSystemId } from "@/lib/system-id";
 import { getGameTheme } from "@/config/gameThemes";
@@ -34,16 +35,6 @@ type Game = {
     players: User[];
     inviteCode: string;
 };
-
-function PlaceholderContent({ label }: { label: string }) {
-    return (
-        <div className="h-full flex flex-col items-center justify-center gap-2 text-muted-foreground">
-            <span className="text-2xl">✦</span>
-            <p className="text-xs">{label}</p>
-            <p className="text-xs opacity-50">Bientôt disponible</p>
-        </div>
-    );
-}
 
 export default function GamePage({ params }: { params: Promise<{ gameId: string }> }) {
     const { gameId } = use(params);
@@ -163,10 +154,10 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
             headerRight: sheetHeaderRight,
         },
         {
-            id: "notes",
-            title: "Notes de session",
-            defaultLayout: { x: 8, y: 0, w: 4, h: 5, minW: 2, minH: 2 },
-            content: <PlaceholderContent label="Notes de session" />,
+            id: "stage",
+            title: "Scène",
+            defaultLayout: { x: 8, y: 0, w: 4, h: 5, minW: 2, minH: 3 },
+            content: <StagePanel gameId={gameId} isMJ={isMJ} />,
         },
         {
             id: "chat",

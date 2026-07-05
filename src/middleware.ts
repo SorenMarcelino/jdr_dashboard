@@ -23,7 +23,18 @@ export function middleware(request: NextRequest) {
     const devConnect = isDev
         ? "http://localhost:5050 ws://localhost:5050 ws://localhost:3000"
         : "";
-    const connectSrc = ["'self'", devConnect, extraConnect]
+    // Origines des médias diffusés sur la scène (image/audio/vidéo/3D par URL
+    // externe, futur CDN). CSV d'origines dans MEDIA_SRC_HOSTS, lu au runtime.
+    // Non renseigné (dev/tests) : repli sur `https:` pour ne pas bloquer les
+    // essais ; en prod, renseigner l'env pour restreindre aux hôtes autorisés.
+    const mediaHosts =
+        (process.env.MEDIA_SRC_HOSTS ?? "")
+            .split(",")
+            .map((h) => h.trim())
+            .filter(Boolean)
+            .join(" ") || "https:";
+
+    const connectSrc = ["'self'", devConnect, extraConnect, mediaHosts]
         .filter(Boolean)
         .join(" ");
 
@@ -32,8 +43,11 @@ export function middleware(request: NextRequest) {
         `script-src ${scriptSrc}`,
         // Styles inline conservés (Next.js, Tailwind et framer-motion en injectent).
         "style-src 'self' 'unsafe-inline'",
-        "img-src 'self' data: blob:",
+        `img-src 'self' data: blob: ${mediaHosts}`,
+        // Audio/vidéo de la scène (nouveau : aucun media-src = default-src 'self')
+        `media-src 'self' ${mediaHosts}`,
         "font-src 'self' data:",
+        // connect-src inclut les hôtes média : model-viewer charge les .glb en fetch
         `connect-src ${connectSrc}`,
         "worker-src 'self' blob:",
         "object-src 'none'",

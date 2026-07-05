@@ -2,6 +2,7 @@ import { verifyAccessToken } from "../utils/SecretToken.mjs";
 import { User } from "../models/UserModel.mjs";
 import { Game } from "../models/GameModel.mjs";
 import { Message } from "../models/MessageModel.mjs";
+import { GameStage } from "../models/GameStageModel.mjs";
 import { DICE_REGISTRY, rollDice } from "../config/diceRegistry.mjs";
 import logger from "../utils/logger.mjs";
 
@@ -61,6 +62,58 @@ async function getGameIfMember(gameId, userId) {
     return isMember ? game : null;
 }
 
+// Vérifie que l'utilisateur est le MJ (créateur) de la partie.
+async function getGameIfMJ(gameId, userId) {
+    const game = await getGameIfMember(gameId, userId);
+    if (!game) return null;
+    return game.createdBy.toString() === userId.toString() ? game : null;
+}
+
+// Types de média diffusables sur la scène.
+const STAGE_KINDS = ["audio", "image", "video", "model3d"];
+const MAX_MEDIA_URL_LENGTH = 2048;
+const MAX_MEDIA_TITLE_LENGTH = 200;
+
+// Valide une URL de média : absolue, http(s), et si MEDIA_ALLOWED_HOSTS est
+// renseigné (CSV d'hôtes), l'hôte doit y figurer. Vide (dev) = tout hôte
+// http(s) accepté. Retourne l'URL normalisée ou null si refusée.
+function validateMediaUrl(rawUrl) {
+    if (typeof rawUrl !== "string" || !rawUrl || rawUrl.length > MAX_MEDIA_URL_LENGTH) {
+        return null;
+    }
+    let url;
+    try {
+        url = new URL(rawUrl);
+    } catch {
+        return null;
+    }
+    if (url.protocol !== "http:" && url.protocol !== "https:") return null;
+
+    const allowedHosts = (process.env.MEDIA_ALLOWED_HOSTS || "")
+        .split(",")
+        .map((h) => h.trim().toLowerCase())
+        .filter(Boolean);
+    if (allowedHosts.length > 0 && !allowedHosts.includes(url.hostname.toLowerCase())) {
+        return null;
+    }
+    return url.toString();
+}
+
+// Sérialise l'état de scène envoyé aux clients (event "stage:update").
+function stageToPayload(gameId, stage) {
+    return {
+        gameId: gameId.toString(),
+        media: stage?.media
+            ? { kind: stage.media.kind, url: stage.media.url, title: stage.media.title }
+            : null,
+        playback: {
+            playing: stage?.playback?.playing ?? false,
+            positionSec: stage?.playback?.positionSec ?? 0,
+            updatedAtServerMs: stage?.playback?.updatedAtServerMs ?? 0,
+        },
+    };
+}
+
 export function setupSocketHandlers(io) {
     // Auth middleware
     io.use(async (socket, next) => {
@@ -106,6 +159,13 @@ export function setupSocketHandlers(io) {
                 socket.join(`game:${gameId}`);
                 socket.emit("joined-game", { gameId });
                 logger.debug({ user: socket.user.username, gameId }, "[Socket] joined game");
+
+                // Late-join : envoie la scène en cours au seul socket qui
+                // rejoint, pour qu'il se cale sur la diffusion en cours.
+                const stage = await GameStage.findOne({ gameId });
+                if (stage?.media) {
+                    socket.emit("stage:update", stageToPayload(gameId, stage));
+                }
             } catch (err) {
                 logger.error({ err }, "[Socket] join-game error");
                 socket.emit("error", { message: "Failed to join game" });
@@ -242,6 +302,118 @@ export function setupSocketHandlers(io) {
             } catch (err) {
                 logger.error({ err }, "[Socket] dice-roll-complete error");
                 socket.emit("error", { message: "Failed to finalize dice roll" });
+            }
+        });
+
+        // ── Scène média (diffusion MJ → joueurs) ──────────────────────────
+
+        // Le MJ diffuse un média (par URL externe) à toute la partie.
+        socket.on("stage:set", async ({ gameId, kind, url, title }) => {
+            try {
+                if (!consumeRate()) {
+                    return socket.emit("error", { message: "Rate limit exceeded, slow down." });
+                }
+                const game = await getGameIfMJ(gameId, socket.user._id);
+                if (!game) {
+                    return socket.emit("error", { message: "Only the GM can control the stage" });
+                }
+
+                if (!STAGE_KINDS.includes(kind)) {
+                    return socket.emit("error", { message: "Invalid media kind" });
+                }
+                const validUrl = validateMediaUrl(url);
+                if (!validUrl) {
+                    return socket.emit("error", { message: "Invalid or disallowed media URL" });
+                }
+                const safeTitle =
+                    typeof title === "string" ? title.trim().slice(0, MAX_MEDIA_TITLE_LENGTH) : "";
+
+                const stage = await GameStage.findOneAndUpdate(
+                    { gameId },
+                    {
+                        media: { kind, url: validUrl, title: safeTitle },
+                        playback: { playing: false, positionSec: 0, updatedAtServerMs: Date.now() },
+                        updatedBy: socket.user._id,
+                    },
+                    { new: true, upsert: true }
+                );
+
+                io.to(`game:${gameId}`).emit("stage:update", stageToPayload(gameId, stage));
+            } catch (err) {
+                logger.error({ err }, "[Socket] stage:set error");
+                socket.emit("error", { message: "Failed to set stage media" });
+            }
+        });
+
+        // Le MJ retire le média en cours (scène vide).
+        socket.on("stage:clear", async ({ gameId }) => {
+            try {
+                const game = await getGameIfMJ(gameId, socket.user._id);
+                if (!game) {
+                    return socket.emit("error", { message: "Only the GM can control the stage" });
+                }
+
+                const stage = await GameStage.findOneAndUpdate(
+                    { gameId },
+                    {
+                        media: null,
+                        playback: { playing: false, positionSec: 0, updatedAtServerMs: Date.now() },
+                        updatedBy: socket.user._id,
+                    },
+                    { new: true, upsert: true }
+                );
+
+                io.to(`game:${gameId}`).emit("stage:update", stageToPayload(gameId, stage));
+            } catch (err) {
+                logger.error({ err }, "[Socket] stage:clear error");
+                socket.emit("error", { message: "Failed to clear stage" });
+            }
+        });
+
+        // Contrôle de lecture audio/vidéo (play/pause/seek), horodaté par le
+        // serveur : les clients se synchronisent sur serverTimeMs.
+        socket.on("stage:control", async ({ gameId, action, positionSec }) => {
+            try {
+                if (!consumeRate()) {
+                    return socket.emit("error", { message: "Rate limit exceeded, slow down." });
+                }
+                const game = await getGameIfMJ(gameId, socket.user._id);
+                if (!game) {
+                    return socket.emit("error", { message: "Only the GM can control the stage" });
+                }
+
+                if (!["play", "pause", "seek"].includes(action)) {
+                    return socket.emit("error", { message: "Invalid stage action" });
+                }
+                const stage = await GameStage.findOne({ gameId });
+                if (!stage?.media) {
+                    return socket.emit("error", { message: "No media on stage" });
+                }
+
+                const pos =
+                    typeof positionSec === "number" && Number.isFinite(positionSec) && positionSec >= 0
+                        ? positionSec
+                        : stage.playback?.positionSec ?? 0;
+                const playing =
+                    action === "play" ? true :
+                    action === "pause" ? false :
+                    stage.playback?.playing ?? false;
+                const serverTimeMs = Date.now();
+
+                stage.playback = { playing, positionSec: pos, updatedAtServerMs: serverTimeMs };
+                stage.updatedBy = socket.user._id;
+                await stage.save();
+
+                io.to(`game:${gameId}`).emit("stage:control", {
+                    gameId: gameId.toString(),
+                    action,
+                    positionSec: pos,
+                    playing,
+                    serverTimeMs,
+                });
+            } catch (err) {
+                logger.error({ err }, "[Socket] stage:control error");
+                socket.emit("error", { message: "Failed to control stage playback" });
             }
         });
 

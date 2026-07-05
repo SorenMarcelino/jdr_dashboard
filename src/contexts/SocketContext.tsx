@@ -31,6 +31,36 @@ export type DiceRollStartData = {
     total: number;
 };
 
+// ── Scène média (diffusion MJ → joueurs) ─────────────────────────────────
+
+export type StageMediaKind = "audio" | "image" | "video" | "model3d";
+
+export type StageMedia = {
+    kind: StageMediaKind;
+    url: string;
+    title: string;
+};
+
+export type StageState = {
+    gameId: string;
+    media: StageMedia | null;
+    playback: {
+        playing: boolean;
+        positionSec: number;
+        updatedAtServerMs: number;
+    };
+};
+
+export type StageControlAction = "play" | "pause" | "seek";
+
+export type StageControl = {
+    gameId: string;
+    action: StageControlAction;
+    positionSec: number;
+    playing: boolean;
+    serverTimeMs: number;
+};
+
 type SocketContextValue = {
     socket: Socket | null;
     connected: boolean;
@@ -39,9 +69,14 @@ type SocketContextValue = {
     sendMessage: (gameId: string, content: string) => void;
     rollDice: (gameId: string, diceType: string, quantity: number) => void;
     completeDiceRoll: (gameId: string, messageId: string) => void;
+    setStage: (gameId: string, media: { kind: StageMediaKind; url: string; title: string }) => void;
+    clearStage: (gameId: string) => void;
+    controlStage: (gameId: string, action: StageControlAction, positionSec: number) => void;
     onChatMessage: (cb: (msg: ChatMessage) => void) => () => void;
     onDiceRollStart: (cb: (data: DiceRollStartData) => void) => () => void;
     onDiceRollResult: (cb: (msg: ChatMessage) => void) => () => void;
+    onStageUpdate: (cb: (state: StageState) => void) => () => void;
+    onStageControl: (cb: (control: StageControl) => void) => () => void;
 };
 
 const SocketContext = createContext<SocketContextValue | null>(null);
@@ -88,6 +123,24 @@ export function SocketProvider({ children }: { children: ReactNode }) {
         socketRef.current?.emit("dice-roll-complete", { gameId, messageId });
     }, []);
 
+    const setStage = useCallback(
+        (gameId: string, media: { kind: StageMediaKind; url: string; title: string }) => {
+            socketRef.current?.emit("stage:set", { gameId, ...media });
+        },
+        []
+    );
+
+    const clearStage = useCallback((gameId: string) => {
+        socketRef.current?.emit("stage:clear", { gameId });
+    }, []);
+
+    const controlStage = useCallback(
+        (gameId: string, action: StageControlAction, positionSec: number) => {
+            socketRef.current?.emit("stage:control", { gameId, action, positionSec });
+        },
+        []
+    );
+
     const onChatMessage = useCallback((cb: (msg: ChatMessage) => void) => {
         const socket = socketRef.current;
         if (!socket) return () => {};
@@ -109,6 +162,20 @@ export function SocketProvider({ children }: { children: ReactNode }) {
         return () => { socket.off("dice-roll-result", cb); };
     }, []);
 
+    const onStageUpdate = useCallback((cb: (state: StageState) => void) => {
+        const socket = socketRef.current;
+        if (!socket) return () => {};
+        socket.on("stage:update", cb);
+        return () => { socket.off("stage:update", cb); };
+    }, []);
+
+    const onStageControl = useCallback((cb: (control: StageControl) => void) => {
+        const socket = socketRef.current;
+        if (!socket) return () => {};
+        socket.on("stage:control", cb);
+        return () => { socket.off("stage:control", cb); };
+    }, []);
+
     return (
         <SocketContext.Provider value={{
             socket: socketRef.current,
@@ -118,9 +185,14 @@ export function SocketProvider({ children }: { children: ReactNode }) {
             sendMessage,
             rollDice,
             completeDiceRoll,
+            setStage,
+            clearStage,
+            controlStage,
             onChatMessage,
             onDiceRollStart,
             onDiceRollResult,
+            onStageUpdate,
+            onStageControl,
         }}>
             {children}
         </SocketContext.Provider>

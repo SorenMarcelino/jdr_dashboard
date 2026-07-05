@@ -66,7 +66,17 @@ export function BentoGrid({ items, storageKey }: Props) {
         if (!storageKey || typeof window === "undefined") return defaultLayout;
         try {
             const saved = localStorage.getItem(storageKey);
-            return saved ? JSON.parse(saved) : defaultLayout;
+            if (!saved) return defaultLayout;
+            // Réconcilie le layout sauvegardé avec les items actuels : les
+            // widgets disparus sont retirés, les nouveaux (ex : ajoutés par
+            // une mise à jour de l'app) reçoivent leur layout par défaut.
+            const parsed: LayoutItem[] = JSON.parse(saved);
+            const ids = new Set(items.map((item) => item.id));
+            const kept = parsed.filter((l) => ids.has(l.i));
+            const missing = defaultLayout.filter(
+                (l) => !kept.some((k) => k.i === l.i)
+            );
+            return [...kept, ...missing];
         } catch {
             return defaultLayout;
         }
