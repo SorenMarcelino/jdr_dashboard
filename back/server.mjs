@@ -58,11 +58,18 @@ app.use(
     })
 );
 
-// Rate limiting pour prévenir les attaques par brute force
+// Rate limiting pour prévenir les attaques par brute force.
+// Les routes d'auth ont leur limiter dédié (authLimiter/refreshLimiter) et
+// sont exclues du compteur global : sinon une rafale de refresh ratés (après
+// logout/expiration) épuisait le quota IP et bloquait /auth/login en 429.
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: isProd ? 100 : 500,
-    message: 'Too many requests from this IP, please try again later.'
+    message: 'Too many requests from this IP, please try again later.',
+    skip: (req) =>
+        req.path === '/auth/login' ||
+        req.path === '/auth/signup' ||
+        req.path === '/auth/refresh',
 });
 
 const authLimiter = rateLimit({

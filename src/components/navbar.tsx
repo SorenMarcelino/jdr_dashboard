@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from "next/navigation";
 import axios from "axios";
 import { ModeToggle } from '@/components/dark-mode-toggle/mode-toggle';
 import { Button } from '@/components/ui/button';
@@ -17,7 +16,6 @@ export type NavbarGame = {
 };
 
 export function Navbar({ game }: { game?: NavbarGame }) {
-    const router = useRouter();
     const [username, setUsername] = useState("");
 
     useEffect(() => {
@@ -44,7 +42,10 @@ export function Navbar({ game }: { game?: NavbarGame }) {
         } catch {
             // ignore
         }
-        router.push("/login");
+        // Navigation dure (pas router.push) : démonte tout React, ce qui tue
+        // les timers d'autosave et requêtes en vol — sinon ils repartent en
+        // 401 → refresh raté en boucle → rate-limit IP → login bloqué en 429.
+        window.location.href = "/login";
     };
 
     // Logo du jeu en cours, ou logo générique hors partie.

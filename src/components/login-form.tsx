@@ -17,7 +17,7 @@ import React, { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import axios from "axios"
-import { API_URL } from "@/lib/api"
+import { API_URL, resetAuthState } from "@/lib/api"
 import { loginSchema, type LoginValues } from "@/lib/validation/auth"
 
 export function LoginForm({
@@ -42,6 +42,7 @@ export function LoginForm({
       )
 
       if (data.success) {
+        resetAuthState()
         router.push("/user")
       } else {
         setError(data.message || "Email ou mot de passe incorrect")

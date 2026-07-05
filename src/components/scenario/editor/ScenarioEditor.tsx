@@ -77,6 +77,15 @@ export function ScenarioEditor({ gameId, scenarioId }: Props) {
         [gameId, scenarioId, currentPageId]
     );
 
+    // À l'unmount, annule le debounce d'autosave en attente : une sauvegarde
+    // qui partirait après démontage (ex : pendant un logout) prendrait un 401
+    // et alimenterait la boucle de refresh.
+    useEffect(() => {
+        return () => {
+            if (debounceRef.current) clearTimeout(debounceRef.current);
+        };
+    }, []);
+
     // Charger le contenu de la page courante
     useEffect(() => {
         if (!currentPageId || !editor) return;
