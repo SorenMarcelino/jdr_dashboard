@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { GridLayout, type Layout, type LayoutItem } from "react-grid-layout";
+import { DetachedWindowPortal } from "@/hooks/use-detached-window";
 
 type BentoItem = {
     id: string;
@@ -22,10 +23,12 @@ const MARGIN: [number, number] = [8, 8];
 function BentoWidgetShell({
     title,
     headerRight,
+    onDetach,
     children,
 }: {
     title: string;
     headerRight?: React.ReactNode;
+    onDetach?: () => void;
     children: React.ReactNode;
 }) {
     return (
@@ -42,7 +45,26 @@ function BentoWidgetShell({
                     </svg>
                     <span className="text-xs font-medium text-muted-foreground">{title}</span>
                 </div>
-                {headerRight && <div>{headerRight}</div>}
+                <div className="flex items-center gap-1.5">
+                    {headerRight && <div>{headerRight}</div>}
+                    {onDetach && (
+                        <button
+                            onClick={onDetach}
+                            // Empêche le drag-handle de capter le clic.
+                            onMouseDown={(e) => e.stopPropagation()}
+                            onTouchStart={(e) => e.stopPropagation()}
+                            className="p-1 rounded text-muted-foreground/60 hover:text-foreground hover:bg-accent cursor-pointer"
+                            title="Détacher dans une fenêtre"
+                            aria-label={`Détacher ${title} dans une fenêtre`}
+                        >
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                                <polyline points="15 3 21 3 21 9"/>
+                                <line x1="10" y1="14" x2="21" y2="3"/>
+                            </svg>
+                        </button>
+                    )}
+                </div>
             </div>
             <div className="flex-1 overflow-auto min-h-0">
                 {children}
@@ -55,6 +77,10 @@ export function BentoGrid({ items, storageKey }: Props) {
     const containerRef = useRef<HTMLDivElement>(null);
     const [containerWidth, setContainerWidth] = useState(0);
     const [rowHeight, setRowHeight] = useState(60);
+    // Widgets détachés dans une fenêtre navigateur : retirés du grid (qui
+    // reflow) et rendus via DetachedWindowPortal. Fermer la fenêtre les
+    // réintègre à leur place (leur layout est conservé).
+    const [detachedIds, setDetachedIds] = useState<Set<string>>(new Set());
 
     // Charger le layout sauvegardé ou utiliser le défaut
     const defaultLayout: LayoutItem[] = items.map((item) => ({
@@ -104,22 +130,45 @@ export function BentoGrid({ items, storageKey }: Props) {
 
     const handleLayoutChange = useCallback(
         (newLayout: Layout) => {
-            setLayout([...newLayout]);
-            if (storageKey) {
-                localStorage.setItem(storageKey, JSON.stringify(newLayout));
-            }
+            // Le grid ne connaît que les widgets visibles : on réinjecte les
+            // layouts des widgets détachés pour ne pas les perdre (ni en état
+            // ni en localStorage) — ils reprennent leur place au re-dock.
+            setLayout((prev) => {
+                const detachedEntries = prev.filter((l) => detachedIds.has(l.i));
+                const merged = [...newLayout, ...detachedEntries];
+                if (storageKey) {
+                    localStorage.setItem(storageKey, JSON.stringify(merged));
+                }
+                return merged;
+            });
         },
-        [storageKey]
+        [storageKey, detachedIds]
     );
+
+    const detachItem = useCallback((id: string) => {
+        setDetachedIds((prev) => new Set(prev).add(id));
+    }, []);
+
+    const reattachItem = useCallback((id: string) => {
+        setDetachedIds((prev) => {
+            if (!prev.has(id)) return prev;
+            const next = new Set(prev);
+            next.delete(id);
+            return next;
+        });
+    }, []);
 
     if (containerWidth === 0) {
         return <div ref={containerRef} className="h-full w-full" />;
     }
 
+    const dockedItems = items.filter((item) => !detachedIds.has(item.id));
+    const detachedItems = items.filter((item) => detachedIds.has(item.id));
+
     return (
         <div ref={containerRef} className="h-full w-full overflow-auto">
             <GridLayout
-                layout={layout}
+                layout={layout.filter((l) => !detachedIds.has(l.i))}
                 width={containerWidth}
                 gridConfig={{
                     cols: COLS,
@@ -135,14 +184,32 @@ export function BentoGrid({ items, storageKey }: Props) {
                 }}
                 onLayoutChange={handleLayoutChange}
             >
-                {items.map((item) => (
+                {dockedItems.map((item) => (
                     <div key={item.id}>
-                        <BentoWidgetShell title={item.title} headerRight={item.headerRight}>
+                        <BentoWidgetShell
+                            title={item.title}
+                            headerRight={item.headerRight}
+                            onDetach={() => detachItem(item.id)}
+                        >
                             {item.content}
                         </BentoWidgetShell>
                     </div>
                 ))}
             </GridLayout>
+
+            {/* Widgets détachés : rendus dans leur propre fenêtre navigateur,
+                React reste réconcilié depuis la fenêtre parente. */}
+            {detachedItems.map((item) => (
+                <DetachedWindowPortal
+                    key={item.id}
+                    title={item.title}
+                    onClose={() => reattachItem(item.id)}
+                >
+                    <div className="h-full bg-background text-foreground overflow-auto">
+                        {item.content}
+                    </div>
+                </DetachedWindowPortal>
+            ))}
         </div>
     );
 }
