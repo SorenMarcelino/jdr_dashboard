@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { BookOpen, PenLine, GitBranch, PanelLeftClose, PanelLeft, Users } from "lucide-react";
+import Link from "next/link";
+import { BookOpen, PenLine, GitBranch, PanelLeftClose, PanelLeft, Users, ArrowLeft } from "lucide-react";
 import { ScenarioProvider, useScenario } from "@/contexts/ScenarioContext";
 import { ScenarioSidebar } from "./sidebar/ScenarioSidebar";
 import { ScenarioEditor } from "./editor/ScenarioEditor";
@@ -88,6 +89,13 @@ function WorkspaceContent({ gameId, scenarioId }: Props) {
             {/* Top bar */}
             <div className="shrink-0 flex items-center justify-between px-4 py-2 border-b bg-background">
                 <div className="flex items-center gap-2">
+                    <Link
+                        href={`/game/${gameId}/scenario`}
+                        className="p-1.5 rounded hover:bg-muted transition-colors"
+                        title="Retour à la liste des scénarios"
+                    >
+                        <ArrowLeft size={16} />
+                    </Link>
                     <button
                         onClick={() => setShowSidebar(!showSidebar)}
                         className="p-1.5 rounded hover:bg-muted transition-colors"
