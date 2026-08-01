@@ -5,7 +5,19 @@ import type { Editor } from "@tiptap/react";
 import {
     Bold, Italic, Heading1, Heading2, Heading3,
     List, ListOrdered, Quote, Minus, Link, UserCircle, StickyNote, Undo2, Redo2,
+    Palette, IndentIncrease, IndentDecrease,
 } from "lucide-react";
+
+const TEXT_COLORS: { label: string; value: string | null }[] = [
+    { label: "Défaut", value: null },
+    { label: "Rouge", value: "#ef4444" },
+    { label: "Orange", value: "#f97316" },
+    { label: "Jaune", value: "#eab308" },
+    { label: "Vert", value: "#22c55e" },
+    { label: "Bleu", value: "#3b82f6" },
+    { label: "Violet", value: "#a855f7" },
+    { label: "Rose", value: "#ec4899" },
+];
 
 type Props = {
     editor: Editor | null;
@@ -49,6 +61,7 @@ function ToolbarButton({
 
 export function ScenarioToolbar({ editor, onAddPageLink, onAddNpcRef, onAddAnnotation }: Props) {
     const [, setTick] = useState(0);
+    const [colorPickerOpen, setColorPickerOpen] = useState(false);
 
     useEffect(() => {
         if (!editor) return;
@@ -87,6 +100,51 @@ export function ScenarioToolbar({ editor, onAddPageLink, onAddNpcRef, onAddAnnot
             </ToolbarButton>
             <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} isActive={editor.isActive("heading", { level: 3 })} title="Titre 3">
                 <Heading3 size={iconSize} />
+            </ToolbarButton>
+
+            <div className="w-px h-5 bg-border mx-1" />
+
+            {/* Couleur de texte */}
+            <div className="relative">
+                <ToolbarButton
+                    onClick={() => setColorPickerOpen((v) => !v)}
+                    isActive={!!editor.getAttributes("textStyle").color}
+                    title="Couleur du texte"
+                >
+                    <Palette size={iconSize} />
+                </ToolbarButton>
+                {colorPickerOpen && (
+                    <div className="absolute top-full left-0 mt-1 flex gap-1 p-2 bg-background border rounded-md shadow-md z-10">
+                        {TEXT_COLORS.map((color) => (
+                            <button
+                                key={color.label}
+                                type="button"
+                                title={color.label}
+                                onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    if (color.value === null) {
+                                        editor.chain().focus().unsetColor().run();
+                                    } else {
+                                        editor.chain().focus().setColor(color.value).run();
+                                    }
+                                    setColorPickerOpen(false);
+                                }}
+                                className="w-5 h-5 rounded-full border border-border"
+                                style={{ backgroundColor: color.value ?? "transparent" }}
+                            />
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            <div className="w-px h-5 bg-border mx-1" />
+
+            {/* Retrait */}
+            <ToolbarButton onClick={() => editor.chain().focus().increaseIndent().run()} title="Augmenter le retrait (Tab)">
+                <IndentIncrease size={iconSize} />
+            </ToolbarButton>
+            <ToolbarButton onClick={() => editor.chain().focus().decreaseIndent().run()} title="Diminuer le retrait (Shift+Tab)">
+                <IndentDecrease size={iconSize} />
             </ToolbarButton>
 
             <div className="w-px h-5 bg-border mx-1" />

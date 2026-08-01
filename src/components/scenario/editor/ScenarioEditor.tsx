@@ -4,6 +4,8 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
+import { TextStyle } from "@tiptap/extension-text-style";
+import Color from "@tiptap/extension-color";
 import axios from "axios";
 import { useScenario } from "@/contexts/ScenarioContext";
 import { ScenarioToolbar } from "./ScenarioToolbar";
@@ -13,6 +15,7 @@ import { AnnotationPopover } from "./AnnotationPopover";
 import { ScenarioPageLinkMark } from "./extensions/ScenarioPageLinkMark";
 import { NpcReferenceMark } from "./extensions/NpcReferenceMark";
 import { AnnotationMark } from "./extensions/AnnotationMark";
+import { IndentExtension } from "./extensions/IndentExtension";
 import { API_URL } from "@/lib/api";
 
 const API = API_URL;
@@ -38,6 +41,9 @@ export function ScenarioEditor({ gameId, scenarioId }: Props) {
         immediatelyRender: false,
         extensions: [
             StarterKit,
+            TextStyle,
+            Color,
+            IndentExtension,
             Placeholder.configure({ placeholder: "Commencez à écrire votre scénario..." }),
             ScenarioPageLinkMark,
             NpcReferenceMark,

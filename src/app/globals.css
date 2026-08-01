@@ -274,3 +274,6 @@ body {
 .tiptap hr {
   @apply border-border my-4;
 }
+.ProseMirror li::marker {
+  color: inherit;
+}

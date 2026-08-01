@@ -3,11 +3,14 @@
 import { useEffect, useState, useCallback } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { TextStyle } from "@tiptap/extension-text-style";
+import Color from "@tiptap/extension-color";
 import axios from "axios";
 import { useScenario } from "@/contexts/ScenarioContext";
 import { ScenarioPageLinkMark } from "../editor/extensions/ScenarioPageLinkMark";
 import { NpcReferenceMark } from "../editor/extensions/NpcReferenceMark";
 import { AnnotationMark } from "../editor/extensions/AnnotationMark";
+import { IndentExtension } from "../editor/extensions/IndentExtension";
 import { AnnotationTooltip } from "./AnnotationTooltip";
 import { NpcSheetPopover } from "./NpcSheetPopover";
 import { API_URL } from "@/lib/api";
@@ -38,7 +41,7 @@ export function ScenarioReader({ gameId, scenarioId }: Props) {
 
     const editor = useEditor({
         immediatelyRender: false,
-        extensions: [StarterKit, ScenarioPageLinkMark, NpcReferenceMark, AnnotationMark],
+        extensions: [StarterKit, TextStyle, Color, IndentExtension, ScenarioPageLinkMark, NpcReferenceMark, AnnotationMark],
         editable: false,
         editorProps: {
             attributes: {
