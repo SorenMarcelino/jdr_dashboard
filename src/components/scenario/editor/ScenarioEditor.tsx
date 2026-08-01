@@ -16,6 +16,7 @@ import { ScenarioPageLinkMark } from "./extensions/ScenarioPageLinkMark";
 import { NpcReferenceMark } from "./extensions/NpcReferenceMark";
 import { AnnotationMark } from "./extensions/AnnotationMark";
 import { IndentExtension } from "./extensions/IndentExtension";
+import { GmOnlyBlock } from "./extensions/GmOnlyBlock";
 import { API_URL } from "@/lib/api";
 
 const API = API_URL;
@@ -44,6 +45,7 @@ export function ScenarioEditor({ gameId, scenarioId }: Props) {
             TextStyle,
             Color,
             IndentExtension,
+            GmOnlyBlock,
             Placeholder.configure({ placeholder: "Commencez à écrire votre scénario..." }),
             ScenarioPageLinkMark,
             NpcReferenceMark,

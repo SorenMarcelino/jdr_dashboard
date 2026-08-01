@@ -11,6 +11,7 @@ import { ScenarioPageLinkMark } from "../editor/extensions/ScenarioPageLinkMark"
 import { NpcReferenceMark } from "../editor/extensions/NpcReferenceMark";
 import { AnnotationMark } from "../editor/extensions/AnnotationMark";
 import { IndentExtension } from "../editor/extensions/IndentExtension";
+import { GmOnlyBlock } from "../editor/extensions/GmOnlyBlock";
 import { AnnotationTooltip } from "./AnnotationTooltip";
 import { NpcSheetPopover } from "./NpcSheetPopover";
 import { API_URL } from "@/lib/api";
@@ -41,7 +42,7 @@ export function ScenarioReader({ gameId, scenarioId }: Props) {
 
     const editor = useEditor({
         immediatelyRender: false,
-        extensions: [StarterKit, TextStyle, Color, IndentExtension, ScenarioPageLinkMark, NpcReferenceMark, AnnotationMark],
+        extensions: [StarterKit, TextStyle, Color, IndentExtension, GmOnlyBlock, ScenarioPageLinkMark, NpcReferenceMark, AnnotationMark],
         editable: false,
         editorProps: {
             attributes: {

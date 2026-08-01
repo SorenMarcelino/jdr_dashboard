@@ -5,7 +5,7 @@ import type { Editor } from "@tiptap/react";
 import {
     Bold, Italic, Heading1, Heading2, Heading3,
     List, ListOrdered, Quote, Minus, Link, UserCircle, StickyNote, Undo2, Redo2,
-    Palette, IndentIncrease, IndentDecrease,
+    Palette, IndentIncrease, IndentDecrease, EyeOff,
 } from "lucide-react";
 
 const TEXT_COLORS: { label: string; value: string | null }[] = [
@@ -161,6 +161,9 @@ export function ScenarioToolbar({ editor, onAddPageLink, onAddNpcRef, onAddAnnot
             </ToolbarButton>
             <ToolbarButton onClick={() => editor.chain().focus().setHorizontalRule().run()} title="Séparateur">
                 <Minus size={iconSize} />
+            </ToolbarButton>
+            <ToolbarButton onClick={() => editor.chain().focus().toggleGmOnlyBlock().run()} isActive={editor.isActive("gmOnlyBlock")} title="Bloc MJ uniquement">
+                <EyeOff size={iconSize} />
             </ToolbarButton>
 
             <div className="w-px h-5 bg-border mx-1" />
