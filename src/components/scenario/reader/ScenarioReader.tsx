@@ -12,6 +12,8 @@ import { NpcReferenceMark } from "../editor/extensions/NpcReferenceMark";
 import { AnnotationMark } from "../editor/extensions/AnnotationMark";
 import { IndentExtension } from "../editor/extensions/IndentExtension";
 import { GmOnlyBlock } from "../editor/extensions/GmOnlyBlock";
+import { HeadingId } from "../editor/extensions/HeadingId";
+import { PageOutline } from "../editor/PageOutline";
 import { AnnotationTooltip } from "./AnnotationTooltip";
 import { NpcSheetPopover } from "./NpcSheetPopover";
 import { API_URL } from "@/lib/api";
@@ -42,7 +44,7 @@ export function ScenarioReader({ gameId, scenarioId }: Props) {
 
     const editor = useEditor({
         immediatelyRender: false,
-        extensions: [StarterKit, TextStyle, Color, IndentExtension, GmOnlyBlock, ScenarioPageLinkMark, NpcReferenceMark, AnnotationMark],
+        extensions: [StarterKit, TextStyle, Color, IndentExtension, GmOnlyBlock, HeadingId, ScenarioPageLinkMark, NpcReferenceMark, AnnotationMark],
         editable: false,
         editorProps: {
             attributes: {
@@ -140,13 +142,16 @@ export function ScenarioReader({ gameId, scenarioId }: Props) {
             <div className="px-6 pt-4 pb-2">
                 <h1 className="text-2xl font-bold">{pageTitle}</h1>
             </div>
-            <div
-                className="flex-1 overflow-y-auto"
-                onClick={handleEditorClick}
-                onMouseOver={handleEditorMouseOver}
-                onMouseOut={handleEditorMouseOut}
-            >
-                <EditorContent editor={editor} />
+            <div className="flex-1 flex min-h-0">
+                <div
+                    className="flex-1 overflow-y-auto"
+                    onClick={handleEditorClick}
+                    onMouseOver={handleEditorMouseOver}
+                    onMouseOut={handleEditorMouseOut}
+                >
+                    <EditorContent editor={editor} />
+                </div>
+                <PageOutline editor={editor} />
             </div>
 
             {tooltip && <AnnotationTooltip text={tooltip.text} x={tooltip.x} y={tooltip.y} />}

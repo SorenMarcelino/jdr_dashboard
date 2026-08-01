@@ -17,6 +17,8 @@ import { NpcReferenceMark } from "./extensions/NpcReferenceMark";
 import { AnnotationMark } from "./extensions/AnnotationMark";
 import { IndentExtension } from "./extensions/IndentExtension";
 import { GmOnlyBlock } from "./extensions/GmOnlyBlock";
+import { HeadingId } from "./extensions/HeadingId";
+import { PageOutline } from "./PageOutline";
 import { API_URL } from "@/lib/api";
 
 const API = API_URL;
@@ -46,6 +48,7 @@ export function ScenarioEditor({ gameId, scenarioId }: Props) {
             Color,
             IndentExtension,
             GmOnlyBlock,
+            HeadingId,
             Placeholder.configure({ placeholder: "Commencez à écrire votre scénario..." }),
             ScenarioPageLinkMark,
             NpcReferenceMark,
@@ -231,9 +234,12 @@ export function ScenarioEditor({ gameId, scenarioId }: Props) {
                 onAddAnnotation={() => openPopover("annotation")}
             />
 
-            {/* Éditeur */}
-            <div className="flex-1 overflow-y-auto">
-                <EditorContent editor={editor} />
+            {/* Éditeur + sommaire */}
+            <div className="flex-1 flex min-h-0">
+                <div className="flex-1 overflow-y-auto">
+                    <EditorContent editor={editor} />
+                </div>
+                <PageOutline editor={editor} />
             </div>
 
             {/* Barre de statut */}
