@@ -6,6 +6,7 @@ import {
     createGameSchema,
     joinGameSchema,
     reorderScenariosSchema,
+    reorderPagesSchema,
 } from "../../validation/schemas.mjs";
 
 test("signupSchema accepts valid payload", () => {
@@ -54,4 +55,18 @@ test("reorderScenariosSchema rejects an empty list", () => {
 
 test("reorderScenariosSchema rejects a missing order", () => {
     assert.ok(!reorderScenariosSchema.safeParse({ orders: [{ scenarioId: "abc123" }] }).success);
+});
+
+test("reorderPagesSchema accepts a list of pageId/order pairs", () => {
+    const r = reorderPagesSchema.safeParse({
+        orders: [
+            { pageId: "abc123", order: 0 },
+            { pageId: "def456", order: 1 },
+        ],
+    });
+    assert.ok(r.success);
+});
+
+test("reorderPagesSchema rejects an empty list", () => {
+    assert.ok(!reorderPagesSchema.safeParse({ orders: [] }).success);
 });

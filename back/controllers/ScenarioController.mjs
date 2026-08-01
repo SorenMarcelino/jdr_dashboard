@@ -285,6 +285,28 @@ export async function deletePage(req, res, next) {
     }
 }
 
+// PATCH /games/:gameId/scenarios/:scenarioId/pages/reorder
+export async function reorderPages(req, res, next) {
+    try {
+        const { gameId, scenarioId } = req.params;
+        await assertMJAccess(gameId, req.user._id);
+
+        const { orders } = req.body; // [{ pageId, order }]
+
+        const bulkOps = orders.map(({ pageId, order }) => ({
+            updateOne: {
+                filter: { _id: pageId, scenarioId },
+                update: { $set: { order } },
+            },
+        }));
+
+        await ScenarioPage.bulkWrite(bulkOps);
+        res.json({ success: true });
+    } catch (err) {
+        next(err);
+    }
+}
+
 // GET /games/:gameId/scenarios/:scenarioId/graph
 export async function getGraphData(req, res, next) {
     try {

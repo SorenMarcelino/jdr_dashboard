@@ -5,6 +5,8 @@ import axios from "axios";
 import { Plus, Search } from "lucide-react";
 import { useScenario } from "@/contexts/ScenarioContext";
 import { PageListItem } from "./PageListItem";
+import { SortableList } from "@/components/ui/sortable-list";
+import { SortableItem } from "@/components/ui/sortable-item";
 import { API_URL } from "@/lib/api";
 
 const API = API_URL;
@@ -15,7 +17,7 @@ type Props = {
 };
 
 export function ScenarioSidebar({ gameId, scenarioId }: Props) {
-    const { pages, currentPageId, navigateToPage, addPage, removePage, scenario } = useScenario();
+    const { pages, setPages, currentPageId, navigateToPage, addPage, removePage, scenario } = useScenario();
     const [search, setSearch] = useState("");
 
     const filtered = pages.filter((p) =>
@@ -56,6 +58,23 @@ export function ScenarioSidebar({ gameId, scenarioId }: Props) {
         }
     };
 
+    const handleReorder = async (newIds: string[]) => {
+        const reordered = newIds
+            .map((id) => pages.find((p) => p._id === id))
+            .filter((p): p is (typeof pages)[number] => Boolean(p))
+            .map((p, index) => ({ ...p, order: index }));
+        setPages(reordered);
+        try {
+            await axios.patch(
+                `${API}/games/${gameId}/scenarios/${scenarioId}/pages/reorder`,
+                { orders: reordered.map((p) => ({ pageId: p._id, order: p.order })) },
+                { withCredentials: true }
+            );
+        } catch (err) {
+            console.error("Erreur réordonnancement:", err);
+        }
+    };
+
     return (
         <div className="w-64 border-r bg-background flex flex-col shrink-0">
             <div className="p-3 border-b">
@@ -73,16 +92,32 @@ export function ScenarioSidebar({ gameId, scenarioId }: Props) {
             </div>
 
             <div className="flex-1 overflow-y-auto p-2 space-y-0.5">
-                {filtered.map((page) => (
-                    <PageListItem
-                        key={page._id}
-                        title={page.title}
-                        isActive={page._id === currentPageId}
-                        isEntry={page._id === scenario?.entryPageId}
-                        onClick={() => navigateToPage(page._id)}
-                        onDelete={() => handleDeletePage(page._id)}
-                    />
-                ))}
+                {search.trim() === "" ? (
+                    <SortableList ids={filtered.map((p) => p._id)} onReorder={handleReorder}>
+                        {filtered.map((page) => (
+                            <SortableItem key={page._id} id={page._id}>
+                                <PageListItem
+                                    title={page.title}
+                                    isActive={page._id === currentPageId}
+                                    isEntry={page._id === scenario?.entryPageId}
+                                    onClick={() => navigateToPage(page._id)}
+                                    onDelete={() => handleDeletePage(page._id)}
+                                />
+                            </SortableItem>
+                        ))}
+                    </SortableList>
+                ) : (
+                    filtered.map((page) => (
+                        <PageListItem
+                            key={page._id}
+                            title={page.title}
+                            isActive={page._id === currentPageId}
+                            isEntry={page._id === scenario?.entryPageId}
+                            onClick={() => navigateToPage(page._id)}
+                            onDelete={() => handleDeletePage(page._id)}
+                        />
+                    ))
+                )}
             </div>
 
             <div className="p-2 border-t">

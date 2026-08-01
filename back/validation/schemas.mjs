@@ -82,6 +82,15 @@ export const reorderScenariosSchema = z.object({
     ).min(1),
 });
 
+export const reorderPagesSchema = z.object({
+    orders: z.array(
+        z.object({
+            pageId: z.string(),
+            order: z.number(),
+        })
+    ).min(1),
+});
+
 // ── Fiches personnage ───────────────────────────────────────────────────
 export const createSheetSchema = z.object({
     systemId: z.string().trim().min(1, "systemId is required"),
