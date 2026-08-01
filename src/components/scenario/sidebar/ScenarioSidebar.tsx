@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import axios from "axios";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Tags } from "lucide-react";
 import { useScenario } from "@/contexts/ScenarioContext";
 import { PageListItem } from "./PageListItem";
 import { SortableList } from "@/components/ui/sortable-list";
@@ -19,10 +19,24 @@ type Props = {
 export function ScenarioSidebar({ gameId, scenarioId }: Props) {
     const { pages, setPages, currentPageId, navigateToPage, addPage, removePage, scenario } = useScenario();
     const [search, setSearch] = useState("");
+    const [groupByTag, setGroupByTag] = useState(false);
 
     const filtered = pages.filter((p) =>
         p.title.toLowerCase().includes(search.toLowerCase())
     );
+
+    const groups = useMemo(() => {
+        if (!groupByTag) return null;
+        const map = new Map<string, typeof filtered>();
+        for (const page of filtered) {
+            const tags = page.tags.length > 0 ? page.tags : ["Sans thème"];
+            for (const tag of tags) {
+                if (!map.has(tag)) map.set(tag, []);
+                map.get(tag)!.push(page);
+            }
+        }
+        return map;
+    }, [filtered, groupByTag]);
 
     const handleCreatePage = async () => {
         try {
@@ -89,15 +103,50 @@ export function ScenarioSidebar({ gameId, scenarioId }: Props) {
                         className="w-full pl-7 pr-3 py-1.5 text-xs border rounded bg-background"
                     />
                 </div>
+                <div className="flex items-center gap-1 mt-2">
+                    <button
+                        onClick={() => setGroupByTag(false)}
+                        className={`flex-1 px-2 py-1 text-[11px] rounded ${!groupByTag ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}
+                    >
+                        Liste
+                    </button>
+                    <button
+                        onClick={() => setGroupByTag(true)}
+                        className={`flex-1 flex items-center justify-center gap-1 px-2 py-1 text-[11px] rounded ${groupByTag ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}
+                    >
+                        <Tags size={11} />
+                        Par thème
+                    </button>
+                </div>
             </div>
 
             <div className="flex-1 overflow-y-auto p-2 space-y-0.5">
-                {search.trim() === "" ? (
+                {groupByTag && groups ? (
+                    Array.from(groups.entries()).map(([tag, tagPages]) => (
+                        <div key={tag} className="mb-3">
+                            <h3 className="px-2 py-1 text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">
+                                {tag}
+                            </h3>
+                            {tagPages.map((page) => (
+                                <PageListItem
+                                    key={page._id}
+                                    title={page.title}
+                                    tags={page.tags}
+                                    isActive={page._id === currentPageId}
+                                    isEntry={page._id === scenario?.entryPageId}
+                                    onClick={() => navigateToPage(page._id)}
+                                    onDelete={() => handleDeletePage(page._id)}
+                                />
+                            ))}
+                        </div>
+                    ))
+                ) : search.trim() === "" ? (
                     <SortableList ids={filtered.map((p) => p._id)} onReorder={handleReorder}>
                         {filtered.map((page) => (
                             <SortableItem key={page._id} id={page._id}>
                                 <PageListItem
                                     title={page.title}
+                                    tags={page.tags}
                                     isActive={page._id === currentPageId}
                                     isEntry={page._id === scenario?.entryPageId}
                                     onClick={() => navigateToPage(page._id)}
@@ -111,6 +160,7 @@ export function ScenarioSidebar({ gameId, scenarioId }: Props) {
                         <PageListItem
                             key={page._id}
                             title={page.title}
+                            tags={page.tags}
                             isActive={page._id === currentPageId}
                             isEntry={page._id === scenario?.entryPageId}
                             onClick={() => navigateToPage(page._id)}

@@ -19,6 +19,7 @@ import { IndentExtension } from "./extensions/IndentExtension";
 import { GmOnlyBlock } from "./extensions/GmOnlyBlock";
 import { HeadingId } from "./extensions/HeadingId";
 import { PageOutline } from "./PageOutline";
+import { TagEditor } from "../sidebar/TagEditor";
 import { API_URL } from "@/lib/api";
 
 const API = API_URL;
@@ -31,7 +32,7 @@ type Props = {
 type PopoverType = "pageLink" | "npcRef" | "annotation" | null;
 
 export function ScenarioEditor({ gameId, scenarioId }: Props) {
-    const { currentPageId, updatePageTitle } = useScenario();
+    const { currentPageId, updatePageTitle, updatePageTags, pages } = useScenario();
     const [saving, setSaving] = useState(false);
     const [lastSaved, setLastSaved] = useState<Date | null>(null);
     const [pageTitle, setPageTitle] = useState("");
@@ -144,6 +145,25 @@ export function ScenarioEditor({ gameId, scenarioId }: Props) {
         [currentPageId, gameId, scenarioId, updatePageTitle]
     );
 
+    const currentPage = pages.find((p) => p._id === currentPageId);
+
+    const handleTagsChange = useCallback(
+        async (tags: string[]) => {
+            if (!currentPageId) return;
+            updatePageTags(currentPageId, tags);
+            try {
+                await axios.put(
+                    `${API}/games/${gameId}/scenarios/${scenarioId}/pages/${currentPageId}`,
+                    { tags },
+                    { withCredentials: true }
+                );
+            } catch (err) {
+                console.error("Erreur sauvegarde thèmes:", err);
+            }
+        },
+        [currentPageId, gameId, scenarioId, updatePageTags]
+    );
+
     const openPopover = useCallback(
         (type: PopoverType) => {
             if (!editor) return;
@@ -224,6 +244,10 @@ export function ScenarioEditor({ gameId, scenarioId }: Props) {
                     className="text-2xl font-bold w-full bg-transparent border-none outline-none placeholder:text-muted-foreground/50"
                     placeholder="Titre de la page..."
                 />
+            </div>
+
+            <div className="px-6 pb-2">
+                <TagEditor tags={currentPage?.tags ?? []} onChange={handleTagsChange} />
             </div>
 
             {/* Toolbar */}

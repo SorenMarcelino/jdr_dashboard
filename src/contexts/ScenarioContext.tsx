@@ -30,6 +30,7 @@ type ScenarioContextType = {
     addPage: (page: PageSummary) => void;
     removePage: (pageId: string) => void;
     updatePageTitle: (pageId: string, title: string) => void;
+    updatePageTags: (pageId: string, tags: string[]) => void;
 };
 
 const ScenarioContext = createContext<ScenarioContextType | null>(null);
@@ -57,6 +58,10 @@ export function ScenarioProvider({ children }: { children: ReactNode }) {
         setPages((prev) => prev.map((p) => (p._id === pageId ? { ...p, title } : p)));
     }, []);
 
+    const updatePageTags = useCallback((pageId: string, tags: string[]) => {
+        setPages((prev) => prev.map((p) => (p._id === pageId ? { ...p, tags } : p)));
+    }, []);
+
     return (
         <ScenarioContext.Provider
             value={{
@@ -71,6 +76,7 @@ export function ScenarioProvider({ children }: { children: ReactNode }) {
                 addPage,
                 removePage,
                 updatePageTitle,
+                updatePageTags,
             }}
         >
             {children}
