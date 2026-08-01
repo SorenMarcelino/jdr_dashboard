@@ -42,7 +42,7 @@ export async function getAllScenarios(req, res, next) {
                     description: 1,
                     entryPageId: 1,
                     currentPageId: 1,
-                    order: 1,
+                    order: { $ifNull: ["$order", 0] },
                     createdAt: 1,
                     updatedAt: 1,
                     pageCount: { $size: "$pages" },
@@ -232,22 +232,25 @@ export async function updatePage(req, res, next) {
         const { gameId, scenarioId, pageId } = req.params;
         await assertMJAccess(gameId, req.user._id);
 
-        const page = await ScenarioPage.findOne({ _id: pageId, scenarioId });
-        if (!page) return res.status(404).json({ success: false, message: "Page introuvable." });
-
         const { title, content, tags, position, order } = req.body;
 
-        if (title !== undefined) page.title = title;
-        if (tags !== undefined) page.tags = tags;
-        if (position !== undefined) page.position = position;
-        if (order !== undefined) page.order = order;
-
+        const update = {};
+        if (title !== undefined) update.title = title;
+        if (tags !== undefined) update.tags = tags;
+        if (position !== undefined) update.position = position;
+        if (order !== undefined) update.order = order;
         if (content !== undefined) {
-            page.content = content;
-            page.outgoingLinks = extractScenarioLinks(content);
+            update.content = content;
+            update.outgoingLinks = extractScenarioLinks(content);
         }
 
-        await page.save();
+        const page = await ScenarioPage.findOneAndUpdate(
+            { _id: pageId, scenarioId },
+            { $set: update },
+            { new: true }
+        );
+        if (!page) return res.status(404).json({ success: false, message: "Page introuvable." });
+
         res.json({ success: true, page });
     } catch (err) {
         next(err);
