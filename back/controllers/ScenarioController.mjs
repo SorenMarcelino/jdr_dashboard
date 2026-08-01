@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Scenario } from "../models/ScenarioModel.mjs";
 import ScenarioPage from "../models/ScenarioPageModel.mjs";
 import { Game } from "../models/GameModel.mjs";
@@ -24,7 +25,32 @@ export async function getAllScenarios(req, res, next) {
     try {
         const { gameId } = req.params;
         await assertMJAccess(gameId, req.user._id);
-        const scenarios = await Scenario.find({ gameId }, "title description entryPageId currentPageId createdAt");
+
+        const scenarios = await Scenario.aggregate([
+            { $match: { gameId: new mongoose.Types.ObjectId(gameId) } },
+            {
+                $lookup: {
+                    from: ScenarioPage.collection.name,
+                    localField: "_id",
+                    foreignField: "scenarioId",
+                    as: "pages",
+                },
+            },
+            {
+                $project: {
+                    title: 1,
+                    description: 1,
+                    entryPageId: 1,
+                    currentPageId: 1,
+                    order: 1,
+                    createdAt: 1,
+                    updatedAt: 1,
+                    pageCount: { $size: "$pages" },
+                },
+            },
+            { $sort: { order: 1 } },
+        ]);
+
         res.json({ success: true, scenarios });
     } catch (err) {
         next(err);
@@ -38,10 +64,14 @@ export async function createScenario(req, res, next) {
         await assertMJAccess(gameId, req.user._id);
         const { title, description } = req.body;
 
+        const lastScenario = await Scenario.findOne({ gameId }).sort({ order: -1 });
+        const order = lastScenario ? lastScenario.order + 1 : 0;
+
         const scenario = await Scenario.create({
             gameId,
             title,
             description: description || "",
+            order,
             createdBy: req.user._id,
         });
 
@@ -115,6 +145,28 @@ export async function deleteScenario(req, res, next) {
 
         await ScenarioPage.deleteMany({ scenarioId });
         res.json({ success: true, message: "Scénario supprimé." });
+    } catch (err) {
+        next(err);
+    }
+}
+
+// PATCH /games/:gameId/scenarios/reorder
+export async function reorderScenarios(req, res, next) {
+    try {
+        const { gameId } = req.params;
+        await assertMJAccess(gameId, req.user._id);
+
+        const { orders } = req.body; // [{ scenarioId, order }]
+
+        const bulkOps = orders.map(({ scenarioId, order }) => ({
+            updateOne: {
+                filter: { _id: scenarioId, gameId },
+                update: { $set: { order } },
+            },
+        }));
+
+        await Scenario.bulkWrite(bulkOps);
+        res.json({ success: true });
     } catch (err) {
         next(err);
     }

@@ -5,6 +5,7 @@ import {
     loginSchema,
     createGameSchema,
     joinGameSchema,
+    reorderScenariosSchema,
 } from "../../validation/schemas.mjs";
 
 test("signupSchema accepts valid payload", () => {
@@ -35,4 +36,22 @@ test("createGameSchema requires name and characterSheet", () => {
 test("joinGameSchema bounds invite code length", () => {
     assert.ok(joinGameSchema.safeParse({ inviteCode: "ABC123" }).success);
     assert.ok(!joinGameSchema.safeParse({ inviteCode: "AB" }).success);
+});
+
+test("reorderScenariosSchema accepts a list of scenarioId/order pairs", () => {
+    const r = reorderScenariosSchema.safeParse({
+        orders: [
+            { scenarioId: "abc123", order: 0 },
+            { scenarioId: "def456", order: 1 },
+        ],
+    });
+    assert.ok(r.success);
+});
+
+test("reorderScenariosSchema rejects an empty list", () => {
+    assert.ok(!reorderScenariosSchema.safeParse({ orders: [] }).success);
+});
+
+test("reorderScenariosSchema rejects a missing order", () => {
+    assert.ok(!reorderScenariosSchema.safeParse({ orders: [{ scenarioId: "abc123" }] }).success);
 });

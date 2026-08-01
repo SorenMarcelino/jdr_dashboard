@@ -31,10 +31,15 @@ const scenarioSchema = new mongoose.Schema({
         ref: "User",
         required: true,
     },
+    order: {
+        type: Number,
+        default: 0,
+    },
 }, {
     timestamps: true,
 });
 
 scenarioSchema.index({ gameId: 1 });
+scenarioSchema.index({ gameId: 1, order: 1 });
 
 export const Scenario = mongoose.model("Scenario", scenarioSchema);

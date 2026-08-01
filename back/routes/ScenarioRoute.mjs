@@ -6,6 +6,7 @@ import {
     getScenario,
     updateScenario,
     deleteScenario,
+    reorderScenarios,
     getAllPages,
     createPage,
     getPage,
@@ -21,6 +22,7 @@ import {
     createPageSchema,
     updatePageSchema,
     updatePositionsSchema,
+    reorderScenariosSchema,
 } from "../validation/schemas.mjs";
 
 // Routes imbriquées dans /games/:gameId — exportées pour montage dans GamesRoute
@@ -32,6 +34,7 @@ scenarioRouter.post("/scenarios", requireAuth, validate(createScenarioSchema), c
 scenarioRouter.get("/scenarios/:scenarioId", requireAuth, getScenario);
 scenarioRouter.put("/scenarios/:scenarioId", requireAuth, validate(updateScenarioSchema), updateScenario);
 scenarioRouter.delete("/scenarios/:scenarioId", requireAuth, deleteScenario);
+scenarioRouter.patch("/scenarios/reorder", requireAuth, validate(reorderScenariosSchema), reorderScenarios);
 
 // Pages
 scenarioRouter.get("/scenarios/:scenarioId/pages", requireAuth, getAllPages);

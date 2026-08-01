@@ -73,6 +73,15 @@ export const updatePositionsSchema = z.object({
     ),
 });
 
+export const reorderScenariosSchema = z.object({
+    orders: z.array(
+        z.object({
+            scenarioId: z.string(),
+            order: z.number(),
+        })
+    ).min(1),
+});
+
 // ── Fiches personnage ───────────────────────────────────────────────────
 export const createSheetSchema = z.object({
     systemId: z.string().trim().min(1, "systemId is required"),
