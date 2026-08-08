@@ -1,0 +1,240 @@
+{
+    "common": {
+        "toggleTheme": "Changer de thème"
+    },
+    "navbar": {
+        "greeting": "Bonjour {username}",
+        "login": "Connexion",
+        "logout": "Déconnexion"
+    },
+    "auth": {
+        "login": {
+            "title": "Bon retour",
+            "subtitle": "Connectez-vous à votre compte JDR Dashboard",
+            "email": "Email",
+            "emailPlaceholder": "m@example.com",
+            "password": "Mot de passe",
+            "submit": "Se connecter",
+            "submitting": "Connexion...",
+            "noAccount": "Pas encore de compte ?",
+            "signupLink": "S'inscrire",
+            "genericError": "Email ou mot de passe incorrect",
+            "termsNotice": "En continuant, vous acceptez nos <terms>conditions d'utilisation</terms> et notre <privacy>politique de confidentialité</privacy>."
+        },
+        "signup": {
+            "title": "Créer un compte",
+            "subtitle": "Rejoins l'aventure",
+            "email": "Email",
+            "emailPlaceholder": "m@example.com",
+            "username": "Nom d'utilisateur",
+            "usernamePlaceholder": "Aragorn",
+            "password": "Mot de passe",
+            "passwordHint": "8 caractères min. avec majuscule, minuscule, chiffre et caractère spécial.",
+            "confirmPassword": "Confirmer le mot de passe",
+            "submit": "Créer mon compte",
+            "submitting": "Création...",
+            "successMessage": "Compte créé avec succès ! Redirection...",
+            "genericError": "Erreur lors de la création du compte.",
+            "hasAccount": "Déjà un compte ?",
+            "loginLink": "Se connecter"
+        },
+        "errors": {
+            "emailRequired": "Email requis",
+            "emailInvalid": "Format d'email invalide",
+            "passwordRequired": "Mot de passe requis",
+            "usernameRequired": "Nom d'utilisateur requis",
+            "passwordMinLength": "8 caractères minimum",
+            "passwordUppercase": "Au moins une majuscule",
+            "passwordLowercase": "Au moins une minuscule",
+            "passwordDigit": "Au moins un chiffre",
+            "passwordSpecial": "Au moins un caractère spécial",
+            "passwordMismatch": "Les mots de passe ne correspondent pas"
+        }
+    },
+    "game": {
+        "myGamesHeading": "Mes parties",
+        "create": {
+            "title": "Créer une nouvelle partie",
+            "nameLabel": "Nom de la partie",
+            "namePlaceholder": "Ex: La Malédiction de Strahd",
+            "descriptionLabel": "Description",
+            "descriptionPlaceholder": "Décrivez votre campagne...",
+            "sheetLabel": "Feuille de personnage",
+            "sheetPlaceholder": "Choisir un système de jeu",
+            "noSheetsAvailable": "Aucun système disponible",
+            "thumbnailLabel": "Miniature",
+            "thumbnailHint": "Format JPG, PNG, WEBP recommandé.",
+            "thumbnailSelected": "Image sélectionnée ✓",
+            "thumbnailDropHint": "Glissez une image ou <action>cliquez pour choisir</action>",
+            "submit": "Créer la partie",
+            "errors": {
+                "nameTooShort": "Le nom doit contenir au moins 2 caractères.",
+                "sheetRequired": "Veuillez choisir une feuille de personnage.",
+                "createFailedAlert": "Erreur lors de la création de la partie. Êtes-vous connecté ?"
+            }
+        },
+        "join": {
+            "title": "Rejoindre une partie",
+            "codeLabel": "Code d'invitation",
+            "codePlaceholder": "Ex: AB12CD",
+            "submit": "Rejoindre",
+            "submitting": "Connexion...",
+            "genericError": "Erreur lors de la connexion."
+        },
+        "list": {
+            "loading": "Chargement des parties...",
+            "empty": "Aucune partie en cours.",
+            "gmLabel": "MJ :",
+            "codeLabel": "Code :"
+        },
+        "session": {
+            "loading": "Chargement...",
+            "notFound": "Partie introuvable ou accès refusé.",
+            "noPlayers": "Aucun joueur n'a rejoint cette partie.",
+            "codeLabel": "Code :",
+            "gmBadge": "MJ",
+            "scenariosLink": "Scénarios",
+            "sheetTitleFor": "Fiche — {username}",
+            "selectPlayer": "Sélectionner un joueur",
+            "sheetTitleDefault": "Fiche de personnage",
+            "stageTitle": "Scène",
+            "chatTitle": "Chat / Dés"
+        }
+    },
+    "bento": {
+        "detach": "Détacher dans une fenêtre",
+        "detachAria": "Détacher {title} dans une fenêtre"
+    },
+    "characterSheet": {
+        "loading": "Chargement de la fiche...",
+        "loadError": "Impossible de charger la fiche.",
+        "templateNotFound": "Template introuvable.",
+        "save": "Enregistrer",
+        "saving": "Sauvegarde...",
+        "fields": {
+            "strength": "Force",
+            "dexterity": "Dextérité",
+            "constitution": "Constitution",
+            "intelligence": "Intelligence",
+            "hitPoints": "Points de vie"
+        },
+        "sections": {},
+        "groups": {}
+    },
+    "stage": {
+        "kindImage": "Image",
+        "kindAudio": "Audio",
+        "kindVideo": "Vidéo",
+        "kindModel3d": "Modèle 3D",
+        "auto": "Auto",
+        "mediaPlaceholder": "URL du média (image, mp3, mp4, glb...)",
+        "mediaTypeAria": "Type de média",
+        "titlePlaceholder": "Titre (optionnel)",
+        "broadcast": "Diffuser",
+        "remove": "Retirer",
+        "gmPrompt": "Diffusez un média à vos joueurs",
+        "noMedia": "Aucun média diffusé",
+        "seekAria": "Position de lecture",
+        "pause": "⏸ Pause",
+        "play": "▶ Lecture",
+        "playing": "Lecture en cours",
+        "paused": "En pause",
+        "enableSound": "▶ Activer le son",
+        "loadingViewer3d": "Chargement de la visionneuse 3D...",
+        "playVideo": "▶ Lancer la lecture",
+        "mediaAlt": "Média diffusé",
+        "model3dAlt": "Modèle 3D diffusé",
+        "videoAria": "Vidéo diffusée"
+    },
+    "chat": {
+        "messagePlaceholder": "Message...",
+        "rolled": "a lancé",
+        "tens": "dizaines",
+        "units": "unités"
+    },
+    "scenario": {
+        "workspace": {
+            "backToList": "Retour à la liste des scénarios",
+            "hideSidebar": "Masquer la sidebar",
+            "showSidebar": "Afficher la sidebar",
+            "edit": "Édition",
+            "read": "Lecture",
+            "map": "Carte",
+            "npc": "PNJ",
+            "loading": "Chargement du scénario...",
+            "notFound": "Scénario introuvable",
+            "fallbackTitle": "Scénario"
+        },
+        "list": {
+            "heading": "Scénarios",
+            "newScenario": "Nouveau scénario",
+            "titlePlaceholder": "Titre du scénario...",
+            "cancel": "Annuler",
+            "create": "Créer",
+            "search": "Rechercher...",
+            "sortManual": "Ordre manuel",
+            "sortName": "Nom (A→Z)",
+            "sortUpdated": "Dernière modification",
+            "empty": "Aucun scénario pour cette partie",
+            "emptyHint": "Créez-en un pour commencer à écrire votre histoire",
+            "pageCount": "{count, plural, =0 {0 page} one {# page} other {# pages}}",
+            "modifiedOn": "Modifié le {date}",
+            "deleteConfirm": "Supprimer ce scénario et toutes ses pages ?",
+            "loading": "Chargement..."
+        },
+        "sidebar": {
+            "search": "Rechercher...",
+            "viewList": "Liste",
+            "viewByTag": "Par thème",
+            "noTag": "Sans thème",
+            "addPage": "Ajouter une page",
+            "newPageTitle": "Nouvelle page",
+            "deletePageConfirm": "Supprimer cette page ?",
+            "entryBadge": "Entrée",
+            "deleteTitle": "Supprimer",
+            "dragHandle": "Glisser pour réordonner",
+            "removeTag": "Retirer ce thème",
+            "addTagPlaceholder": "+ thème"
+        },
+        "editor": {
+            "placeholder": "Commencez à écrire votre scénario...",
+            "titlePlaceholder": "Titre de la page...",
+            "saving": "Sauvegarde...",
+            "savedAt": "Sauvegardé à {time}",
+            "selectPage": "Sélectionnez une page dans la barre latérale"
+        },
+        "toolbar": {
+            "bold": "Gras",
+            "italic": "Italique",
+            "heading1": "Titre 1",
+            "heading2": "Titre 2",
+            "heading3": "Titre 3",
+            "textColor": "Couleur du texte",
+            "colorDefault": "Défaut",
+            "colorRed": "Rouge",
+            "colorOrange": "Orange",
+            "colorYellow": "Jaune",
+            "colorGreen": "Vert",
+            "colorBlue": "Bleu",
+            "colorPurple": "Violet",
+            "colorPink": "Rose",
+            "increaseIndent": "Augmenter le retrait (Tab)",
+            "decreaseIndent": "Diminuer le retrait (Shift+Tab)",
+            "bulletList": "Liste",
+            "orderedList": "Liste numérotée",
+            "quote": "Citation",
+            "divider": "Séparateur",
+            "gmOnlyBlock": "Bloc MJ uniquement",
+            "pageLink": "Lier à une page",
+            "npcLink": "Lier un PNJ",
+            "annotation": "Ajouter une note",
+            "undo": "Annuler",
+            "redo": "Rétablir"
+        },
+        "outline": {
+            "title": "Sommaire",
+            "show": "Afficher le sommaire",
+            "hide": "Masquer le sommaire"
+        }
+    }
+}

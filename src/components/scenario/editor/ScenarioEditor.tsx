@@ -7,6 +7,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { TextStyle } from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
 import axios from "axios";
+import { useTranslations, useFormatter } from "next-intl";
 import { useScenario } from "@/contexts/ScenarioContext";
 import { ScenarioToolbar } from "./ScenarioToolbar";
 import { PageLinkSelector } from "./PageLinkSelector";
@@ -40,6 +41,8 @@ export function ScenarioEditor({ gameId, scenarioId }: Props) {
     const savedSelectionRef = useRef<{ from: number; to: number } | null>(null);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const initialLoadRef = useRef(false);
+    const t = useTranslations("scenario.editor");
+    const format = useFormatter();
 
     const editor = useEditor({
         immediatelyRender: false,
@@ -50,7 +53,7 @@ export function ScenarioEditor({ gameId, scenarioId }: Props) {
             IndentExtension,
             GmOnlyBlock,
             HeadingId,
-            Placeholder.configure({ placeholder: "Commencez à écrire votre scénario..." }),
+            Placeholder.configure({ placeholder: t("placeholder") }),
             ScenarioPageLinkMark,
             NpcReferenceMark,
             AnnotationMark,
@@ -228,7 +231,7 @@ export function ScenarioEditor({ gameId, scenarioId }: Props) {
     if (!currentPageId) {
         return (
             <div className="flex-1 flex items-center justify-center text-muted-foreground">
-                <p className="text-sm">Sélectionnez une page dans la barre latérale</p>
+                <p className="text-sm">{t("selectPage")}</p>
             </div>
         );
     }
@@ -242,7 +245,7 @@ export function ScenarioEditor({ gameId, scenarioId }: Props) {
                     value={pageTitle}
                     onChange={(e) => handleTitleChange(e.target.value)}
                     className="text-2xl font-bold w-full bg-transparent border-none outline-none placeholder:text-muted-foreground/50"
-                    placeholder="Titre de la page..."
+                    placeholder={t("titlePlaceholder")}
                 />
             </div>
 
@@ -269,9 +272,9 @@ export function ScenarioEditor({ gameId, scenarioId }: Props) {
             {/* Barre de statut */}
             <div className="flex items-center justify-end px-4 py-1.5 border-t text-xs text-muted-foreground">
                 {saving ? (
-                    <span>Sauvegarde...</span>
+                    <span>{t("saving")}</span>
                 ) : lastSaved ? (
-                    <span>Sauvegardé à {lastSaved.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</span>
+                    <span>{t("savedAt", { time: format.dateTime(lastSaved, { hour: "2-digit", minute: "2-digit" }) })}</span>
                 ) : null}
             </div>
 

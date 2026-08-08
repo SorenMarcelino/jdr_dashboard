@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type Props = {
     id: string;
@@ -12,6 +13,7 @@ type Props = {
 
 export function SortableItem({ id, children }: Props) {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+    const t = useTranslations("scenario.sidebar");
 
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -26,7 +28,7 @@ export function SortableItem({ id, children }: Props) {
                 {...listeners}
                 type="button"
                 className="p-1 text-muted-foreground/50 hover:text-muted-foreground cursor-grab active:cursor-grabbing shrink-0"
-                title="Glisser pour réordonner"
+                title={t("dragHandle")}
             >
                 <GripVertical size={14} />
             </button>

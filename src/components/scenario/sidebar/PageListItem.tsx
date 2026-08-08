@@ -1,6 +1,7 @@
 "use client";
 
 import { FileText, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type Props = {
     title: string;
@@ -12,6 +13,8 @@ type Props = {
 };
 
 export function PageListItem({ title, tags, isActive, isEntry, onClick, onDelete }: Props) {
+    const t = useTranslations("scenario.sidebar");
+
     return (
         <div
             className={`group flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer transition-colors text-sm ${
@@ -32,7 +35,7 @@ export function PageListItem({ title, tags, isActive, isEntry, onClick, onDelete
             </div>
             {isEntry && (
                 <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/20 text-primary shrink-0">
-                    Entrée
+                    {t("entryBadge")}
                 </span>
             )}
             <button
@@ -41,7 +44,7 @@ export function PageListItem({ title, tags, isActive, isEntry, onClick, onDelete
                     onDelete();
                 }}
                 className="opacity-0 group-hover:opacity-100 p-0.5 hover:text-destructive transition-all"
-                title="Supprimer"
+                title={t("deleteTitle")}
             >
                 <Trash2 size={12} />
             </button>

@@ -6,6 +6,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { TextStyle } from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
 import axios from "axios";
+import { useTranslations } from "next-intl";
 import { useScenario } from "@/contexts/ScenarioContext";
 import { ScenarioPageLinkMark } from "../editor/extensions/ScenarioPageLinkMark";
 import { NpcReferenceMark } from "../editor/extensions/NpcReferenceMark";
@@ -41,6 +42,8 @@ export function ScenarioReader({ gameId, scenarioId }: Props) {
     const [pageTitle, setPageTitle] = useState("");
     const [tooltip, setTooltip] = useState<TooltipState>(null);
     const [npcPopover, setNpcPopover] = useState<NpcPopoverState>(null);
+    const t = useTranslations("scenario.editor");
+    const tToolbar = useTranslations("scenario.workspace");
 
     const editor = useEditor({
         immediatelyRender: false,
@@ -90,7 +93,7 @@ export function ScenarioReader({ gameId, scenarioId }: Props) {
             const npcRef = target.closest("[data-npc-ref]") as HTMLElement | null;
             if (npcRef) {
                 const sheetId = npcRef.getAttribute("data-npc-ref");
-                const npcName = npcRef.textContent || "PNJ";
+                const npcName = npcRef.textContent || tToolbar("npc");
                 if (sheetId) setNpcPopover({ sheetId, npcName });
                 return;
             }
@@ -132,7 +135,7 @@ export function ScenarioReader({ gameId, scenarioId }: Props) {
     if (!currentPageId) {
         return (
             <div className="flex-1 flex items-center justify-center text-muted-foreground">
-                <p className="text-sm">Sélectionnez une page dans la barre latérale</p>
+                <p className="text-sm">{t("selectPage")}</p>
             </div>
         );
     }

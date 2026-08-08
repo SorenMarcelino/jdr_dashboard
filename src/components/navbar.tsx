@@ -4,7 +4,9 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import axios from "axios";
+import { useTranslations } from 'next-intl';
 import { ModeToggle } from '@/components/dark-mode-toggle/mode-toggle';
+import { LanguageSwitcher } from '@/components/language-switcher';
 import { Button } from '@/components/ui/button';
 import { getGameLogo, getNavbarLogoAsset } from '@/config/gameLogos';
 import { API_URL } from "@/lib/api";
@@ -17,6 +19,7 @@ export type NavbarGame = {
 
 export function Navbar({ game }: { game?: NavbarGame }) {
     const [username, setUsername] = useState("");
+    const t = useTranslations("navbar");
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -70,17 +73,18 @@ export function Navbar({ game }: { game?: NavbarGame }) {
             <div className="flex items-center gap-3">
                 {username ? (
                     <>
-                        <span className="text-sm text-muted-foreground">Hello {username}</span>
+                        <span className="text-sm text-muted-foreground">{t("greeting", { username })}</span>
                         <Button size="sm" onClick={handleLogout}>
-                            Logout
+                            {t("logout")}
                         </Button>
                     </>
                 ) : (
                     <Button asChild size="sm">
-                        <Link href="/login">Log In</Link>
+                        <Link href="/login">{t("login")}</Link>
                     </Button>
                 )}
 
+                <LanguageSwitcher />
                 <ModeToggle />
             </div>
         </nav>

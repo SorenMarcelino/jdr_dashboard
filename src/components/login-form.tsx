@@ -13,12 +13,13 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { useRouter } from "next/navigation"
-import React, { useState } from "react"
+import React, { useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import axios from "axios"
+import { useTranslations } from "next-intl"
 import { API_URL, resetAuthState } from "@/lib/api"
-import { loginSchema, type LoginValues } from "@/lib/validation/auth"
+import { createLoginSchema, type LoginValues } from "@/lib/validation/auth"
 
 export function LoginForm({
   className,
@@ -26,6 +27,10 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   const router = useRouter()
   const [error, setError] = useState("")
+  const t = useTranslations("auth.login")
+  const tErrors = useTranslations("auth.errors")
+
+  const loginSchema = useMemo(() => createLoginSchema(tErrors), [tErrors])
 
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
@@ -45,10 +50,10 @@ export function LoginForm({
         resetAuthState()
         router.push("/user")
       } else {
-        setError(data.message || "Email ou mot de passe incorrect")
+        setError(data.message || t("genericError"))
       }
     } catch {
-      setError("Email ou mot de passe incorrect")
+      setError(t("genericError"))
     }
   }
 
@@ -60,9 +65,9 @@ export function LoginForm({
             <form className="p-6 md:p-8" onSubmit={form.handleSubmit(onSubmit)}>
               <div className="flex flex-col gap-6">
                 <div className="flex flex-col items-center text-center">
-                  <h1 className="text-2xl font-bold">Bon retour</h1>
+                  <h1 className="text-2xl font-bold">{t("title")}</h1>
                   <p className="text-balance text-muted-foreground">
-                    Connectez-vous à votre compte JDR Dashboard
+                    {t("subtitle")}
                   </p>
                 </div>
 
@@ -71,9 +76,9 @@ export function LoginForm({
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>{t("email")}</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="m@example.com" autoComplete="email" {...field} />
+                        <Input type="email" placeholder={t("emailPlaceholder")} autoComplete="email" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -85,7 +90,7 @@ export function LoginForm({
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Mot de passe</FormLabel>
+                      <FormLabel>{t("password")}</FormLabel>
                       <FormControl>
                         <Input type="password" autoComplete="current-password" {...field} />
                       </FormControl>
@@ -101,13 +106,13 @@ export function LoginForm({
                 )}
 
                 <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-                  {form.formState.isSubmitting ? "Connexion..." : "Se connecter"}
+                  {form.formState.isSubmitting ? t("submitting") : t("submit")}
                 </Button>
 
                 <div className="text-center text-sm">
-                  Pas encore de compte ?{" "}
+                  {t("noAccount")}{" "}
                   <a href="/signup" className="underline underline-offset-4">
-                    S&apos;inscrire
+                    {t("signupLink")}
                   </a>
                 </div>
               </div>
@@ -117,8 +122,10 @@ export function LoginForm({
         </CardContent>
       </Card>
       <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary">
-        En continuant, vous acceptez nos <a href="#">conditions d&apos;utilisation</a>{" "}
-        et notre <a href="#">politique de confidentialité</a>.
+        {t.rich("termsNotice", {
+          terms: (chunks) => <a href="#">{chunks}</a>,
+          privacy: (chunks) => <a href="#">{chunks}</a>,
+        })}
       </div>
     </div>
   )

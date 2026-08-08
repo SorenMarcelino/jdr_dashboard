@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { Send } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type Props = {
     onSend: (content: string) => void;
@@ -10,6 +11,7 @@ type Props = {
 
 export function ChatInput({ onSend, disabled }: Props) {
     const [value, setValue] = useState("");
+    const t = useTranslations("chat");
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
@@ -23,7 +25,7 @@ export function ChatInput({ onSend, disabled }: Props) {
         <form onSubmit={handleSubmit} className="flex items-center gap-1.5 px-2 py-1.5 border-t bg-background">
             <input
                 type="text"
-                placeholder="Message..."
+                placeholder={t("messagePlaceholder")}
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
                 disabled={disabled}

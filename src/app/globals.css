@@ -283,6 +283,13 @@ body {
 }
 
 .scenario-gm-only-block::before {
-  content: "🙈 MJ uniquement";
   @apply absolute left-3 top-2 rounded-full bg-destructive/15 px-2 py-0.5 text-[11px] font-medium text-destructive;
+}
+
+html[lang="fr"] .scenario-gm-only-block::before {
+    content: "🙈 MJ uniquement";
+}
+
+html[lang="en"] .scenario-gm-only-block::before {
+    content: "🙈 GM only";
 }

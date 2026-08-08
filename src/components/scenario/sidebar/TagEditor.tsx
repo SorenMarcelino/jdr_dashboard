@@ -2,6 +2,7 @@
 
 import { useState, type KeyboardEvent } from "react";
 import { X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type Props = {
     tags: string[];
@@ -10,6 +11,7 @@ type Props = {
 
 export function TagEditor({ tags, onChange }: Props) {
     const [draft, setDraft] = useState("");
+    const t = useTranslations("scenario.sidebar");
 
     const addTag = () => {
         const value = draft.trim();
@@ -44,7 +46,7 @@ export function TagEditor({ tags, onChange }: Props) {
                         type="button"
                         onClick={() => removeTag(tag)}
                         className="hover:text-destructive"
-                        title="Retirer ce thème"
+                        title={t("removeTag")}
                     >
                         <X size={10} />
                     </button>
@@ -56,7 +58,7 @@ export function TagEditor({ tags, onChange }: Props) {
                 onChange={(e) => setDraft(e.target.value)}
                 onKeyDown={handleKeyDown}
                 onBlur={addTag}
-                placeholder="+ thème"
+                placeholder={t("addTagPlaceholder")}
                 className="w-20 px-2 py-0.5 text-xs bg-transparent border border-dashed rounded-full focus:outline-none focus:border-primary"
             />
         </div>

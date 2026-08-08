@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Editor } from "@tiptap/react";
+import { useTranslations } from "next-intl";
 import { ChevronsRight, List } from "lucide-react";
 
 type OutlineEntry = {
@@ -33,6 +34,7 @@ export function PageOutline({ editor }: Props) {
     const [outline, setOutline] = useState<OutlineEntry[]>([]);
     const [collapsed, setCollapsed] = useState(false);
     const [activeId, setActiveId] = useState<string | null>(null);
+    const t = useTranslations("scenario.outline");
 
     useEffect(() => {
         if (!editor) return;
@@ -71,7 +73,7 @@ export function PageOutline({ editor }: Props) {
             <button
                 onClick={() => setCollapsed(false)}
                 className="w-8 border-l flex items-start justify-center pt-3 hover:bg-muted transition-colors shrink-0"
-                title="Afficher le sommaire"
+                title={t("show")}
             >
                 <List size={14} />
             </button>
@@ -81,11 +83,11 @@ export function PageOutline({ editor }: Props) {
     return (
         <div className="w-56 border-l bg-background flex flex-col shrink-0">
             <div className="flex items-center justify-between px-3 py-2 border-b">
-                <span className="text-xs font-semibold text-muted-foreground">Sommaire</span>
+                <span className="text-xs font-semibold text-muted-foreground">{t("title")}</span>
                 <button
                     onClick={() => setCollapsed(true)}
                     className="p-1 rounded hover:bg-muted transition-colors"
-                    title="Masquer le sommaire"
+                    title={t("hide")}
                 >
                     <ChevronsRight size={14} />
                 </button>

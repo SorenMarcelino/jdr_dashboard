@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { CharacterSheetField, FieldDef } from "./CharacterSheetField";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -8,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 export type SectionDef = {
     id: string;
     title?: string;
+    titleKey?: string | null;
     order?: number;
     columns?: number;
 };
@@ -15,6 +17,7 @@ export type SectionDef = {
 export type GroupDef = {
     id: string;
     label?: string;
+    labelKey?: string | null;
     section: string;
     order?: number;
     columns?: number;
@@ -62,6 +65,7 @@ function SectionHeading({ title }: { title: string }) {
 }
 
 export function GenericCharacterSheet({ template, instance, isEditable, onSave }: Props) {
+    const t = useTranslations("characterSheet");
     const defaultValues = Object.fromEntries(
         template.fields.map((f) => [f.id, f.defaultValue ?? null])
     );
@@ -113,7 +117,11 @@ export function GenericCharacterSheet({ template, instance, isEditable, onSave }
 
                     return (
                         <section key={section.id} className="flex flex-col gap-3">
-                            {section.title && <SectionHeading title={section.title} />}
+                            {section.title && (
+                                <SectionHeading
+                                    title={section.titleKey ? t(`sections.${section.titleKey}`) : section.title}
+                                />
+                            )}
 
                             {ungrouped.length > 0 && (
                                 <div className={`grid ${colClass(section.columns)} gap-2`}>
@@ -126,9 +134,10 @@ export function GenericCharacterSheet({ template, instance, isEditable, onSave }
                                     {sectionGroups.map((group) => {
                                         const groupFields = sectionFields.filter((f) => f.group === group.id);
                                         if (groupFields.length === 0) return null;
+                                        const groupLabel = group.labelKey ? t(`groups.${group.labelKey}`) : group.label;
                                         return (
                                             <div key={group.id} className="@container flex flex-col gap-2 bg-muted/40 rounded-lg p-3 min-w-0">
-                                                {group.label && <span className="text-xs font-semibold">{group.label}</span>}
+                                                {groupLabel && <span className="text-xs font-semibold">{groupLabel}</span>}
                                                 <div className={`grid ${colClass(group.columns)} gap-1.5`}>
                                                     {groupFields.map(renderField)}
                                                 </div>
@@ -144,7 +153,7 @@ export function GenericCharacterSheet({ template, instance, isEditable, onSave }
                 {isEditable && (
                     <div className="flex justify-end pt-1">
                         <Button onClick={handleSave} disabled={saving} size="sm">
-                            {saving ? "Sauvegarde..." : "Sauvegarder"}
+                            {saving ? t("saving") : t("save")}
                         </Button>
                     </div>
                 )}

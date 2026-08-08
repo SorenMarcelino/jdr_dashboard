@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 type Props = {
     url: string;
@@ -34,6 +35,7 @@ declare module "react" {
 // charge le binaire via fetch).
 export function ModelRenderer({ url, title }: Props) {
     const [ready, setReady] = useState(false);
+    const t = useTranslations("stage");
 
     useEffect(() => {
         let cancelled = false;
@@ -48,7 +50,7 @@ export function ModelRenderer({ url, title }: Props) {
     if (!ready) {
         return (
             <div className="h-full w-full flex items-center justify-center bg-muted text-muted-foreground text-xs">
-                Chargement de la visionneuse 3D...
+                {t("loadingViewer3d")}
             </div>
         );
     }
@@ -57,7 +59,7 @@ export function ModelRenderer({ url, title }: Props) {
         <div className="h-full w-full bg-muted">
             <model-viewer
                 src={url}
-                alt={title || "Modèle 3D diffusé"}
+                alt={title || t("model3dAlt")}
                 camera-controls
                 auto-rotate
                 style={{ width: "100%", height: "100%" }}

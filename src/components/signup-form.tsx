@@ -14,12 +14,13 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { useRouter } from "next/navigation"
-import React, { useState } from "react"
+import React, { useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import axios from "axios"
+import { useTranslations } from "next-intl"
 import { API_URL } from "@/lib/api"
-import { signupSchema, type SignupValues } from "@/lib/validation/auth"
+import { createSignupSchema, type SignupValues } from "@/lib/validation/auth"
 
 export function SignupForm({
     className,
@@ -28,6 +29,10 @@ export function SignupForm({
     const router = useRouter()
     const [error, setError] = useState("")
     const [success, setSuccess] = useState("")
+    const t = useTranslations("auth.signup")
+    const tErrors = useTranslations("auth.errors")
+
+    const signupSchema = useMemo(() => createSignupSchema(tErrors), [tErrors])
 
     const form = useForm<SignupValues>({
         resolver: zodResolver(signupSchema),
@@ -45,16 +50,16 @@ export function SignupForm({
             )
 
             if (data.success) {
-                setSuccess("Compte créé avec succès ! Redirection...")
+                setSuccess(t("successMessage"))
                 setTimeout(() => router.push("/user"), 1500)
             } else {
-                setError(data.message || "Erreur lors de la création du compte.")
+                setError(data.message || t("genericError"))
             }
         } catch (err: unknown) {
             if (axios.isAxiosError(err)) {
-                setError(err.response?.data?.message || "Erreur lors de la création du compte.")
+                setError(err.response?.data?.message || t("genericError"))
             } else {
-                setError("Erreur lors de la création du compte.")
+                setError(t("genericError"))
             }
         }
     }
@@ -67,9 +72,9 @@ export function SignupForm({
                         <form className="p-6 md:p-8" onSubmit={form.handleSubmit(onSubmit)}>
                             <div className="flex flex-col gap-6">
                                 <div className="flex flex-col items-center text-center">
-                                    <h1 className="text-2xl font-bold">Créer un compte</h1>
+                                    <h1 className="text-2xl font-bold">{t("title")}</h1>
                                     <p className="text-balance text-muted-foreground">
-                                        Rejoins l&apos;aventure
+                                        {t("subtitle")}
                                     </p>
                                 </div>
 
@@ -78,9 +83,9 @@ export function SignupForm({
                                     name="email"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Email</FormLabel>
+                                            <FormLabel>{t("email")}</FormLabel>
                                             <FormControl>
-                                                <Input type="email" placeholder="m@example.com" autoComplete="email" {...field} />
+                                                <Input type="email" placeholder={t("emailPlaceholder")} autoComplete="email" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -92,9 +97,9 @@ export function SignupForm({
                                     name="username"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Nom d&apos;utilisateur</FormLabel>
+                                            <FormLabel>{t("username")}</FormLabel>
                                             <FormControl>
-                                                <Input type="text" placeholder="Aragorn" autoComplete="username" {...field} />
+                                                <Input type="text" placeholder={t("usernamePlaceholder")} autoComplete="username" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -106,12 +111,12 @@ export function SignupForm({
                                     name="password"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Mot de passe</FormLabel>
+                                            <FormLabel>{t("password")}</FormLabel>
                                             <FormControl>
                                                 <Input type="password" autoComplete="new-password" {...field} />
                                             </FormControl>
                                             <FormDescription>
-                                                8 caractères min. avec majuscule, minuscule, chiffre et caractère spécial.
+                                                {t("passwordHint")}
                                             </FormDescription>
                                             <FormMessage />
                                         </FormItem>
@@ -123,7 +128,7 @@ export function SignupForm({
                                     name="confirmPassword"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Confirmer le mot de passe</FormLabel>
+                                            <FormLabel>{t("confirmPassword")}</FormLabel>
                                             <FormControl>
                                                 <Input type="password" autoComplete="new-password" {...field} />
                                             </FormControl>
@@ -144,13 +149,13 @@ export function SignupForm({
                                 )}
 
                                 <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-                                    {form.formState.isSubmitting ? "Création..." : "Créer mon compte"}
+                                    {form.formState.isSubmitting ? t("submitting") : t("submit")}
                                 </Button>
 
                                 <div className="text-center text-sm">
-                                    Déjà un compte ?{" "}
+                                    {t("hasAccount")}{" "}
                                     <a href="/login" className="underline underline-offset-4">
-                                        Se connecter
+                                        {t("loginLink")}
                                     </a>
                                 </div>
                             </div>

@@ -2,21 +2,22 @@
 
 import { useEffect, useState } from "react";
 import type { Editor } from "@tiptap/react";
+import { useTranslations } from "next-intl";
 import {
     Bold, Italic, Heading1, Heading2, Heading3,
     List, ListOrdered, Quote, Minus, Link, UserCircle, StickyNote, Undo2, Redo2,
     Palette, IndentIncrease, IndentDecrease, EyeOff,
 } from "lucide-react";
 
-const TEXT_COLORS: { label: string; value: string | null }[] = [
-    { label: "Défaut", value: null },
-    { label: "Rouge", value: "#ef4444" },
-    { label: "Orange", value: "#f97316" },
-    { label: "Jaune", value: "#eab308" },
-    { label: "Vert", value: "#22c55e" },
-    { label: "Bleu", value: "#3b82f6" },
-    { label: "Violet", value: "#a855f7" },
-    { label: "Rose", value: "#ec4899" },
+const TEXT_COLOR_KEYS: { key: string; value: string | null }[] = [
+    { key: "colorDefault", value: null },
+    { key: "colorRed", value: "#ef4444" },
+    { key: "colorOrange", value: "#f97316" },
+    { key: "colorYellow", value: "#eab308" },
+    { key: "colorGreen", value: "#22c55e" },
+    { key: "colorBlue", value: "#3b82f6" },
+    { key: "colorPurple", value: "#a855f7" },
+    { key: "colorPink", value: "#ec4899" },
 ];
 
 type Props = {
@@ -62,6 +63,7 @@ function ToolbarButton({
 export function ScenarioToolbar({ editor, onAddPageLink, onAddNpcRef, onAddAnnotation }: Props) {
     const [, setTick] = useState(0);
     const [colorPickerOpen, setColorPickerOpen] = useState(false);
+    const t = useTranslations("scenario.toolbar");
 
     useEffect(() => {
         if (!editor) return;
@@ -82,23 +84,23 @@ export function ScenarioToolbar({ editor, onAddPageLink, onAddNpcRef, onAddAnnot
     return (
         <div className="flex items-center gap-0.5 flex-wrap border-b bg-background px-2 py-1">
             {/* Formatage de base */}
-            <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()} isActive={editor.isActive("bold")} title="Gras">
+            <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()} isActive={editor.isActive("bold")} title={t("bold")}>
                 <Bold size={iconSize} />
             </ToolbarButton>
-            <ToolbarButton onClick={() => editor.chain().focus().toggleItalic().run()} isActive={editor.isActive("italic")} title="Italique">
+            <ToolbarButton onClick={() => editor.chain().focus().toggleItalic().run()} isActive={editor.isActive("italic")} title={t("italic")}>
                 <Italic size={iconSize} />
             </ToolbarButton>
 
             <div className="w-px h-5 bg-border mx-1" />
 
             {/* Titres */}
-            <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} isActive={editor.isActive("heading", { level: 1 })} title="Titre 1">
+            <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} isActive={editor.isActive("heading", { level: 1 })} title={t("heading1")}>
                 <Heading1 size={iconSize} />
             </ToolbarButton>
-            <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} isActive={editor.isActive("heading", { level: 2 })} title="Titre 2">
+            <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} isActive={editor.isActive("heading", { level: 2 })} title={t("heading2")}>
                 <Heading2 size={iconSize} />
             </ToolbarButton>
-            <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} isActive={editor.isActive("heading", { level: 3 })} title="Titre 3">
+            <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} isActive={editor.isActive("heading", { level: 3 })} title={t("heading3")}>
                 <Heading3 size={iconSize} />
             </ToolbarButton>
 
@@ -109,17 +111,17 @@ export function ScenarioToolbar({ editor, onAddPageLink, onAddNpcRef, onAddAnnot
                 <ToolbarButton
                     onClick={() => setColorPickerOpen((v) => !v)}
                     isActive={!!editor.getAttributes("textStyle").color}
-                    title="Couleur du texte"
+                    title={t("textColor")}
                 >
                     <Palette size={iconSize} />
                 </ToolbarButton>
                 {colorPickerOpen && (
                     <div className="absolute top-full left-0 mt-1 flex gap-1 p-2 bg-background border rounded-md shadow-md z-10">
-                        {TEXT_COLORS.map((color) => (
+                        {TEXT_COLOR_KEYS.map((color) => (
                             <button
-                                key={color.label}
+                                key={color.key}
                                 type="button"
-                                title={color.label}
+                                title={t(color.key)}
                                 onMouseDown={(e) => {
                                     e.preventDefault();
                                     if (color.value === null) {
@@ -140,52 +142,52 @@ export function ScenarioToolbar({ editor, onAddPageLink, onAddNpcRef, onAddAnnot
             <div className="w-px h-5 bg-border mx-1" />
 
             {/* Retrait */}
-            <ToolbarButton onClick={() => editor.chain().focus().increaseIndent().run()} title="Augmenter le retrait (Tab)">
+            <ToolbarButton onClick={() => editor.chain().focus().increaseIndent().run()} title={t("increaseIndent")}>
                 <IndentIncrease size={iconSize} />
             </ToolbarButton>
-            <ToolbarButton onClick={() => editor.chain().focus().decreaseIndent().run()} title="Diminuer le retrait (Shift+Tab)">
+            <ToolbarButton onClick={() => editor.chain().focus().decreaseIndent().run()} title={t("decreaseIndent")}>
                 <IndentDecrease size={iconSize} />
             </ToolbarButton>
 
             <div className="w-px h-5 bg-border mx-1" />
 
             {/* Listes */}
-            <ToolbarButton onClick={() => editor.chain().focus().toggleBulletList().run()} isActive={editor.isActive("bulletList")} title="Liste">
+            <ToolbarButton onClick={() => editor.chain().focus().toggleBulletList().run()} isActive={editor.isActive("bulletList")} title={t("bulletList")}>
                 <List size={iconSize} />
             </ToolbarButton>
-            <ToolbarButton onClick={() => editor.chain().focus().toggleOrderedList().run()} isActive={editor.isActive("orderedList")} title="Liste numérotée">
+            <ToolbarButton onClick={() => editor.chain().focus().toggleOrderedList().run()} isActive={editor.isActive("orderedList")} title={t("orderedList")}>
                 <ListOrdered size={iconSize} />
             </ToolbarButton>
-            <ToolbarButton onClick={() => editor.chain().focus().toggleBlockquote().run()} isActive={editor.isActive("blockquote")} title="Citation">
+            <ToolbarButton onClick={() => editor.chain().focus().toggleBlockquote().run()} isActive={editor.isActive("blockquote")} title={t("quote")}>
                 <Quote size={iconSize} />
             </ToolbarButton>
-            <ToolbarButton onClick={() => editor.chain().focus().setHorizontalRule().run()} title="Séparateur">
+            <ToolbarButton onClick={() => editor.chain().focus().setHorizontalRule().run()} title={t("divider")}>
                 <Minus size={iconSize} />
             </ToolbarButton>
-            <ToolbarButton onClick={() => editor.chain().focus().toggleGmOnlyBlock().run()} isActive={editor.isActive("gmOnlyBlock")} title="Bloc MJ uniquement">
+            <ToolbarButton onClick={() => editor.chain().focus().toggleGmOnlyBlock().run()} isActive={editor.isActive("gmOnlyBlock")} title={t("gmOnlyBlock")}>
                 <EyeOff size={iconSize} />
             </ToolbarButton>
 
             <div className="w-px h-5 bg-border mx-1" />
 
             {/* Annotations spéciales */}
-            <ToolbarButton onClick={onAddPageLink} disabled={!hasSelection} title="Lier à une page">
+            <ToolbarButton onClick={onAddPageLink} disabled={!hasSelection} title={t("pageLink")}>
                 <Link size={iconSize} />
             </ToolbarButton>
-            <ToolbarButton onClick={onAddNpcRef} disabled={!hasSelection} title="Lier un PNJ">
+            <ToolbarButton onClick={onAddNpcRef} disabled={!hasSelection} title={t("npcLink")}>
                 <UserCircle size={iconSize} />
             </ToolbarButton>
-            <ToolbarButton onClick={onAddAnnotation} disabled={!hasSelection} title="Ajouter une note">
+            <ToolbarButton onClick={onAddAnnotation} disabled={!hasSelection} title={t("annotation")}>
                 <StickyNote size={iconSize} />
             </ToolbarButton>
 
             <div className="flex-1" />
 
             {/* Undo/Redo */}
-            <ToolbarButton onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} title="Annuler">
+            <ToolbarButton onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} title={t("undo")}>
                 <Undo2 size={iconSize} />
             </ToolbarButton>
-            <ToolbarButton onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()} title="Rétablir">
+            <ToolbarButton onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()} title={t("redo")}>
                 <Redo2 size={iconSize} />
             </ToolbarButton>
         </div>

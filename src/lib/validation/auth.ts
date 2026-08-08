@@ -1,31 +1,36 @@
 import { z } from "zod";
 
-// Politique de mot de passe alignée sur le backend (validatePassword) :
-// 8 caractères min., au moins une majuscule, une minuscule, un chiffre et un
-// caractère spécial.
-const passwordSchema = z
-    .string()
-    .min(8, "8 caractères minimum")
-    .regex(/[A-Z]/, "Au moins une majuscule")
-    .regex(/[a-z]/, "Au moins une minuscule")
-    .regex(/\d/, "Au moins un chiffre")
-    .regex(/[!@#$%^&*(),.?":{}|<>]/, "Au moins un caractère spécial");
+type Translator = (key: string) => string;
 
-export const loginSchema = z.object({
-    email: z.string().min(1, "Email requis").email("Format d'email invalide"),
-    password: z.string().min(1, "Mot de passe requis"),
-});
-export type LoginValues = z.infer<typeof loginSchema>;
+function createPasswordSchema(t: Translator) {
+    return z
+        .string()
+        .min(8, t("passwordMinLength"))
+        .regex(/[A-Z]/, t("passwordUppercase"))
+        .regex(/[a-z]/, t("passwordLowercase"))
+        .regex(/\d/, t("passwordDigit"))
+        .regex(/[!@#$%^&*(),.?":{}|<>]/, t("passwordSpecial"));
+}
 
-export const signupSchema = z
-    .object({
-        email: z.string().min(1, "Email requis").email("Format d'email invalide"),
-        username: z.string().trim().min(1, "Nom d'utilisateur requis").max(50),
-        password: passwordSchema,
-        confirmPassword: z.string(),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-        message: "Les mots de passe ne correspondent pas",
-        path: ["confirmPassword"],
+export function createLoginSchema(t: Translator) {
+    return z.object({
+        email: z.string().min(1, t("emailRequired")).email(t("emailInvalid")),
+        password: z.string().min(1, t("passwordRequired")),
     });
-export type SignupValues = z.infer<typeof signupSchema>;
+}
+export type LoginValues = z.infer<ReturnType<typeof createLoginSchema>>;
+
+export function createSignupSchema(t: Translator) {
+    return z
+        .object({
+            email: z.string().min(1, t("emailRequired")).email(t("emailInvalid")),
+            username: z.string().trim().min(1, t("usernameRequired")).max(50),
+            password: createPasswordSchema(t),
+            confirmPassword: z.string(),
+        })
+        .refine((data) => data.password === data.confirmPassword, {
+            message: t("passwordMismatch"),
+            path: ["confirmPassword"],
+        });
+}
+export type SignupValues = z.infer<ReturnType<typeof createSignupSchema>>;

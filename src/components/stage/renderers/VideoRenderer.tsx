@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { useTranslations } from "next-intl";
 import { useMediaSync, type StagePlayback } from "./useMediaSync";
 
 type Props = {
@@ -15,6 +16,7 @@ type Props = {
 export function VideoRenderer({ url, title, playback, onMediaEl }: Props) {
     const videoRef = useRef<HTMLVideoElement | null>(null);
     const { blocked, retry } = useMediaSync(videoRef, playback);
+    const t = useTranslations("stage");
 
     return (
         <div className="relative h-full w-full flex items-center justify-center bg-muted">
@@ -27,14 +29,14 @@ export function VideoRenderer({ url, title, playback, onMediaEl }: Props) {
                 preload="auto"
                 playsInline
                 className="max-h-full max-w-full object-contain"
-                aria-label={title || "Vidéo diffusée"}
+                aria-label={title || t("videoAria")}
             />
             {blocked && (
                 <button
                     onClick={retry}
                     className="absolute inset-0 m-auto h-fit w-fit px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90"
                 >
-                    ▶ Lancer la lecture
+                    {t("playVideo")}
                 </button>
             )}
         </div>

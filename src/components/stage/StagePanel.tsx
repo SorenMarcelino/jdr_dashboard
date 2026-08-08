@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
     useSocket,
     type StageState,
@@ -19,11 +20,11 @@ type Props = {
     isMJ: boolean;
 };
 
-const KIND_LABELS: Record<StageMediaKind, string> = {
-    image: "Image",
-    audio: "Audio",
-    video: "Vidéo",
-    model3d: "Modèle 3D",
+const KIND_KEYS: Record<StageMediaKind, string> = {
+    image: "kindImage",
+    audio: "kindAudio",
+    video: "kindVideo",
+    model3d: "kindModel3d",
 };
 
 // Détecte le type de média à partir de l'extension du chemin de l'URL.
@@ -64,6 +65,7 @@ function MjPlaybackControls({
 }) {
     const [position, setPosition] = useState(0);
     const [duration, setDuration] = useState(0);
+    const t = useTranslations("stage");
 
     useEffect(() => {
         if (!mediaEl) return;
@@ -89,7 +91,7 @@ function MjPlaybackControls({
                     onControl(playing ? "pause" : "play", mediaEl?.currentTime ?? 0)
                 }
             >
-                {playing ? "⏸ Pause" : "▶ Play"}
+                {playing ? t("pause") : t("play")}
             </Button>
             <input
                 type="range"
@@ -99,7 +101,7 @@ function MjPlaybackControls({
                 value={Math.min(position, duration || 0)}
                 onChange={(e) => onControl("seek", Number(e.target.value))}
                 className="flex-1 accent-primary"
-                aria-label="Position de lecture"
+                aria-label={t("seekAria")}
             />
             <span className="text-xs text-muted-foreground tabular-nums shrink-0">
                 {formatTime(position)} / {formatTime(duration)}
@@ -119,6 +121,7 @@ export function StagePanel({ gameId, isMJ }: Props) {
     const [title, setTitle] = useState("");
     const [kindChoice, setKindChoice] = useState<StageMediaKind | "auto">("auto");
     const [mediaEl, setMediaEl] = useState<HTMLMediaElement | null>(null);
+    const t = useTranslations("stage");
 
     const detectedKind = useMemo(() => detectKind(url), [url]);
     const effectiveKind = kindChoice === "auto" ? detectedKind : kindChoice;
@@ -174,20 +177,20 @@ export function StagePanel({ gameId, isMJ }: Props) {
                         <Input
                             value={url}
                             onChange={(e) => setUrl(e.target.value)}
-                            placeholder="URL du média (image, mp3, mp4, glb...)"
+                            placeholder={t("mediaPlaceholder")}
                             className="h-8 text-xs"
                         />
                         <select
                             value={kindChoice}
                             onChange={(e) => setKindChoice(e.target.value as StageMediaKind | "auto")}
                             className="h-8 rounded-md border bg-background px-2 text-xs"
-                            aria-label="Type de média"
+                            aria-label={t("mediaTypeAria")}
                         >
                             <option value="auto">
-                                Auto{detectedKind ? ` (${KIND_LABELS[detectedKind]})` : ""}
+                                {t("auto")}{detectedKind ? ` (${t(KIND_KEYS[detectedKind])})` : ""}
                             </option>
-                            {Object.entries(KIND_LABELS).map(([value, label]) => (
-                                <option key={value} value={value}>{label}</option>
+                            {Object.entries(KIND_KEYS).map(([value, key]) => (
+                                <option key={value} value={value}>{t(key)}</option>
                             ))}
                         </select>
                     </div>
@@ -195,7 +198,7 @@ export function StagePanel({ gameId, isMJ }: Props) {
                         <Input
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            placeholder="Titre (optionnel)"
+                            placeholder={t("titlePlaceholder")}
                             className="h-8 text-xs"
                         />
                         <Button
@@ -203,11 +206,11 @@ export function StagePanel({ gameId, isMJ }: Props) {
                             onClick={handleBroadcast}
                             disabled={!url.trim() || !effectiveKind}
                         >
-                            Diffuser
+                            {t("broadcast")}
                         </Button>
                         {media && (
                             <Button size="sm" variant="outline" onClick={() => clearStage(gameId)}>
-                                Retirer
+                                {t("remove")}
                             </Button>
                         )}
                     </div>
@@ -220,7 +223,7 @@ export function StagePanel({ gameId, isMJ }: Props) {
                     <div className="h-full flex flex-col items-center justify-center gap-2 text-muted-foreground">
                         <span className="text-2xl">🎬</span>
                         <p className="text-xs">
-                            {isMJ ? "Diffusez un média à vos joueurs" : "Aucun média diffusé"}
+                            {isMJ ? t("gmPrompt") : t("noMedia")}
                         </p>
                     </div>
                 ) : media.kind === "image" ? (

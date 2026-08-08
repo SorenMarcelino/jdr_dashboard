@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import axios, { AxiosError } from "axios";
+import { useTranslations } from "next-intl";
 import { Card, CardContent } from "@/components/ui/card";
 import { getGameTheme } from "@/config/gameThemes";
 import { API_URL } from "@/lib/api";
@@ -22,6 +23,7 @@ export function CurrentGamesCards() {
     const [games, setGames] = useState<Game[]>([]);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
+    const t = useTranslations("game.list");
 
     useEffect(() => {
         const fetchGames = async () => {
@@ -46,11 +48,11 @@ export function CurrentGamesCards() {
     }, [router]);
 
     if (loading) {
-        return <p className="text-muted-foreground text-sm">Chargement des parties...</p>;
+        return <p className="text-muted-foreground text-sm">{t("loading")}</p>;
     }
 
     if (games.length === 0) {
-        return <p className="text-muted-foreground text-sm">Aucune partie en cours.</p>;
+        return <p className="text-muted-foreground text-sm">{t("empty")}</p>;
     }
 
     return (
@@ -83,8 +85,8 @@ export function CurrentGamesCards() {
                         {game.description && (
                             <p className="text-sm text-muted-foreground line-clamp-2">{game.description}</p>
                         )}
-                        <p className="text-xs text-muted-foreground">MJ : {game.createdBy?.username}</p>
-                        <p className="text-xs font-mono text-muted-foreground">Code : {game.inviteCode}</p>
+                        <p className="text-xs text-muted-foreground">{t("gmLabel")} {game.createdBy?.username}</p>
+                        <p className="text-xs font-mono text-muted-foreground">{t("codeLabel")} {game.inviteCode}</p>
                     </CardContent>
                 </Card>
             ))}

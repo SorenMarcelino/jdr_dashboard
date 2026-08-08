@@ -5,6 +5,7 @@ import { use } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { useTranslations } from "next-intl";
 import { Navbar } from "@/components/navbar";
 import { CharacterSheetViewer } from "@/components/character-sheet/CharacterSheetViewer";
 import { BentoGrid } from "@/components/bento/BentoGrid";
@@ -43,6 +44,7 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [selectedPlayer, setSelectedPlayer] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+    const t = useTranslations("game.session");
 
     useEffect(() => {
         const load = async () => {
@@ -80,7 +82,7 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
             <>
                 <Navbar />
                 <main className="min-h-svh bg-muted flex items-center justify-center">
-                    <p className="text-muted-foreground">Chargement...</p>
+                    <p className="text-muted-foreground">{t("loading")}</p>
                 </main>
             </>
         );
@@ -91,7 +93,7 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
             <>
                 <Navbar />
                 <main className="min-h-svh bg-muted flex items-center justify-center">
-                    <p className="text-muted-foreground">Partie introuvable ou accès refusé.</p>
+                    <p className="text-muted-foreground">{t("notFound")}</p>
                 </main>
             </>
         );
@@ -105,8 +107,8 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
         game.players.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center gap-2 text-muted-foreground p-6 text-center">
                 <span className="text-3xl">👥</span>
-                <p className="text-sm font-medium">Aucun joueur n&apos;a rejoint cette partie.</p>
-                <p className="text-xs">Code : <span className="font-mono font-bold">{game.inviteCode}</span></p>
+                <p className="text-sm font-medium">{t("noPlayers")}</p>
+                <p className="text-xs">{t("codeLabel")} <span className="font-mono font-bold">{game.inviteCode}</span></p>
             </div>
         ) : selectedPlayer ? (
             <CharacterSheetViewer
@@ -147,21 +149,21 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
         {
             id: "sheet",
             title: isMJ
-                ? `Fiche — ${selectedPlayer?.username ?? "Sélectionner un joueur"}`
-                : "Fiche de personnage",
+                ? t("sheetTitleFor", { username: selectedPlayer?.username ?? t("selectPlayer") })
+                : t("sheetTitleDefault"),
             defaultLayout: { x: 0, y: 0, w: 8, h: 10, minW: 3, minH: 4 },
             content: sheetContent,
             headerRight: sheetHeaderRight,
         },
         {
             id: "stage",
-            title: "Scène",
+            title: t("stageTitle"),
             defaultLayout: { x: 8, y: 0, w: 4, h: 5, minW: 2, minH: 3 },
             content: <StagePanel gameId={gameId} isMJ={isMJ} />,
         },
         {
             id: "chat",
-            title: "Chat / Dés",
+            title: t("chatTitle"),
             defaultLayout: { x: 8, y: 5, w: 4, h: 5, minW: 2, minH: 2 },
             content: <ChatPanel gameId={gameId} currentUserId={currentUser._id} />,
         },
@@ -177,7 +179,7 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
                     <div className="flex items-center gap-3">
                         <h1 className="text-sm font-bold">{game.name}</h1>
                         {isMJ && (
-                            <span className="text-xs bg-primary text-primary-foreground rounded-full px-2 py-0.5 font-semibold">MJ</span>
+                            <span className="text-xs bg-primary text-primary-foreground rounded-full px-2 py-0.5 font-semibold">{t("gmBadge")}</span>
                         )}
                         <span className="text-xs text-muted-foreground">{game.characterSheet}</span>
                     </div>
@@ -187,10 +189,10 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
                                 href={`/game/${gameId}/scenario`}
                                 className="px-2.5 py-1 rounded-md bg-muted hover:bg-accent text-foreground font-medium transition-colors"
                             >
-                                Scénarios
+                                {t("scenariosLink")}
                             </Link>
                             <div className="flex items-center gap-2">
-                                <span>Code :</span>
+                                <span>{t("codeLabel")}</span>
                                 <span className="font-mono font-bold tracking-widest bg-muted px-2 py-0.5 rounded">{game.inviteCode}</span>
                             </div>
                         </div>

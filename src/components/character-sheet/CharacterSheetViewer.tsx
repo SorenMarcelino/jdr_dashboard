@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useTranslations } from "next-intl";
 import { GenericCharacterSheet, Template as SheetTemplate } from "./GenericCharacterSheet";
 import { API_URL } from "@/lib/api";
 
@@ -31,6 +32,7 @@ export function CharacterSheetViewer({ systemId, gameId, playerId, isEditable = 
     const [instance, setInstance] = useState<Instance | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const t = useTranslations("characterSheet");
 
     useEffect(() => {
         const load = async () => {
@@ -55,7 +57,7 @@ export function CharacterSheetViewer({ systemId, gameId, playerId, isEditable = 
                 if (sheetRes.data.success) setInstance(sheetRes.data.sheet);
             } catch (err) {
                 console.error("Erreur chargement fiche:", err);
-                setError("Impossible de charger la fiche.");
+                setError(t("loadError"));
             } finally {
                 setLoading(false);
             }
@@ -88,9 +90,9 @@ export function CharacterSheetViewer({ systemId, gameId, playerId, isEditable = 
         }
     };
 
-    if (loading) return <p className="text-sm text-muted-foreground">Chargement de la fiche...</p>;
+    if (loading) return <p className="text-sm text-muted-foreground">{t("loading")}</p>;
     if (error) return <p className="text-sm text-destructive">{error}</p>;
-    if (!template) return <p className="text-sm text-muted-foreground">Template introuvable.</p>;
+    if (!template) return <p className="text-sm text-muted-foreground">{t("templateNotFound")}</p>;
 
     return (
         <GenericCharacterSheet

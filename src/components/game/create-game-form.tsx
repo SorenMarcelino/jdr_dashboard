@@ -4,6 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import axios from "axios";
+import { useMemo } from "react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -38,16 +40,21 @@ const API = API_URL;
 
 type SheetOption = { value: string; label: string };
 
-const formSchema = z.object({
-    name: z.string().min(2, { message: "Le nom doit contenir au moins 2 caractères." }),
-    description: z.string().optional(),
-    characterSheet: z.string().min(1, { message: "Veuillez choisir une feuille de personnage." }),
-    thumbnail: z.string().optional(),
-});
-
 export function ProfileForm({ onCreated }: { onCreated?: () => void }) {
     const [open, setOpen] = useState(false);
     const [sheets, setSheets] = useState<SheetOption[]>([]);
+    const t = useTranslations("game.create");
+
+    const formSchema = useMemo(
+        () =>
+            z.object({
+                name: z.string().min(2, { message: t("errors.nameTooShort") }),
+                description: z.string().optional(),
+                characterSheet: z.string().min(1, { message: t("errors.sheetRequired") }),
+                thumbnail: z.string().optional(),
+            }),
+        [t]
+    );
 
     // Liste des systèmes de fiche disponibles, pilotée par les templates en base.
     useEffect(() => {
@@ -89,18 +96,18 @@ export function ProfileForm({ onCreated }: { onCreated?: () => void }) {
             }
         } catch (error) {
             console.error("Erreur lors de la création de la partie:", error);
-            alert("Erreur lors de la création de la partie. Êtes-vous connecté ?");
+            alert(t("errors.createFailedAlert"));
         }
     }
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button>Créer une nouvelle partie</Button>
+                <Button>{t("title")}</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Créer une nouvelle partie</DialogTitle>
+                    <DialogTitle>{t("title")}</DialogTitle>
                 </DialogHeader>
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -110,9 +117,9 @@ export function ProfileForm({ onCreated }: { onCreated?: () => void }) {
                     name="name"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Nom de la partie</FormLabel>
+                            <FormLabel>{t("nameLabel")}</FormLabel>
                             <FormControl>
-                                <Input placeholder="Ex: La Malédiction de Strahd" {...field} />
+                                <Input placeholder={t("namePlaceholder")} {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -124,10 +131,10 @@ export function ProfileForm({ onCreated }: { onCreated?: () => void }) {
                     name="description"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Description</FormLabel>
+                            <FormLabel>{t("descriptionLabel")}</FormLabel>
                             <FormControl>
                                 <Textarea
-                                    placeholder="Décrivez votre campagne..."
+                                    placeholder={t("descriptionPlaceholder")}
                                     className="resize-none"
                                     rows={4}
                                     {...field}
@@ -143,17 +150,17 @@ export function ProfileForm({ onCreated }: { onCreated?: () => void }) {
                     name="characterSheet"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Feuille de personnage</FormLabel>
+                            <FormLabel>{t("sheetLabel")}</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
                                     <SelectTrigger>
-                                        <SelectValue placeholder="Choisir un système de jeu" />
+                                        <SelectValue placeholder={t("sheetPlaceholder")} />
                                     </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
                                     {sheets.length === 0 ? (
                                         <SelectItem value="__none" disabled>
-                                            Aucun système disponible
+                                            {t("noSheetsAvailable")}
                                         </SelectItem>
                                     ) : (
                                         sheets.map((sheet) => (
@@ -174,7 +181,7 @@ export function ProfileForm({ onCreated }: { onCreated?: () => void }) {
                     name="thumbnail"
                     render={({ field: { value, onChange, ...fieldProps } }) => (
                         <FormItem>
-                            <FormLabel>Miniature</FormLabel>
+                            <FormLabel>{t("thumbnailLabel")}</FormLabel>
                             <FormControl>
                                 <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted transition-colors">
                                     <Input
@@ -194,22 +201,24 @@ export function ProfileForm({ onCreated }: { onCreated?: () => void }) {
                                     />
                                     <label htmlFor="thumbnail-upload" className="cursor-pointer text-center p-4">
                                         {value ? (
-                                            <span className="text-sm text-green-600">Image sélectionnée ✓</span>
+                                            <span className="text-sm text-green-600">{t("thumbnailSelected")}</span>
                                         ) : (
                                             <span className="text-sm text-muted-foreground">
-                                                Glissez une image ou <span className="underline">cliquez pour choisir</span>
+                                                {t.rich("thumbnailDropHint", {
+                                                    action: (chunks) => <span className="underline">{chunks}</span>,
+                                                })}
                                             </span>
                                         )}
                                     </label>
                                 </div>
                             </FormControl>
-                            <FormDescription>Format JPG, PNG, WEBP recommandé.</FormDescription>
+                            <FormDescription>{t("thumbnailHint")}</FormDescription>
                             <FormMessage />
                         </FormItem>
                     )}
                 />
 
-                <Button type="submit" className="w-full">Créer la partie</Button>
+                <Button type="submit" className="w-full">{t("submit")}</Button>
             </form>
         </Form>
             </DialogContent>

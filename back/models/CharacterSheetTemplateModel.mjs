@@ -4,6 +4,9 @@ import mongoose from "mongoose";
 const fieldSchema = new mongoose.Schema({
     id: { type: String, required: true },
     label: { type: String, required: true },
+    // Clé de traduction optionnelle (namespace `characterSheet.fields`) pour les
+    // libellés génériques communs à plusieurs systèmes. Absent => on affiche `label` tel quel.
+    labelKey: { type: String, default: null },
     type: {
         type: String,
         enum: ["text", "number", "textarea", "checkbox", "select", "damage-track", "stress-track", "image"],
@@ -27,6 +30,7 @@ const fieldSchema = new mongoose.Schema({
 const sectionSchema = new mongoose.Schema({
     id: { type: String, required: true },
     title: { type: String, default: "" },
+    titleKey: { type: String, default: null },
     order: { type: Number, default: 0 },
     // Nombre de colonnes de la grille (1-4), responsive via container queries.
     columns: { type: Number, default: 2 },
@@ -36,6 +40,7 @@ const sectionSchema = new mongoose.Schema({
 const groupSchema = new mongoose.Schema({
     id: { type: String, required: true },
     label: { type: String, default: "" },
+    labelKey: { type: String, default: null },
     section: { type: String, required: true },
     order: { type: Number, default: 0 },
     columns: { type: Number, default: 3 },

@@ -1,0 +1,240 @@
+{
+    "common": {
+        "toggleTheme": "Toggle theme"
+    },
+    "navbar": {
+        "greeting": "Hello {username}",
+        "login": "Log in",
+        "logout": "Log out"
+    },
+    "auth": {
+        "login": {
+            "title": "Welcome back",
+            "subtitle": "Sign in to your JDR Dashboard account",
+            "email": "Email",
+            "emailPlaceholder": "m@example.com",
+            "password": "Password",
+            "submit": "Sign in",
+            "submitting": "Signing in...",
+            "noAccount": "Don't have an account yet?",
+            "signupLink": "Sign up",
+            "genericError": "Incorrect email or password",
+            "termsNotice": "By continuing, you agree to our <terms>terms of service</terms> and our <privacy>privacy policy</privacy>."
+        },
+        "signup": {
+            "title": "Create an account",
+            "subtitle": "Join the adventure",
+            "email": "Email",
+            "emailPlaceholder": "m@example.com",
+            "username": "Username",
+            "usernamePlaceholder": "Aragorn",
+            "password": "Password",
+            "passwordHint": "8 characters min., with an uppercase letter, a lowercase letter, a digit and a special character.",
+            "confirmPassword": "Confirm password",
+            "submit": "Create my account",
+            "submitting": "Creating...",
+            "successMessage": "Account created successfully! Redirecting...",
+            "genericError": "Error creating the account.",
+            "hasAccount": "Already have an account?",
+            "loginLink": "Sign in"
+        },
+        "errors": {
+            "emailRequired": "Email is required",
+            "emailInvalid": "Invalid email format",
+            "passwordRequired": "Password is required",
+            "usernameRequired": "Username is required",
+            "passwordMinLength": "8 characters minimum",
+            "passwordUppercase": "At least one uppercase letter",
+            "passwordLowercase": "At least one lowercase letter",
+            "passwordDigit": "At least one digit",
+            "passwordSpecial": "At least one special character",
+            "passwordMismatch": "Passwords do not match"
+        }
+    },
+    "game": {
+        "myGamesHeading": "My games",
+        "create": {
+            "title": "Create a new game",
+            "nameLabel": "Game name",
+            "namePlaceholder": "E.g. The Curse of Strahd",
+            "descriptionLabel": "Description",
+            "descriptionPlaceholder": "Describe your campaign...",
+            "sheetLabel": "Character sheet",
+            "sheetPlaceholder": "Choose a game system",
+            "noSheetsAvailable": "No system available",
+            "thumbnailLabel": "Thumbnail",
+            "thumbnailHint": "JPG, PNG or WEBP recommended.",
+            "thumbnailSelected": "Image selected ✓",
+            "thumbnailDropHint": "Drop an image or <action>click to choose</action>",
+            "submit": "Create the game",
+            "errors": {
+                "nameTooShort": "The name must be at least 2 characters long.",
+                "sheetRequired": "Please choose a character sheet.",
+                "createFailedAlert": "Error creating the game. Are you logged in?"
+            }
+        },
+        "join": {
+            "title": "Join a game",
+            "codeLabel": "Invite code",
+            "codePlaceholder": "E.g. AB12CD",
+            "submit": "Join",
+            "submitting": "Connecting...",
+            "genericError": "Error while joining."
+        },
+        "list": {
+            "loading": "Loading games...",
+            "empty": "No games yet.",
+            "gmLabel": "GM:",
+            "codeLabel": "Code:"
+        },
+        "session": {
+            "loading": "Loading...",
+            "notFound": "Game not found or access denied.",
+            "noPlayers": "No player has joined this game yet.",
+            "codeLabel": "Code:",
+            "gmBadge": "GM",
+            "scenariosLink": "Scenarios",
+            "sheetTitleFor": "Sheet — {username}",
+            "selectPlayer": "Select a player",
+            "sheetTitleDefault": "Character sheet",
+            "stageTitle": "Stage",
+            "chatTitle": "Chat / Dice"
+        }
+    },
+    "bento": {
+        "detach": "Detach into a window",
+        "detachAria": "Detach {title} into a window"
+    },
+    "characterSheet": {
+        "loading": "Loading character sheet...",
+        "loadError": "Could not load the character sheet.",
+        "templateNotFound": "Template not found.",
+        "save": "Save",
+        "saving": "Saving...",
+        "fields": {
+            "strength": "Strength",
+            "dexterity": "Dexterity",
+            "constitution": "Constitution",
+            "intelligence": "Intelligence",
+            "hitPoints": "Hit points"
+        },
+        "sections": {},
+        "groups": {}
+    },
+    "stage": {
+        "kindImage": "Image",
+        "kindAudio": "Audio",
+        "kindVideo": "Video",
+        "kindModel3d": "3D model",
+        "auto": "Auto",
+        "mediaPlaceholder": "Media URL (image, mp3, mp4, glb...)",
+        "mediaTypeAria": "Media type",
+        "titlePlaceholder": "Title (optional)",
+        "broadcast": "Broadcast",
+        "remove": "Remove",
+        "gmPrompt": "Broadcast media to your players",
+        "noMedia": "No media broadcast",
+        "seekAria": "Playback position",
+        "pause": "⏸ Pause",
+        "play": "▶ Play",
+        "playing": "Playing",
+        "paused": "Paused",
+        "enableSound": "▶ Enable sound",
+        "loadingViewer3d": "Loading the 3D viewer...",
+        "playVideo": "▶ Start playback",
+        "mediaAlt": "Broadcast media",
+        "model3dAlt": "Broadcast 3D model",
+        "videoAria": "Broadcast video"
+    },
+    "chat": {
+        "messagePlaceholder": "Message...",
+        "rolled": "rolled",
+        "tens": "tens",
+        "units": "units"
+    },
+    "scenario": {
+        "workspace": {
+            "backToList": "Back to the scenario list",
+            "hideSidebar": "Hide sidebar",
+            "showSidebar": "Show sidebar",
+            "edit": "Edit",
+            "read": "Read",
+            "map": "Map",
+            "npc": "NPCs",
+            "loading": "Loading scenario...",
+            "notFound": "Scenario not found",
+            "fallbackTitle": "Scenario"
+        },
+        "list": {
+            "heading": "Scenarios",
+            "newScenario": "New scenario",
+            "titlePlaceholder": "Scenario title...",
+            "cancel": "Cancel",
+            "create": "Create",
+            "search": "Search...",
+            "sortManual": "Manual order",
+            "sortName": "Name (A→Z)",
+            "sortUpdated": "Last modified",
+            "empty": "No scenario for this game yet",
+            "emptyHint": "Create one to start writing your story",
+            "pageCount": "{count, plural, =0 {0 page} one {# page} other {# pages}}",
+            "modifiedOn": "Modified on {date}",
+            "deleteConfirm": "Delete this scenario and all its pages?",
+            "loading": "Loading..."
+        },
+        "sidebar": {
+            "search": "Search...",
+            "viewList": "List",
+            "viewByTag": "By theme",
+            "noTag": "No theme",
+            "addPage": "Add a page",
+            "newPageTitle": "New page",
+            "deletePageConfirm": "Delete this page?",
+            "entryBadge": "Entry",
+            "deleteTitle": "Delete",
+            "dragHandle": "Drag to reorder",
+            "removeTag": "Remove this theme",
+            "addTagPlaceholder": "+ theme"
+        },
+        "editor": {
+            "placeholder": "Start writing your scenario...",
+            "titlePlaceholder": "Page title...",
+            "saving": "Saving...",
+            "savedAt": "Saved at {time}",
+            "selectPage": "Select a page from the sidebar"
+        },
+        "toolbar": {
+            "bold": "Bold",
+            "italic": "Italic",
+            "heading1": "Heading 1",
+            "heading2": "Heading 2",
+            "heading3": "Heading 3",
+            "textColor": "Text color",
+            "colorDefault": "Default",
+            "colorRed": "Red",
+            "colorOrange": "Orange",
+            "colorYellow": "Yellow",
+            "colorGreen": "Green",
+            "colorBlue": "Blue",
+            "colorPurple": "Purple",
+            "colorPink": "Pink",
+            "increaseIndent": "Increase indent (Tab)",
+            "decreaseIndent": "Decrease indent (Shift+Tab)",
+            "bulletList": "Bullet list",
+            "orderedList": "Numbered list",
+            "quote": "Quote",
+            "divider": "Divider",
+            "gmOnlyBlock": "GM-only block",
+            "pageLink": "Link to a page",
+            "npcLink": "Link an NPC",
+            "annotation": "Add a note",
+            "undo": "Undo",
+            "redo": "Redo"
+        },
+        "outline": {
+            "title": "Outline",
+            "show": "Show outline",
+            "hide": "Hide outline"
+        }
+    }
+}

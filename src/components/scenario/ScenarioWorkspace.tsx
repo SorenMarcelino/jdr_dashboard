@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
 import { BookOpen, PenLine, GitBranch, PanelLeftClose, PanelLeft, Users, ArrowLeft } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { ScenarioProvider, useScenario } from "@/contexts/ScenarioContext";
 import { ScenarioSidebar } from "./sidebar/ScenarioSidebar";
 import { ScenarioEditor } from "./editor/ScenarioEditor";
@@ -24,6 +25,7 @@ type Props = {
 
 function WorkspaceContent({ gameId, scenarioId }: Props) {
     const { scenario, setScenario, setPages, navigateToPage, mode, setMode } = useScenario();
+    const t = useTranslations("scenario.workspace");
     const [loading, setLoading] = useState(true);
     const [showSidebar, setShowSidebar] = useState(true);
     const [showGraph, setShowGraph] = useState(false);
@@ -71,7 +73,7 @@ function WorkspaceContent({ gameId, scenarioId }: Props) {
     if (loading) {
         return (
             <div className="flex-1 flex items-center justify-center text-muted-foreground">
-                <p className="text-sm">Chargement du scénario...</p>
+                <p className="text-sm">{t("loading")}</p>
             </div>
         );
     }
@@ -79,7 +81,7 @@ function WorkspaceContent({ gameId, scenarioId }: Props) {
     if (!scenario) {
         return (
             <div className="flex-1 flex items-center justify-center text-muted-foreground">
-                <p className="text-sm">Scénario introuvable</p>
+                <p className="text-sm">{t("notFound")}</p>
             </div>
         );
     }
@@ -92,14 +94,14 @@ function WorkspaceContent({ gameId, scenarioId }: Props) {
                     <Link
                         href={`/game/${gameId}/scenario`}
                         className="p-1.5 rounded hover:bg-muted transition-colors"
-                        title="Retour à la liste des scénarios"
+                        title={t("backToList")}
                     >
                         <ArrowLeft size={16} />
                     </Link>
                     <button
                         onClick={() => setShowSidebar(!showSidebar)}
                         className="p-1.5 rounded hover:bg-muted transition-colors"
-                        title={showSidebar ? "Masquer la sidebar" : "Afficher la sidebar"}
+                        title={showSidebar ? t("hideSidebar") : t("showSidebar")}
                     >
                         {showSidebar ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
                     </button>
@@ -114,7 +116,7 @@ function WorkspaceContent({ gameId, scenarioId }: Props) {
                         }`}
                     >
                         <PenLine size={13} />
-                        Édition
+                        {t("edit")}
                     </button>
                     <button
                         onClick={() => setMode("read")}
@@ -123,7 +125,7 @@ function WorkspaceContent({ gameId, scenarioId }: Props) {
                         }`}
                     >
                         <BookOpen size={13} />
-                        Lecture
+                        {t("read")}
                     </button>
                     <div className="w-px h-5 bg-border mx-1" />
                     <button
@@ -133,7 +135,7 @@ function WorkspaceContent({ gameId, scenarioId }: Props) {
                         }`}
                     >
                         <GitBranch size={13} />
-                        Carte
+                        {t("map")}
                     </button>
                     <div className="w-px h-5 bg-border mx-1" />
                     <button
@@ -141,7 +143,7 @@ function WorkspaceContent({ gameId, scenarioId }: Props) {
                         className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md hover:bg-muted transition-colors"
                     >
                         <Users size={13} />
-                        PNJ
+                        {t("npc")}
                     </button>
                 </div>
             </div>

@@ -1,4 +1,7 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
+
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 // La Content-Security-Policy est gérée par `src/middleware.ts` (stratégie par
 // nonce). Les autres en-têtes de sécurité, statiques, restent ici.
@@ -25,4 +28,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

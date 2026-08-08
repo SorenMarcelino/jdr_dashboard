@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { useTranslations } from "next-intl";
 import { useMediaSync, type StagePlayback } from "./useMediaSync";
 
 type Props = {
@@ -15,6 +16,7 @@ type Props = {
 export function AudioRenderer({ url, title, playback, onMediaEl }: Props) {
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const { blocked, retry } = useMediaSync(audioRef, playback);
+    const t = useTranslations("stage");
 
     return (
         <div className="h-full w-full flex flex-col items-center justify-center gap-3 bg-muted p-4">
@@ -31,14 +33,14 @@ export function AudioRenderer({ url, title, playback, onMediaEl }: Props) {
             </span>
             <p className="text-sm font-medium text-center break-all">{title || url}</p>
             <p className="text-xs text-muted-foreground">
-                {playback.playing ? "Lecture en cours" : "En pause"}
+                {playback.playing ? t("playing") : t("paused")}
             </p>
             {blocked && (
                 <button
                     onClick={retry}
                     className="px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:opacity-90"
                 >
-                    ▶ Activer le son
+                    {t("enableSound")}
                 </button>
             )}
         </div>

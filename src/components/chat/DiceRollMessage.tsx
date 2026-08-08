@@ -1,14 +1,14 @@
 "use client";
 
+import { useFormatter, useTranslations } from "next-intl";
 import type { ChatMessage } from "@/contexts/SocketContext";
 import { DICE_CONFIGS, type DiceType } from "@/config/diceConfig";
 import { Dices } from "lucide-react";
 
-function formatTime(dateStr: string) {
-    return new Date(dateStr).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
-}
-
 export function DiceRollMessage({ message }: { message: ChatMessage; isOwn: boolean }) {
+    const format = useFormatter();
+    const t = useTranslations("chat");
+
     const roll = message.diceRoll;
     if (!roll) return null;
 
@@ -23,11 +23,11 @@ export function DiceRollMessage({ message }: { message: ChatMessage; isOwn: bool
                 <div className="flex items-center gap-2 text-xs">
                     <Dices className={`w-3.5 h-3.5 ${colorClass}`} />
                     <span className="font-medium">{message.username}</span>
-                    <span className="text-muted-foreground">a lancé</span>
+                    <span className="text-muted-foreground">{t("rolled")}</span>
                     <span className={`font-bold ${colorClass}`}>
                         {roll.quantity > 1 ? `${roll.quantity}${roll.diceType}` : roll.diceType}
                     </span>
-                    <span className="ml-auto text-[10px] text-muted-foreground/60">{formatTime(message.createdAt)}</span>
+                    <span className="ml-auto text-[10px] text-muted-foreground/60">{format.dateTime(new Date(message.createdAt), { hour: "2-digit", minute: "2-digit" })}</span>
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
@@ -37,7 +37,7 @@ export function DiceRollMessage({ message }: { message: ChatMessage; isOwn: bool
                                 {(() => {
                                     const tens = roll.total === 100 ? 0 : Math.floor(roll.total / 10) * 10;
                                     const units = roll.total === 100 ? 0 : roll.total % 10;
-                                    return `dizaines: ${tens === 0 ? "00" : tens} | unités: ${units}`;
+                                    return `${t("tens")}: ${tens === 0 ? "00" : tens} | ${t("units")}: ${units}`;
                                 })()}
                             </span>
                         </>

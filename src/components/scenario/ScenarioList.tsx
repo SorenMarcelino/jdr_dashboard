@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Plus, BookText, Trash2, Search, FileStack } from "lucide-react";
+import { useTranslations, useFormatter } from "next-intl";
 import { SortableList } from "@/components/ui/sortable-list";
 import { SortableItem } from "@/components/ui/sortable-item";
 import { API_URL } from "@/lib/api";
@@ -22,45 +23,6 @@ type Scenario = {
 
 type SortMode = "manual" | "name" | "updatedAt";
 
-type ScenarioCardProps = {
-    scenario: Scenario;
-    onOpen: (scenarioId: string) => void;
-    onDelete: (scenarioId: string) => void;
-};
-
-function ScenarioCard({ scenario: s, onOpen, onDelete }: ScenarioCardProps) {
-    return (
-        <div
-            className="group flex items-center gap-3 p-4 border rounded-lg bg-background hover:border-primary/50 transition-colors cursor-pointer"
-            onClick={() => onOpen(s._id)}
-        >
-            <BookText size={20} className="text-muted-foreground shrink-0" />
-            <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-semibold truncate">{s.title}</h3>
-                {s.description && (
-                    <p className="text-xs text-muted-foreground truncate mt-0.5">{s.description}</p>
-                )}
-                <div className="flex items-center gap-3 text-[10px] text-muted-foreground mt-1">
-                    <span className="flex items-center gap-1">
-                        <FileStack size={11} />
-                        {s.pageCount} page{s.pageCount > 1 ? "s" : ""}
-                    </span>
-                    <span>Modifié le {new Date(s.updatedAt).toLocaleDateString("fr-FR")}</span>
-                </div>
-            </div>
-            <button
-                onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(s._id);
-                }}
-                className="opacity-0 group-hover:opacity-100 p-1.5 hover:text-destructive transition-all"
-            >
-                <Trash2 size={14} />
-            </button>
-        </div>
-    );
-}
-
 type Props = {
     gameId: string;
 };
@@ -73,6 +35,8 @@ export function ScenarioList({ gameId }: Props) {
     const [newTitle, setNewTitle] = useState("");
     const [search, setSearch] = useState("");
     const [sortMode, setSortMode] = useState<SortMode>("manual");
+    const t = useTranslations("scenario.list");
+    const format = useFormatter();
 
     useEffect(() => {
         axios
@@ -139,7 +103,7 @@ export function ScenarioList({ gameId }: Props) {
     };
 
     const handleDelete = async (scenarioId: string) => {
-        if (!confirm("Supprimer ce scénario et toutes ses pages ?")) return;
+        if (!confirm(t("deleteConfirm"))) return;
         try {
             await axios.delete(`${API}/games/${gameId}/scenarios/${scenarioId}`, {
                 withCredentials: true,
@@ -151,21 +115,50 @@ export function ScenarioList({ gameId }: Props) {
     };
 
     if (loading) {
-        return <p className="text-sm text-muted-foreground text-center py-8">Chargement...</p>;
+        return <p className="text-sm text-muted-foreground text-center py-8">{t("loading")}</p>;
     }
 
-    const openScenario = (scenarioId: string) => router.push(`/game/${gameId}/scenario/${scenarioId}`);
+    const ScenarioCard = ({ s }: { s: Scenario }) => (
+        <div
+            className="group flex items-center gap-3 p-4 border rounded-lg bg-background hover:border-primary/50 transition-colors cursor-pointer"
+            onClick={() => router.push(`/game/${gameId}/scenario/${s._id}`)}
+        >
+            <BookText size={20} className="text-muted-foreground shrink-0" />
+            <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-semibold truncate">{s.title}</h3>
+                {s.description && (
+                    <p className="text-xs text-muted-foreground truncate mt-0.5">{s.description}</p>
+                )}
+                <div className="flex items-center gap-3 text-[10px] text-muted-foreground mt-1">
+                    <span className="flex items-center gap-1">
+                        <FileStack size={11} />
+                        {t("pageCount", { count: s.pageCount })}
+                    </span>
+                    <span>{t("modifiedOn", { date: format.dateTime(new Date(s.updatedAt), { dateStyle: "medium" }) })}</span>
+                </div>
+            </div>
+            <button
+                onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(s._id);
+                }}
+                className="opacity-0 group-hover:opacity-100 p-1.5 hover:text-destructive transition-all"
+            >
+                <Trash2 size={14} />
+            </button>
+        </div>
+    );
 
     return (
         <div className="max-w-2xl mx-auto p-6">
             <div className="flex items-center justify-between mb-6">
-                <h1 className="text-xl font-bold">Scénarios</h1>
+                <h1 className="text-xl font-bold">{t("heading")}</h1>
                 <button
                     onClick={() => setCreating(!creating)}
                     className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:opacity-90 transition-opacity"
                 >
                     <Plus size={16} />
-                    Nouveau scénario
+                    {t("newScenario")}
                 </button>
             </div>
 
@@ -175,7 +168,7 @@ export function ScenarioList({ gameId }: Props) {
                         type="text"
                         value={newTitle}
                         onChange={(e) => setNewTitle(e.target.value)}
-                        placeholder="Titre du scénario..."
+                        placeholder={t("titlePlaceholder")}
                         className="w-full px-3 py-2 text-sm border rounded bg-background mb-3"
                         autoFocus
                     />
@@ -185,14 +178,14 @@ export function ScenarioList({ gameId }: Props) {
                             onClick={() => setCreating(false)}
                             className="px-3 py-1.5 text-xs border rounded hover:bg-muted"
                         >
-                            Annuler
+                            {t("cancel")}
                         </button>
                         <button
                             type="submit"
                             disabled={!newTitle.trim()}
                             className="px-3 py-1.5 text-xs bg-primary text-primary-foreground rounded disabled:opacity-50"
                         >
-                            Créer
+                            {t("create")}
                         </button>
                     </div>
                 </form>
@@ -204,7 +197,7 @@ export function ScenarioList({ gameId }: Props) {
                         <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" size={13} />
                         <input
                             type="text"
-                            placeholder="Rechercher..."
+                            placeholder={t("search")}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             className="w-full pl-7 pr-3 py-1.5 text-xs border rounded bg-background"
@@ -215,9 +208,9 @@ export function ScenarioList({ gameId }: Props) {
                         onChange={(e) => setSortMode(e.target.value as SortMode)}
                         className="text-xs border rounded px-2 py-1.5 bg-background"
                     >
-                        <option value="manual">Ordre manuel</option>
-                        <option value="name">Nom (A→Z)</option>
-                        <option value="updatedAt">Dernière modification</option>
+                        <option value="manual">{t("sortManual")}</option>
+                        <option value="name">{t("sortName")}</option>
+                        <option value="updatedAt">{t("sortUpdated")}</option>
                     </select>
                 </div>
             )}
@@ -225,15 +218,15 @@ export function ScenarioList({ gameId }: Props) {
             {scenarios.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
                     <BookText size={48} className="mx-auto mb-3 opacity-30" />
-                    <p className="text-sm">Aucun scénario pour cette partie</p>
-                    <p className="text-xs mt-1">Créez-en un pour commencer à écrire votre histoire</p>
+                    <p className="text-sm">{t("empty")}</p>
+                    <p className="text-xs mt-1">{t("emptyHint")}</p>
                 </div>
             ) : sortMode === "manual" && !search.trim() ? (
                 <SortableList ids={visible.map((s) => s._id)} onReorder={handleReorder}>
                     <div className="space-y-2">
                         {visible.map((s) => (
                             <SortableItem key={s._id} id={s._id}>
-                                <ScenarioCard scenario={s} onOpen={openScenario} onDelete={handleDelete} />
+                                <ScenarioCard s={s} />
                             </SortableItem>
                         ))}
                     </div>
@@ -241,7 +234,7 @@ export function ScenarioList({ gameId }: Props) {
             ) : (
                 <div className="space-y-2">
                     {visible.map((s) => (
-                        <ScenarioCard key={s._id} scenario={s} onOpen={openScenario} onDelete={handleDelete} />
+                        <ScenarioCard key={s._id} s={s} />
                     ))}
                 </div>
             )}

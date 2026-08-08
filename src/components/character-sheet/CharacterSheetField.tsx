@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
@@ -19,6 +20,7 @@ export type FieldType =
 export type FieldDef = {
     id: string;
     label: string;
+    labelKey?: string | null;
     type: FieldType;
     section?: string;
     group?: string | null;
@@ -45,12 +47,14 @@ const DAMAGE_COLORS: Record<string, string> = {
 };
 
 export function CharacterSheetField({ field, value, onChange, readOnly = false }: Props) {
-    const { id, label, type, options } = field;
+    const { id, label, labelKey, type, options } = field;
+    const t = useTranslations("characterSheet.fields");
+    const displayLabel = labelKey ? t(labelKey) : label;
 
     if (type === "text") {
         return (
             <div className="flex flex-col gap-1">
-                <Label htmlFor={id} className="text-xs font-medium">{label}</Label>
+                <Label htmlFor={id} className="text-xs font-medium">{displayLabel}</Label>
                 <Input
                     id={id}
                     value={(value as string) ?? ""}
@@ -65,7 +69,7 @@ export function CharacterSheetField({ field, value, onChange, readOnly = false }
     if (type === "number") {
         return (
             <div className="flex flex-col gap-1">
-                <Label htmlFor={id} className="text-xs font-medium">{label}</Label>
+                <Label htmlFor={id} className="text-xs font-medium">{displayLabel}</Label>
                 <Input
                     id={id}
                     type="number"
@@ -83,7 +87,7 @@ export function CharacterSheetField({ field, value, onChange, readOnly = false }
     if (type === "textarea") {
         return (
             <div className="flex flex-col gap-1">
-                <Label htmlFor={id} className="text-xs font-medium">{label}</Label>
+                <Label htmlFor={id} className="text-xs font-medium">{displayLabel}</Label>
                 <Textarea
                     id={id}
                     value={(value as string) ?? ""}
@@ -105,7 +109,7 @@ export function CharacterSheetField({ field, value, onChange, readOnly = false }
                     disabled={readOnly}
                     className="shrink-0"
                 />
-                <Label htmlFor={id} className="text-xs font-medium truncate">{label}</Label>
+                <Label htmlFor={id} className="text-xs font-medium truncate">{displayLabel}</Label>
             </div>
         );
     }
@@ -114,7 +118,7 @@ export function CharacterSheetField({ field, value, onChange, readOnly = false }
         const opts = options ?? [];
         return (
             <div className="flex flex-col gap-1">
-                <Label htmlFor={id} className="text-xs font-medium">{label}</Label>
+                <Label htmlFor={id} className="text-xs font-medium">{displayLabel}</Label>
                 <select
                     id={id}
                     value={(value as string) ?? ""}
@@ -135,7 +139,7 @@ export function CharacterSheetField({ field, value, onChange, readOnly = false }
         const tracks = options ?? ["Hale", "Hurt", "Impaired", "Debilitated", "Dead"];
         return (
             <div className="flex flex-col gap-2">
-                <Label className="text-xs font-medium">{label}</Label>
+                <Label className="text-xs font-medium">{displayLabel}</Label>
                 <div className="grid grid-cols-2 @[300px]:grid-cols-3 @[420px]:grid-cols-5 gap-1.5">
                     {tracks.map((track) => {
                         const active = (value as string) === track;
@@ -167,7 +171,7 @@ export function CharacterSheetField({ field, value, onChange, readOnly = false }
         const max = field.max ?? 10;
         return (
             <div className="flex flex-wrap items-center gap-3">
-                <Label className="text-xs font-medium shrink-0">{label}</Label>
+                <Label className="text-xs font-medium shrink-0">{displayLabel}</Label>
                 <div className="flex flex-wrap gap-1">
                     {Array.from({ length: max }).map((_, i) => (
                         <button
@@ -191,10 +195,10 @@ export function CharacterSheetField({ field, value, onChange, readOnly = false }
         const url = (value as string) ?? "";
         return (
             <div className="flex flex-col gap-2">
-                <Label htmlFor={id} className="text-xs font-medium">{label}</Label>
+                <Label htmlFor={id} className="text-xs font-medium">{displayLabel}</Label>
                 <div className="relative w-full aspect-square rounded-lg overflow-hidden border bg-muted flex items-center justify-center max-w-[120px]">
                     {url
-                        ? <Image src={url} alt={label} fill unoptimized sizes="120px" className="object-cover" />
+                        ? <Image src={url} alt={displayLabel} fill unoptimized sizes="120px" className="object-cover" />
                         : <span className="text-3xl text-muted-foreground">👤</span>
                     }
                 </div>

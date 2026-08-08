@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { GridLayout, type Layout, type LayoutItem } from "react-grid-layout";
 import { DetachedWindowPortal } from "@/hooks/use-detached-window";
+import { useTranslations } from "next-intl";
 
 type BentoItem = {
     id: string;
@@ -31,6 +32,8 @@ function BentoWidgetShell({
     onDetach?: () => void;
     children: React.ReactNode;
 }) {
+    const t = useTranslations("bento");
+
     return (
         <div className="h-full flex flex-col rounded-xl border bg-card shadow-sm overflow-hidden">
             <div className="drag-handle shrink-0 flex items-center justify-between px-3 py-2 border-b bg-muted/40 cursor-grab active:cursor-grabbing select-none">
@@ -54,8 +57,8 @@ function BentoWidgetShell({
                             onMouseDown={(e) => e.stopPropagation()}
                             onTouchStart={(e) => e.stopPropagation()}
                             className="p-1 rounded text-muted-foreground/60 hover:text-foreground hover:bg-accent cursor-pointer"
-                            title="Détacher dans une fenêtre"
-                            aria-label={`Détacher ${title} dans une fenêtre`}
+                            title={t("detach")}
+                            aria-label={t("detachAria", { title })}
                         >
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
