@@ -1,24 +1,8 @@
 import mongoose from "mongoose";
 import { Scenario } from "../models/ScenarioModel.mjs";
 import ScenarioPage from "../models/ScenarioPageModel.mjs";
-import { Game } from "../models/GameModel.mjs";
 import { extractScenarioLinks } from "../utils/extractScenarioLinks.mjs";
-
-// Vérifie que l'utilisateur est le MJ de la partie
-async function assertMJAccess(gameId, userId) {
-    const game = await Game.findById(gameId);
-    if (!game) {
-        const err = new Error("Partie introuvable.");
-        err.statusCode = 404;
-        throw err;
-    }
-    if (game.createdBy.toString() !== userId.toString()) {
-        const err = new Error("Réservé au Maître du Jeu.");
-        err.statusCode = 403;
-        throw err;
-    }
-    return game;
-}
+import { assertMJAccess } from "../utils/gameAccess.mjs";
 
 // GET /games/:gameId/scenarios
 export async function getAllScenarios(req, res, next) {

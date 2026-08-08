@@ -1,24 +1,7 @@
 import CharacterSheetTemplate from "../models/CharacterSheetTemplateModel.mjs";
 import CharacterSheetInstance from "../models/CharacterSheetInstanceModel.mjs";
 import { Game } from "../models/GameModel.mjs";
-
-// Vérifie que l'utilisateur a accès à la partie (créateur ou joueur)
-async function assertGameAccess(gameId, userId) {
-    const game = await Game.findById(gameId);
-    if (!game) {
-        const err = new Error("Partie introuvable.");
-        err.statusCode = 404;
-        throw err;
-    }
-    const isCreator = game.createdBy.toString() === userId.toString();
-    const isPlayer = game.players.some((p) => p.toString() === userId.toString());
-    if (!isCreator && !isPlayer) {
-        const err = new Error("Accès refusé à cette partie.");
-        err.statusCode = 403;
-        throw err;
-    }
-    return { game, isCreator };
-}
+import { assertMJAccess, assertGameAccess } from "../utils/gameAccess.mjs";
 
 // GET /character-sheets/templates
 export async function getAllTemplates(req, res, next) {
@@ -144,26 +127,11 @@ export async function updateSheet(req, res, next) {
 // PNJ (NPC) sheets — MJ only
 // ──────────────────────────────────────
 
-async function assertMJ(gameId, userId) {
-    const game = await Game.findById(gameId);
-    if (!game) {
-        const err = new Error("Partie introuvable.");
-        err.statusCode = 404;
-        throw err;
-    }
-    if (game.createdBy.toString() !== userId.toString()) {
-        const err = new Error("Réservé au MJ.");
-        err.statusCode = 403;
-        throw err;
-    }
-    return game;
-}
-
 // GET /games/:gameId/npc-sheets
 export async function getNpcSheets(req, res, next) {
     try {
         const { gameId } = req.params;
-        await assertMJ(gameId, req.user._id);
+        await assertMJAccess(gameId, req.user._id);
 
         const sheets = await CharacterSheetInstance.find({ gameId, isNpc: true });
         res.json({ success: true, sheets });
@@ -178,7 +146,7 @@ export async function createNpcSheet(req, res, next) {
         const { gameId } = req.params;
         const { npcName, values } = req.body;
 
-        const game = await assertMJ(gameId, req.user._id);
+        const game = await assertMJAccess(gameId, req.user._id);
 
         if (!npcName || !npcName.trim()) {
             return res.status(400).json({ success: false, message: "Le nom du PNJ est requis." });
@@ -205,7 +173,7 @@ export async function updateNpcSheet(req, res, next) {
         const { gameId, sheetId } = req.params;
         const { values, npcName } = req.body;
 
-        await assertMJ(gameId, req.user._id);
+        await assertMJAccess(gameId, req.user._id);
 
         const sheet = await CharacterSheetInstance.findById(sheetId);
         if (!sheet || !sheet.isNpc || sheet.gameId.toString() !== gameId) {
@@ -227,7 +195,7 @@ export async function deleteNpcSheet(req, res, next) {
     try {
         const { gameId, sheetId } = req.params;
 
-        await assertMJ(gameId, req.user._id);
+        await assertMJAccess(gameId, req.user._id);
 
         const sheet = await CharacterSheetInstance.findById(sheetId);
         if (!sheet || !sheet.isNpc || sheet.gameId.toString() !== gameId) {

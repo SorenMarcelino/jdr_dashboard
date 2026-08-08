@@ -91,6 +91,30 @@ export const reorderPagesSchema = z.object({
     ).min(1),
 });
 
+// ── Règles / Lore (Codex) ──────────────────────────────────────────────
+export const createKnowledgeEntrySchema = z.object({
+    type: z.enum(["rule", "lore"]),
+    title: z.string().trim().min(1, "Title is required").max(200),
+    category: z.string().trim().max(80).optional(),
+});
+
+export const updateKnowledgeEntrySchema = z.object({
+    title: z.string().trim().min(1).max(200).optional(),
+    content: z.any().optional(),
+    category: z.string().trim().max(80).nullable().optional(),
+    visibleToPlayers: z.boolean().optional(),
+});
+
+export const reorderKnowledgeEntriesSchema = z.object({
+    type: z.enum(["rule", "lore"]),
+    orders: z.array(
+        z.object({
+            entryId: z.string(),
+            order: z.number(),
+        })
+    ).min(1),
+});
+
 // ── Fiches personnage ───────────────────────────────────────────────────
 export const createSheetSchema = z.object({
     systemId: z.string().trim().min(1, "systemId is required"),

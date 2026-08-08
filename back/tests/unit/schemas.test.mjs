@@ -7,6 +7,9 @@ import {
     joinGameSchema,
     reorderScenariosSchema,
     reorderPagesSchema,
+    createKnowledgeEntrySchema,
+    updateKnowledgeEntrySchema,
+    reorderKnowledgeEntriesSchema,
 } from "../../validation/schemas.mjs";
 
 test("signupSchema accepts valid payload", () => {
@@ -69,4 +72,30 @@ test("reorderPagesSchema accepts a list of pageId/order pairs", () => {
 
 test("reorderPagesSchema rejects an empty list", () => {
     assert.ok(!reorderPagesSchema.safeParse({ orders: [] }).success);
+});
+
+test("createKnowledgeEntrySchema requires type and title", () => {
+    assert.ok(createKnowledgeEntrySchema.safeParse({ type: "rule", title: "Combat" }).success);
+    assert.ok(createKnowledgeEntrySchema.safeParse({ type: "lore", title: "La Cité engloutie", category: "Lieu" }).success);
+    assert.ok(!createKnowledgeEntrySchema.safeParse({ type: "rule", title: "" }).success);
+    assert.ok(!createKnowledgeEntrySchema.safeParse({ type: "spell", title: "Combat" }).success);
+    assert.ok(!createKnowledgeEntrySchema.safeParse({ title: "Combat" }).success);
+});
+
+test("updateKnowledgeEntrySchema accepts partial updates", () => {
+    assert.ok(updateKnowledgeEntrySchema.safeParse({ title: "Combat rapproché" }).success);
+    assert.ok(updateKnowledgeEntrySchema.safeParse({ visibleToPlayers: true }).success);
+    assert.ok(updateKnowledgeEntrySchema.safeParse({ category: "Monstre" }).success);
+    assert.ok(updateKnowledgeEntrySchema.safeParse({ content: { type: "doc", content: [] } }).success);
+    assert.ok(updateKnowledgeEntrySchema.safeParse({}).success);
+});
+
+test("reorderKnowledgeEntriesSchema requires a type and a non-empty order list", () => {
+    const r = reorderKnowledgeEntriesSchema.safeParse({
+        type: "lore",
+        orders: [{ entryId: "abc123", order: 0 }],
+    });
+    assert.ok(r.success);
+    assert.ok(!reorderKnowledgeEntriesSchema.safeParse({ type: "lore", orders: [] }).success);
+    assert.ok(!reorderKnowledgeEntriesSchema.safeParse({ orders: [{ entryId: "abc123", order: 0 }] }).success);
 });
