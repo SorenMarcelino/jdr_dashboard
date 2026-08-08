@@ -76,7 +76,7 @@ export function KnowledgeWorkspace({ gameId, type }: Props) {
         ])
             .then(([userRes, gameRes]) => {
                 if (userRes.data.success && gameRes.data.success) {
-                    const userId = userRes.data.user.id;
+                    const userId = userRes.data.user._id;
                     const game = gameRes.data.game;
                     setIsMJ(game.createdBy._id?.toString() === userId?.toString());
                 }
