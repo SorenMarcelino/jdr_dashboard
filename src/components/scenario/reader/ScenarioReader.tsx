@@ -11,12 +11,14 @@ import { useScenario } from "@/contexts/ScenarioContext";
 import { ScenarioPageLinkMark } from "../editor/extensions/ScenarioPageLinkMark";
 import { NpcReferenceMark } from "../editor/extensions/NpcReferenceMark";
 import { AnnotationMark } from "../editor/extensions/AnnotationMark";
+import { KnowledgeReferenceMark } from "../editor/extensions/KnowledgeReferenceMark";
 import { IndentExtension } from "../editor/extensions/IndentExtension";
 import { GmOnlyBlock } from "../editor/extensions/GmOnlyBlock";
 import { HeadingId } from "../editor/extensions/HeadingId";
 import { PageOutline } from "../editor/PageOutline";
 import { AnnotationTooltip } from "./AnnotationTooltip";
 import { NpcSheetPopover } from "./NpcSheetPopover";
+import { KnowledgeEntryPreviewPopover } from "./KnowledgeEntryPreviewPopover";
 import { API_URL } from "@/lib/api";
 
 const API = API_URL;
@@ -37,17 +39,23 @@ type NpcPopoverState = {
     npcName: string;
 } | null;
 
+type KnowledgePopoverState = {
+    entryId: string;
+    title: string;
+} | null;
+
 export function ScenarioReader({ gameId, scenarioId }: Props) {
     const { currentPageId, navigateToPage } = useScenario();
     const [pageTitle, setPageTitle] = useState("");
     const [tooltip, setTooltip] = useState<TooltipState>(null);
     const [npcPopover, setNpcPopover] = useState<NpcPopoverState>(null);
+    const [knowledgePopover, setKnowledgePopover] = useState<KnowledgePopoverState>(null);
     const t = useTranslations("scenario.editor");
     const tToolbar = useTranslations("scenario.workspace");
 
     const editor = useEditor({
         immediatelyRender: false,
-        extensions: [StarterKit, TextStyle, Color, IndentExtension, GmOnlyBlock, HeadingId, ScenarioPageLinkMark, NpcReferenceMark, AnnotationMark],
+        extensions: [StarterKit, TextStyle, Color, IndentExtension, GmOnlyBlock, HeadingId, ScenarioPageLinkMark, NpcReferenceMark, AnnotationMark, KnowledgeReferenceMark],
         editable: false,
         editorProps: {
             attributes: {
@@ -97,6 +105,15 @@ export function ScenarioReader({ gameId, scenarioId }: Props) {
                 if (sheetId) setNpcPopover({ sheetId, npcName });
                 return;
             }
+
+            // Clic sur une référence règle/lore
+            const knowledgeRef = target.closest("[data-knowledge-ref]") as HTMLElement | null;
+            if (knowledgeRef) {
+                const entryId = knowledgeRef.getAttribute("data-knowledge-ref");
+                const title = knowledgeRef.textContent || "";
+                if (entryId) setKnowledgePopover({ entryId, title });
+                return;
+            }
         },
         [navigateToPage]
     );
@@ -123,11 +140,20 @@ export function ScenarioReader({ gameId, scenarioId }: Props) {
             const rect = annotation.getBoundingClientRect();
             setTooltip({ text: previewText, x: rect.left + rect.width / 2, y: rect.top });
         }
+
+        const knowledgeRef = target.closest("[data-knowledge-ref]") as HTMLElement | null;
+        if (knowledgeRef) {
+            const previewText = knowledgeRef.getAttribute("data-preview-text");
+            if (previewText) {
+                const rect = knowledgeRef.getBoundingClientRect();
+                setTooltip({ text: previewText, x: rect.left + rect.width / 2, y: rect.top });
+            }
+        }
     }, [editor]);
 
     const handleEditorMouseOut = useCallback((e: React.MouseEvent) => {
         const target = e.target as HTMLElement;
-        if (target.closest("[data-annotation]")) {
+        if (target.closest("[data-annotation]") || target.closest("[data-knowledge-ref]")) {
             setTooltip(null);
         }
     }, []);
@@ -164,6 +190,14 @@ export function ScenarioReader({ gameId, scenarioId }: Props) {
                     sheetId={npcPopover.sheetId}
                     npcName={npcPopover.npcName}
                     onClose={() => setNpcPopover(null)}
+                />
+            )}
+            {knowledgePopover && (
+                <KnowledgeEntryPreviewPopover
+                    gameId={gameId}
+                    entryId={knowledgePopover.entryId}
+                    title={knowledgePopover.title}
+                    onClose={() => setKnowledgePopover(null)}
                 />
             )}
         </div>

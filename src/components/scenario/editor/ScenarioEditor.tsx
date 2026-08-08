@@ -16,6 +16,8 @@ import { AnnotationPopover } from "./AnnotationPopover";
 import { ScenarioPageLinkMark } from "./extensions/ScenarioPageLinkMark";
 import { NpcReferenceMark } from "./extensions/NpcReferenceMark";
 import { AnnotationMark } from "./extensions/AnnotationMark";
+import { KnowledgeReferenceMark } from "./extensions/KnowledgeReferenceMark";
+import { KnowledgeSelector } from "./KnowledgeSelector";
 import { IndentExtension } from "./extensions/IndentExtension";
 import { GmOnlyBlock } from "./extensions/GmOnlyBlock";
 import { HeadingId } from "./extensions/HeadingId";
@@ -30,7 +32,7 @@ type Props = {
     scenarioId: string;
 };
 
-type PopoverType = "pageLink" | "npcRef" | "annotation" | null;
+type PopoverType = "pageLink" | "npcRef" | "annotation" | "knowledgeRule" | "knowledgeLore" | null;
 
 export function ScenarioEditor({ gameId, scenarioId }: Props) {
     const { currentPageId, updatePageTitle, updatePageTags, pages } = useScenario();
@@ -57,6 +59,7 @@ export function ScenarioEditor({ gameId, scenarioId }: Props) {
             ScenarioPageLinkMark,
             NpcReferenceMark,
             AnnotationMark,
+            KnowledgeReferenceMark,
         ],
         editorProps: {
             attributes: {
@@ -228,6 +231,28 @@ export function ScenarioEditor({ gameId, scenarioId }: Props) {
         [editor, restoreSelection]
     );
 
+    const handleAddKnowledgeRef = useCallback(
+        (entryType: "rule" | "lore", entryId: string, title: string) => {
+            if (!editor || !savedSelectionRef.current) return;
+            const { from, to } = savedSelectionRef.current;
+            const selectedText = editor.state.doc.textBetween(from, to, " ");
+            restoreSelection();
+            editor
+                .chain()
+                .focus()
+                .setMark("knowledgeReference", {
+                    entryId,
+                    entryType,
+                    title,
+                    previewText: selectedText || title,
+                })
+                .run();
+            savedSelectionRef.current = null;
+            setPopover(null);
+        },
+        [editor, restoreSelection]
+    );
+
     if (!currentPageId) {
         return (
             <div className="flex-1 flex items-center justify-center text-muted-foreground">
@@ -259,6 +284,8 @@ export function ScenarioEditor({ gameId, scenarioId }: Props) {
                 onAddPageLink={() => openPopover("pageLink")}
                 onAddNpcRef={() => openPopover("npcRef")}
                 onAddAnnotation={() => openPopover("annotation")}
+                onAddRuleRef={() => openPopover("knowledgeRule")}
+                onAddLoreRef={() => openPopover("knowledgeLore")}
             />
 
             {/* Éditeur + sommaire */}
@@ -295,6 +322,22 @@ export function ScenarioEditor({ gameId, scenarioId }: Props) {
             {popover === "annotation" && (
                 <AnnotationPopover
                     onConfirm={handleAddAnnotation}
+                    onClose={() => setPopover(null)}
+                />
+            )}
+            {popover === "knowledgeRule" && (
+                <KnowledgeSelector
+                    gameId={gameId}
+                    entryType="rule"
+                    onSelect={(entryId, title) => handleAddKnowledgeRef("rule", entryId, title)}
+                    onClose={() => setPopover(null)}
+                />
+            )}
+            {popover === "knowledgeLore" && (
+                <KnowledgeSelector
+                    gameId={gameId}
+                    entryType="lore"
+                    onSelect={(entryId, title) => handleAddKnowledgeRef("lore", entryId, title)}
                     onClose={() => setPopover(null)}
                 />
             )}

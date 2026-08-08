@@ -94,6 +94,8 @@
             "codeLabel": "Code :",
             "gmBadge": "MJ",
             "scenariosLink": "Scénarios",
+            "rulesLink": "Règles",
+            "loreLink": "Lore",
             "sheetTitleFor": "Fiche — {username}",
             "selectPlayer": "Sélectionner un joueur",
             "sheetTitleDefault": "Fiche de personnage",
@@ -228,6 +230,8 @@
             "pageLink": "Lier à une page",
             "npcLink": "Lier un PNJ",
             "annotation": "Ajouter une note",
+            "linkRule": "Lier une règle",
+            "linkLore": "Lier un point de lore",
             "undo": "Annuler",
             "redo": "Rétablir"
         },
@@ -235,6 +239,56 @@
             "title": "Sommaire",
             "show": "Afficher le sommaire",
             "hide": "Masquer le sommaire"
+        }
+    },
+    "knowledge": {
+        "editor": {
+            "categoryLabel": "Catégorie",
+            "categoryPlaceholder": "ex: Combat, Lieu, Monstre...",
+            "titlePlaceholder": "Titre de l'entrée...",
+            "contentPlaceholder": "Rédigez le contenu...",
+            "visibleToggleLabel": "Visible des joueurs",
+            "saving": "Sauvegarde...",
+            "savedAt": "Sauvegardé à {time}",
+            "selectEntry": "Sélectionnez une entrée dans la barre latérale"
+        },
+        "sidebar": {
+            "search": "Rechercher...",
+            "viewList": "Liste",
+            "viewByCategory": "Par catégorie",
+            "noCategory": "Sans catégorie",
+            "deleteConfirm": "Supprimer cette entrée ?",
+            "deleteTitle": "Supprimer",
+            "visibleBadge": "Visible des joueurs",
+            "hiddenBadge": "Masqué aux joueurs"
+        },
+        "rules": {
+            "newEntryTitle": "Nouveau chapitre",
+            "addEntry": "Ajouter un chapitre",
+            "heading": "Règles",
+            "loading": "Chargement..."
+        },
+        "lore": {
+            "newEntryTitle": "Nouveau point de lore",
+            "addEntry": "Ajouter un point de lore",
+            "heading": "Lore",
+            "loading": "Chargement..."
+        },
+        "reader": {
+            "loading": "Chargement...",
+            "empty": "Rien n'a encore été partagé ici."
+        },
+        "selector": {
+            "titleRule": "Lier une règle",
+            "titleLore": "Lier un point de lore",
+            "searchPlaceholder": "Rechercher...",
+            "loading": "Chargement...",
+            "empty": "Aucune entrée trouvée",
+            "categoryFallback": "Sans catégorie"
+        },
+        "popover": {
+            "loading": "Chargement...",
+            "notFound": "Entrée introuvable"
         }
     }
 }

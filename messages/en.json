@@ -94,6 +94,8 @@
             "codeLabel": "Code:",
             "gmBadge": "GM",
             "scenariosLink": "Scenarios",
+            "rulesLink": "Rules",
+            "loreLink": "Lore",
             "sheetTitleFor": "Sheet — {username}",
             "selectPlayer": "Select a player",
             "sheetTitleDefault": "Character sheet",
@@ -228,6 +230,8 @@
             "pageLink": "Link to a page",
             "npcLink": "Link an NPC",
             "annotation": "Add a note",
+            "linkRule": "Link a rule",
+            "linkLore": "Link a lore entry",
             "undo": "Undo",
             "redo": "Redo"
         },
@@ -235,6 +239,56 @@
             "title": "Outline",
             "show": "Show outline",
             "hide": "Hide outline"
+        }
+    },
+    "knowledge": {
+        "editor": {
+            "categoryLabel": "Category",
+            "categoryPlaceholder": "e.g. Combat, Place, Monster...",
+            "titlePlaceholder": "Entry title...",
+            "contentPlaceholder": "Write the content...",
+            "visibleToggleLabel": "Visible to players",
+            "saving": "Saving...",
+            "savedAt": "Saved at {time}",
+            "selectEntry": "Select an entry in the sidebar"
+        },
+        "sidebar": {
+            "search": "Search...",
+            "viewList": "List",
+            "viewByCategory": "By category",
+            "noCategory": "No category",
+            "deleteConfirm": "Delete this entry?",
+            "deleteTitle": "Delete",
+            "visibleBadge": "Visible to players",
+            "hiddenBadge": "Hidden from players"
+        },
+        "rules": {
+            "newEntryTitle": "New chapter",
+            "addEntry": "Add a chapter",
+            "heading": "Rules",
+            "loading": "Loading..."
+        },
+        "lore": {
+            "newEntryTitle": "New lore entry",
+            "addEntry": "Add a lore entry",
+            "heading": "Lore",
+            "loading": "Loading..."
+        },
+        "reader": {
+            "loading": "Loading...",
+            "empty": "Nothing has been shared here yet."
+        },
+        "selector": {
+            "titleRule": "Link a rule",
+            "titleLore": "Link a lore entry",
+            "searchPlaceholder": "Search...",
+            "loading": "Loading...",
+            "empty": "No entry found",
+            "categoryFallback": "No category"
+        },
+        "popover": {
+            "loading": "Loading...",
+            "notFound": "Entry not found"
         }
     }
 }

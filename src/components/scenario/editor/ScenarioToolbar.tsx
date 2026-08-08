@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import {
     Bold, Italic, Heading1, Heading2, Heading3,
     List, ListOrdered, Quote, Minus, Link, UserCircle, StickyNote, Undo2, Redo2,
-    Palette, IndentIncrease, IndentDecrease, EyeOff,
+    Palette, IndentIncrease, IndentDecrease, EyeOff, ScrollText, Landmark,
 } from "lucide-react";
 
 const TEXT_COLOR_KEYS: { key: string; value: string | null }[] = [
@@ -25,6 +25,8 @@ type Props = {
     onAddPageLink: () => void;
     onAddNpcRef: () => void;
     onAddAnnotation: () => void;
+    onAddRuleRef: () => void;
+    onAddLoreRef: () => void;
 };
 
 function ToolbarButton({
@@ -60,7 +62,7 @@ function ToolbarButton({
     );
 }
 
-export function ScenarioToolbar({ editor, onAddPageLink, onAddNpcRef, onAddAnnotation }: Props) {
+export function ScenarioToolbar({ editor, onAddPageLink, onAddNpcRef, onAddAnnotation, onAddRuleRef, onAddLoreRef }: Props) {
     const [, setTick] = useState(0);
     const [colorPickerOpen, setColorPickerOpen] = useState(false);
     const t = useTranslations("scenario.toolbar");
@@ -179,6 +181,12 @@ export function ScenarioToolbar({ editor, onAddPageLink, onAddNpcRef, onAddAnnot
             </ToolbarButton>
             <ToolbarButton onClick={onAddAnnotation} disabled={!hasSelection} title={t("annotation")}>
                 <StickyNote size={iconSize} />
+            </ToolbarButton>
+            <ToolbarButton onClick={onAddRuleRef} disabled={!hasSelection} title={t("linkRule")}>
+                <ScrollText size={iconSize} />
+            </ToolbarButton>
+            <ToolbarButton onClick={onAddLoreRef} disabled={!hasSelection} title={t("linkLore")}>
+                <Landmark size={iconSize} />
             </ToolbarButton>
 
             <div className="flex-1" />

@@ -240,6 +240,25 @@ body {
   @apply border-b-2 border-dotted border-chart-4 cursor-help;
 }
 
+.scenario-knowledge-ref {
+  @apply underline cursor-pointer font-medium;
+  text-decoration-style: solid;
+}
+
+.scenario-knowledge-ref-rule {
+  @apply text-chart-1 decoration-chart-1/50;
+}
+.scenario-knowledge-ref-rule:hover {
+  @apply decoration-chart-1;
+}
+
+.scenario-knowledge-ref-lore {
+  @apply text-chart-5 decoration-chart-5/50;
+}
+.scenario-knowledge-ref-lore:hover {
+  @apply decoration-chart-5;
+}
+
 /* TipTap editor */
 .tiptap p.is-editor-empty:first-child::before {
   @apply text-muted-foreground/50 float-left h-0 pointer-events-none;

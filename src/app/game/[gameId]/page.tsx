@@ -183,20 +183,34 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
                         )}
                         <span className="text-xs text-muted-foreground">{game.characterSheet}</span>
                     </div>
-                    {isMJ && (
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                            <Link
-                                href={`/game/${gameId}/scenario`}
-                                className="px-2.5 py-1 rounded-md bg-muted hover:bg-accent text-foreground font-medium transition-colors"
-                            >
-                                {t("scenariosLink")}
-                            </Link>
-                            <div className="flex items-center gap-2">
-                                <span>{t("codeLabel")}</span>
-                                <span className="font-mono font-bold tracking-widest bg-muted px-2 py-0.5 rounded">{game.inviteCode}</span>
-                            </div>
-                        </div>
-                    )}
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                        <Link
+                            href={`/game/${gameId}/rules`}
+                            className="px-2.5 py-1 rounded-md bg-muted hover:bg-accent text-foreground font-medium transition-colors"
+                        >
+                            {t("rulesLink")}
+                        </Link>
+                        <Link
+                            href={`/game/${gameId}/lore`}
+                            className="px-2.5 py-1 rounded-md bg-muted hover:bg-accent text-foreground font-medium transition-colors"
+                        >
+                            {t("loreLink")}
+                        </Link>
+                        {isMJ && (
+                            <>
+                                <Link
+                                    href={`/game/${gameId}/scenario`}
+                                    className="px-2.5 py-1 rounded-md bg-muted hover:bg-accent text-foreground font-medium transition-colors"
+                                >
+                                    {t("scenariosLink")}
+                                </Link>
+                                <div className="flex items-center gap-2">
+                                    <span>{t("codeLabel")}</span>
+                                    <span className="font-mono font-bold tracking-widest bg-muted px-2 py-0.5 rounded">{game.inviteCode}</span>
+                                </div>
+                            </>
+                        )}
+                    </div>
                 </div>
 
                 {/* Bento dashboard */}
