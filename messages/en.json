@@ -262,7 +262,7 @@
             "visibleBadge": "Visible to players",
             "hiddenBadge": "Hidden from players"
         },
-        "rules": {
+        "rule": {
             "newEntryTitle": "New chapter",
             "addEntry": "Add a chapter",
             "heading": "Rules",

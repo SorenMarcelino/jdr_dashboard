@@ -49,7 +49,6 @@ export function KnowledgeEntryPreviewPopover({ gameId, entryId, title, onClose }
             })
             .catch(() => setNotFound(true))
             .finally(() => setLoading(false));
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [gameId, entryId, editor]);
 
     return (
