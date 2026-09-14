@@ -164,6 +164,22 @@
                     "title": "The Night Owl",
                     "hint": "most active late at night"
                 }
+            },
+            "charts": {
+                "d20Title": "d20 face distribution",
+                "d20Hint": "With a fair die and enough rolls, the bars even out.",
+                "diceTypeTitle": "Dice rolled by type",
+                "speechTitle": "Speech share"
+            },
+            "heatmap": {
+                "title": "Activity by hour",
+                "mon": "Mon",
+                "tue": "Tue",
+                "wed": "Wed",
+                "thu": "Thu",
+                "fri": "Fri",
+                "sat": "Sat",
+                "sun": "Sun"
             }
         }
     },

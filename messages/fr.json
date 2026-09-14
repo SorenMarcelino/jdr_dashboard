@@ -164,6 +164,22 @@
                     "title": "Le Noctambule",
                     "hint": "le plus actif tard le soir"
                 }
+            },
+            "charts": {
+                "d20Title": "Répartition des faces du d20",
+                "d20Hint": "Sur un dé équitable et beaucoup de jets, les barres s'égalisent.",
+                "diceTypeTitle": "Dés lancés par type",
+                "speechTitle": "Part de parole"
+            },
+            "heatmap": {
+                "title": "Activité par heure",
+                "mon": "Lun",
+                "tue": "Mar",
+                "wed": "Mer",
+                "thu": "Jeu",
+                "fri": "Ven",
+                "sat": "Sam",
+                "sun": "Dim"
             }
         }
     },

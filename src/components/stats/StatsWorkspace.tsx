@@ -10,6 +10,10 @@ import type { GameStats } from "@/types/stats";
 import { StatCard, formatDuration } from "@/components/stats/StatCard";
 import { BadgeShowcase } from "@/components/stats/BadgeShowcase";
 import { LuckTable } from "@/components/stats/LuckTable";
+import { DiceHistogram } from "@/components/stats/DiceHistogram";
+import { DiceTypeChart } from "@/components/stats/DiceTypeChart";
+import { SpeechShareChart } from "@/components/stats/SpeechShareChart";
+import { ActivityHeatmap } from "@/components/stats/ActivityHeatmap";
 
 export function StatsWorkspace({ gameId }: { gameId: string }) {
     const [stats, setStats] = useState<GameStats | null>(null);
@@ -90,6 +94,14 @@ export function StatsWorkspace({ gameId }: { gameId: string }) {
                 </div>
 
                 <LuckTable players={stats.dice.byPlayer} />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <DiceHistogram histogram={stats.dice.d20Histogram} />
+                    <DiceTypeChart data={stats.dice.byDiceType} />
+                    <SpeechShareChart players={stats.chat.byPlayer} />
+                </div>
+
+                <ActivityHeatmap heatmap={stats.chat.heatmap} />
             </div>
         </div>
     );
