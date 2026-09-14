@@ -96,11 +96,19 @@
             "scenariosLink": "Scenarios",
             "rulesLink": "Rules",
             "loreLink": "Lore",
+            "statsLink": "Stats",
             "sheetTitleFor": "Sheet — {username}",
             "selectPlayer": "Select a player",
             "sheetTitleDefault": "Character sheet",
             "stageTitle": "Stage",
             "chatTitle": "Chat / Dice"
+        },
+        "stats": {
+            "title": "Game statistics",
+            "back": "Back to game",
+            "loading": "Loading statistics…",
+            "error": "Could not load statistics.",
+            "empty": "Not enough activity for statistics yet."
         }
     },
     "bento": {

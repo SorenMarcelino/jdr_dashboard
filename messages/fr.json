@@ -96,11 +96,19 @@
             "scenariosLink": "Scénarios",
             "rulesLink": "Règles",
             "loreLink": "Lore",
+            "statsLink": "Statistiques",
             "sheetTitleFor": "Fiche — {username}",
             "selectPlayer": "Sélectionner un joueur",
             "sheetTitleDefault": "Fiche de personnage",
             "stageTitle": "Scène",
             "chatTitle": "Chat / Dés"
+        },
+        "stats": {
+            "title": "Statistiques de la partie",
+            "back": "Retour à la partie",
+            "loading": "Chargement des statistiques…",
+            "error": "Impossible de charger les statistiques.",
+            "empty": "Pas encore assez d'activité pour des statistiques."
         }
     },
     "bento": {

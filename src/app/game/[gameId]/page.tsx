@@ -185,6 +185,12 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
                     </div>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
                         <Link
+                            href={`/game/${gameId}/stats`}
+                            className="px-2.5 py-1 rounded-md bg-muted hover:bg-accent text-foreground font-medium transition-colors"
+                        >
+                            {t("statsLink")}
+                        </Link>
+                        <Link
                             href={`/game/${gameId}/rules`}
                             className="px-2.5 py-1 rounded-md bg-muted hover:bg-accent text-foreground font-medium transition-colors"
                         >
