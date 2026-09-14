@@ -135,3 +135,119 @@ export function computeDiceStats(messages) {
         worstRoll,
     };
 }
+
+// Au-delà de cette coupure sans message, on considère qu'une nouvelle session
+// de jeu commence. Valeur exportée pour être testable et ajustable.
+export const SESSION_GAP_MS = 4 * 60 * 60 * 1000;
+
+// Mots vides FR + EN. Volontairement courte : on filtre aussi tout ce qui fait
+// moins de 3 caractères, ce qui élimine déjà l'essentiel du bruit.
+const STOPWORDS = new Set([
+    "les", "des", "une", "que", "qui", "pas", "pour", "dans", "sur", "avec",
+    "est", "sont", "mais", "tout", "tous", "plus", "cette", "son", "ses",
+    "vous", "nous", "elle", "ils", "elles", "lui", "leur", "ont", "fait",
+    "the", "and", "for", "you", "that", "this", "with", "was", "are", "have",
+    "not", "but", "his", "her", "they", "から", "その",
+]);
+
+const EMOJI_RE = /\p{Extended_Pictographic}/gu;
+
+export function median(values) {
+    if (values.length === 0) return 0;
+    const sorted = [...values].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 === 0
+        ? (sorted[mid - 1] + sorted[mid]) / 2
+        : sorted[mid];
+}
+
+export function computeChatStats(messages) {
+    const all = [...messages].sort(byDateAsc);
+    const heatmap = Array.from({ length: 7 }, () => Array(24).fill(0));
+    const players = new Map();
+    const wordCounts = new Map();
+    const emojiCounts = new Map();
+    const delays = [];
+
+    const playerFor = (m) => {
+        const key = String(m.userId);
+        if (!players.has(key)) {
+            players.set(key, {
+                userId: key,
+                username: m.username,
+                messages: 0,
+                textMessages: 0,
+                diceMessages: 0,
+                totalLength: 0,
+                replyDelays: [],
+                // Histogramme horaire UTC, pivoté côté client pour le badge
+                // du Noctambule, qui dépend du fuseau du lecteur.
+                hours: Array(24).fill(0),
+            });
+        }
+        return players.get(key);
+    };
+
+    for (let i = 0; i < all.length; i++) {
+        const m = all[i];
+        const at = new Date(m.createdAt);
+        const p = playerFor(m);
+
+        p.messages += 1;
+        p.hours[at.getUTCHours()] += 1;
+        heatmap[at.getUTCDay()][at.getUTCHours()] += 1;
+
+        if (m.type === "text") {
+            p.textMessages += 1;
+            p.totalLength += (m.content ?? "").length;
+
+            for (const raw of (m.content ?? "").toLowerCase().split(/[^\p{L}\p{N}'-]+/u)) {
+                const w = raw.replace(/^['-]+|['-]+$/g, "");
+                if (w.length < 3 || STOPWORDS.has(w)) continue;
+                wordCounts.set(w, (wordCounts.get(w) ?? 0) + 1);
+            }
+            for (const e of (m.content ?? "").match(EMOJI_RE) ?? []) {
+                emojiCounts.set(e, (emojiCounts.get(e) ?? 0) + 1);
+            }
+        } else {
+            p.diceMessages += 1;
+        }
+
+        if (i > 0) {
+            const prev = all[i - 1];
+            const delta = at - new Date(prev.createdAt);
+            // Les coupures entre sessions ne mesurent pas le rythme de la
+            // table, elles mesurent le calendrier. On les écarte.
+            if (delta <= SESSION_GAP_MS) {
+                delays.push(delta);
+                if (String(prev.userId) !== String(m.userId)) {
+                    p.replyDelays.push(delta);
+                }
+            }
+        }
+    }
+
+    const totalMessages = all.length;
+    const byPlayer = [...players.values()]
+        .map(({ totalLength, replyDelays, ...p }) => ({
+            ...p,
+            share: totalMessages > 0 ? p.messages / totalMessages : 0,
+            avgLength: p.textMessages > 0 ? totalLength / p.textMessages : 0,
+            medianReplyMs: median(replyDelays),
+        }))
+        .sort((a, b) => b.messages - a.messages);
+
+    const top = (map, n) =>
+        [...map.entries()]
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, n);
+
+    return {
+        totalMessages,
+        byPlayer,
+        heatmap,
+        medianDelayMs: median(delays),
+        topWords: top(wordCounts, 20).map(([word, count]) => ({ word, count })),
+        topEmojis: top(emojiCounts, 10).map(([emoji, count]) => ({ emoji, count })),
+    };
+}
