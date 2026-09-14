@@ -8,6 +8,9 @@ import {
     median,
     computeChatStats,
     computeSessionStats,
+    computeBadges,
+    computeGameStats,
+    BADGE_THRESHOLDS,
 } from "../../services/gameStatsService.mjs";
 
 // Fabrique un message de jet de dés.
@@ -126,6 +129,21 @@ const text = ({ userId = "u1", username = "Alice", content = "bonjour", at = "20
     diceRoll: undefined,
     createdAt: new Date(at),
 });
+
+// Génère n messages texte pour franchir un seuil de badge.
+const manyTexts = (n, userId, username, startHour = 10) =>
+    Array.from({ length: n }, (_, i) =>
+        text({
+            userId,
+            username,
+            content: `message numero ${i}`,
+            at: new Date(Date.UTC(2026, 0, 1, startHour, i)).toISOString(),
+        })
+    );
+
+// Génère n dés d'un coup pour franchir un seuil de badge.
+const manyDice = (n, userId, username, value, diceType = "d20") =>
+    roll({ userId, username, diceType, results: Array(n).fill(value) });
 
 test("median handles odd, even and empty inputs", () => {
     assert.equal(median([3, 1, 2]), 2);
@@ -298,4 +316,84 @@ test("computeSessionStats on an empty list returns zeroed aggregates", () => {
     assert.equal(stats.avgDurationMs, 0);
     assert.equal(stats.firstActivityAt, null);
     assert.equal(stats.lastActivityAt, null);
+});
+
+test("no luck badge is awarded below the dice threshold", () => {
+    const messages = [manyDice(10, "u1", "Alice", 20)];
+    const badges = computeBadges(computeDiceStats(messages), computeChatStats(messages));
+    assert.equal(badges.find((b) => b.id === "blessed"), undefined);
+    assert.equal(badges.find((b) => b.id === "cursed"), undefined);
+});
+
+test("luck badges are awarded above the dice threshold", () => {
+    const messages = [
+        manyDice(BADGE_THRESHOLDS.blessed, "u1", "Alice", 20),
+        manyDice(BADGE_THRESHOLDS.blessed, "u2", "Bob", 1),
+    ];
+    const badges = computeBadges(computeDiceStats(messages), computeChatStats(messages));
+    assert.equal(badges.find((b) => b.id === "blessed").username, "Alice");
+    assert.equal(badges.find((b) => b.id === "cursed").username, "Bob");
+});
+
+test("no chatterbox badge below the message threshold", () => {
+    const messages = manyTexts(5, "u1", "Alice");
+    const badges = computeBadges(computeDiceStats(messages), computeChatStats(messages));
+    assert.equal(badges.find((b) => b.id === "chatterbox"), undefined);
+});
+
+test("chatterbox goes to the most talkative player above threshold", () => {
+    const messages = [
+        ...manyTexts(BADGE_THRESHOLDS.chatterbox, "u1", "Alice"),
+        ...manyTexts(3, "u2", "Bob", 15),
+    ];
+    const badges = computeBadges(computeDiceStats(messages), computeChatStats(messages));
+    assert.equal(badges.find((b) => b.id === "chatterbox").username, "Alice");
+});
+
+test("a single eligible player is blessed, never also cursed", () => {
+    const messages = [manyDice(BADGE_THRESHOLDS.blessed, "u1", "Alice", 20)];
+    const badges = computeBadges(computeDiceStats(messages), computeChatStats(messages));
+    assert.equal(badges.find((b) => b.id === "blessed").username, "Alice");
+    assert.equal(badges.find((b) => b.id === "cursed"), undefined);
+});
+
+test("highRoller measures the biggest single batch, not the career total", () => {
+    const messages = [
+        // Bob lance beaucoup de dés, mais jamais plus de 2 d'un coup.
+        ...Array.from({ length: 20 }, () => manyDice(2, "u2", "Bob", 3, "d6")),
+        // Alice ne lance qu'une fois, mais 10 dés d'un coup.
+        manyDice(10, "u1", "Alice", 3, "d6"),
+    ];
+    const dice = computeDiceStats(messages);
+    assert.ok(dice.byPlayer.find((p) => p.username === "Bob").dice > 10);
+    const badges = computeBadges(dice, computeChatStats(messages));
+    assert.equal(badges.find((b) => b.id === "highRoller").username, "Alice");
+    assert.equal(badges.find((b) => b.id === "highRoller").value, 10);
+});
+
+test("computeGameStats assembles every section and reports meta", () => {
+    const messages = [text({ content: "salut" }), roll({ results: [4] })];
+    const stats = computeGameStats(messages, {
+        _id: "g1",
+        createdAt: new Date("2026-01-01T00:00:00Z"),
+        players: [{ _id: "u1" }, { _id: "u2" }],
+    });
+    assert.equal(stats.meta.messageCount, 2);
+    assert.equal(stats.meta.playerCount, 2);
+    assert.equal(stats.meta.truncated, false);
+    assert.ok(stats.dice);
+    assert.ok(stats.chat);
+    assert.ok(stats.sessions);
+    assert.ok(Array.isArray(stats.badges));
+});
+
+test("computeGameStats on a game with no message does not throw", () => {
+    const stats = computeGameStats([], {
+        _id: "g1",
+        createdAt: new Date("2026-01-01T00:00:00Z"),
+        players: [],
+    });
+    assert.equal(stats.meta.messageCount, 0);
+    assert.deepEqual(stats.badges, []);
+    assert.equal(stats.dice.totalRolls, 0);
 });

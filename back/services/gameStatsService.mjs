@@ -296,3 +296,94 @@ export function computeSessionStats(messages, game) {
         campaignDurationMs: lastActivityAt - new Date(game.createdAt),
     };
 }
+
+// Garde-fou : au-delà, on ne garde que les messages les plus récents. Une
+// campagne normale est très loin du compte ; ce plafond protège le cas
+// pathologique sans imposer de cache.
+export const MAX_MESSAGES = 20_000;
+
+// Nombre minimum d'observations pour qu'un badge soit décerné. En dessous,
+// le badge est simplement absent : « Le Maudit » attribué sur douze jets est
+// faux, et cesse vite d'être drôle.
+export const BADGE_THRESHOLDS = {
+    blessed: 50,      // dés lancés
+    cursed: 50,       // dés lancés
+    critic: 20,       // d20 lancés
+    chatterbox: 30,   // messages
+    novelist: 10,     // messages texte
+    nightOwl: 20,     // messages
+    highRoller: 1,    // jets
+    slowpoke: 20,     // messages
+};
+
+// Renvoie l'élément qui maximise `score`, à condition que `eligible` soit vrai.
+const pick = (list, eligible, score) => {
+    const candidates = list.filter(eligible);
+    if (candidates.length === 0) return null;
+    return candidates.reduce((best, c) => (score(c) > score(best) ? c : best));
+};
+
+export function computeBadges(dice, chat) {
+    const badges = [];
+    const add = (id, entry, value) => {
+        if (entry) badges.push({ id, userId: entry.userId, username: entry.username, value });
+    };
+
+    const blessed = pick(dice.byPlayer, (p) => p.dice >= BADGE_THRESHOLDS.blessed, (p) => p.luckIndex);
+    add("blessed", blessed, blessed?.luckIndex);
+
+    // Un seul joueur au-dessus du seuil serait à la fois le plus chanceux et
+    // le plus malchanceux de la table. On exclut le Béni des candidats.
+    const cursed = pick(
+        dice.byPlayer,
+        (p) => p.dice >= BADGE_THRESHOLDS.cursed && p.userId !== blessed?.userId,
+        (p) => -p.luckIndex
+    );
+    add("cursed", cursed, cursed?.luckIndex);
+
+    const critic = pick(dice.byPlayer, (p) => p.dice >= BADGE_THRESHOLDS.critic, (p) => p.natMax);
+    add("critic", critic, critic?.natMax);
+
+    const chatterbox = pick(chat.byPlayer, (p) => p.messages >= BADGE_THRESHOLDS.chatterbox, (p) => p.messages);
+    add("chatterbox", chatterbox, chatterbox?.messages);
+
+    const novelist = pick(chat.byPlayer, (p) => p.textMessages >= BADGE_THRESHOLDS.novelist, (p) => p.avgLength);
+    add("novelist", novelist, novelist?.avgLength);
+
+    const slowpoke = pick(chat.byPlayer, (p) => p.messages >= BADGE_THRESHOLDS.slowpoke, (p) => p.medianReplyMs);
+    add("slowpoke", slowpoke, slowpoke?.medianReplyMs);
+
+    // Le plus gros lot de dés lancé d'un coup — pas le plus gros total lancé
+    // sur la campagne, qui ne ferait que redoubler « Le Flambeur » avec le
+    // joueur le plus assidu.
+    const highRoller = pick(
+        dice.byPlayer,
+        (p) => p.rolls >= BADGE_THRESHOLDS.highRoller,
+        (p) => p.biggestBatch
+    );
+    add("highRoller", highRoller, highRoller?.biggestBatch);
+
+    return badges;
+}
+
+export function computeGameStats(messages, game) {
+    const truncated = messages.length > MAX_MESSAGES;
+    const window = truncated ? messages.slice(-MAX_MESSAGES) : messages;
+
+    const dice = computeDiceStats(window);
+    const chat = computeChatStats(window);
+    const sessions = computeSessionStats(window, game);
+
+    return {
+        meta: {
+            gameId: String(game._id),
+            playerCount: (game.players ?? []).length,
+            messageCount: window.length,
+            truncated,
+        },
+        dice,
+        chat,
+        sessions,
+        badges: computeBadges(dice, chat),
+    };
+}
