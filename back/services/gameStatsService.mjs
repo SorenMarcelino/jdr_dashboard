@@ -147,7 +147,7 @@ const STOPWORDS = new Set([
     "est", "sont", "mais", "tout", "tous", "plus", "cette", "son", "ses",
     "vous", "nous", "elle", "ils", "elles", "lui", "leur", "ont", "fait",
     "the", "and", "for", "you", "that", "this", "with", "was", "are", "have",
-    "not", "but", "his", "her", "they", "から", "その",
+    "not", "but", "his", "her", "they",
 ]);
 
 const EMOJI_RE = /\p{Extended_Pictographic}/gu;
@@ -201,8 +201,8 @@ export function computeChatStats(messages) {
             p.textMessages += 1;
             p.totalLength += (m.content ?? "").length;
 
-            for (const raw of (m.content ?? "").toLowerCase().split(/[^\p{L}\p{N}'-]+/u)) {
-                const w = raw.replace(/^['-]+|['-]+$/g, "");
+            for (const raw of (m.content ?? "").toLowerCase().split(/[^\p{L}\p{N}-]+/u)) {
+                const w = raw.replace(/^-+|-+$/g, "");
                 if (w.length < 3 || STOPWORDS.has(w)) continue;
                 wordCounts.set(w, (wordCounts.get(w) ?? 0) + 1);
             }

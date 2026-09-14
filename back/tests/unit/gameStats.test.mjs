@@ -228,3 +228,16 @@ test("computeChatStats on an empty list returns zeroed aggregates", () => {
     assert.deepEqual(stats.topWords, []);
     assert.equal(stats.heatmap.length, 7);
 });
+
+test("French elisions are split correctly, no apostrophes in topWords", () => {
+    const stats = computeChatStats([
+        text({ content: "j'ai vu l'auberge et qu'il partait vers l'auberge" }),
+    ]);
+    // auberge should appear twice
+    const aubergeEntry = stats.topWords.find((w) => w.word === "auberge");
+    assert.ok(aubergeEntry, "auberge should be in topWords");
+    assert.equal(aubergeEntry.count, 2);
+    // No word should contain an apostrophe
+    const hasApostrophe = stats.topWords.some((w) => w.word.includes("'"));
+    assert.ok(!hasApostrophe, "topWords should not contain apostrophes");
+});
