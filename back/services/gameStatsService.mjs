@@ -55,6 +55,9 @@ export function computeDiceStats(messages) {
                 // Série courante et record de d20 sans nat 20.
                 currentStreak: 0,
                 coldStreak: 0,
+                // Dés d20 lancés et natural 20 obtenus (pour le badge Critique).
+                d20Dice: 0,
+                d20Nat20: 0,
             });
         }
         return players.get(key);
@@ -86,8 +89,10 @@ export function computeDiceStats(messages) {
             if (r === 1) p.natOne += 1;
 
             if (diceType === "d20") {
+                p.d20Dice += 1;
                 d20Histogram[r - 1] += 1;
                 if (r === 20) {
+                    p.d20Nat20 += 1;
                     p.currentStreak = 0;
                 } else {
                     p.currentStreak += 1;
@@ -308,7 +313,7 @@ export const MAX_MESSAGES = 20_000;
 export const BADGE_THRESHOLDS = {
     blessed: 50,      // dés lancés
     cursed: 50,       // dés lancés
-    critic: 20,       // d20 lancés
+    critic: 20,       // dés d20 lancés
     chatterbox: 30,   // messages
     novelist: 10,     // messages texte
     nightOwl: 20,     // messages
@@ -341,8 +346,8 @@ export function computeBadges(dice, chat) {
     );
     add("cursed", cursed, cursed?.luckIndex);
 
-    const critic = pick(dice.byPlayer, (p) => p.dice >= BADGE_THRESHOLDS.critic, (p) => p.natMax);
-    add("critic", critic, critic?.natMax);
+    const critic = pick(dice.byPlayer, (p) => p.d20Dice >= BADGE_THRESHOLDS.critic, (p) => p.d20Nat20);
+    add("critic", critic, critic?.d20Nat20);
 
     const chatterbox = pick(chat.byPlayer, (p) => p.messages >= BADGE_THRESHOLDS.chatterbox, (p) => p.messages);
     add("chatterbox", chatterbox, chatterbox?.messages);
@@ -367,8 +372,12 @@ export function computeBadges(dice, chat) {
 }
 
 export function computeGameStats(messages, game) {
-    const truncated = messages.length > MAX_MESSAGES;
-    const window = truncated ? messages.slice(-MAX_MESSAGES) : messages;
+    // Trier d'abord pour que slice(-MAX_MESSAGES) capture les messages les plus
+    // récents, et pour que les sub-fonctions les traitent dans le bon ordre.
+    const sorted = [...messages].sort(byDateAsc);
+
+    const truncated = sorted.length > MAX_MESSAGES;
+    const window = truncated ? sorted.slice(-MAX_MESSAGES) : sorted;
 
     const dice = computeDiceStats(window);
     const chat = computeChatStats(window);

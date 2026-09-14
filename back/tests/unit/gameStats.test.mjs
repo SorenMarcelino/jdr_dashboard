@@ -357,6 +357,21 @@ test("a single eligible player is blessed, never also cursed", () => {
     assert.equal(badges.find((b) => b.id === "cursed"), undefined);
 });
 
+test("critic counts only d20 natural 20s, not max faces of other dice", () => {
+    const messages = [
+        // Bob lance beaucoup de d4 (max = 4), tous au max, mais ce sont des d4.
+        ...Array.from({ length: 15 }, () => manyDice(BADGE_THRESHOLDS.critic + 5, "u2", "Bob", 4, "d4")),
+        // Alice lance 25 d20 : 20 réguliers + 5 natural 20s.
+        roll({ userId: "u1", username: "Alice", diceType: "d20", results: [20, 20, 20, 20, 20, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 1, 2, 3, 4, 19] }),
+    ];
+    const dice = computeDiceStats(messages);
+    const bobD4Max = dice.byPlayer.find((p) => p.username === "Bob").natMax;
+    assert.ok(bobD4Max >= BADGE_THRESHOLDS.critic, "Bob should have many d4 maxes");
+    const badges = computeBadges(dice, computeChatStats(messages));
+    assert.equal(badges.find((b) => b.id === "critic").username, "Alice");
+    assert.equal(badges.find((b) => b.id === "critic").value, 5);
+});
+
 test("highRoller measures the biggest single batch, not the career total", () => {
     const messages = [
         // Bob lance beaucoup de dés, mais jamais plus de 2 d'un coup.
@@ -396,4 +411,23 @@ test("computeGameStats on a game with no message does not throw", () => {
     assert.equal(stats.meta.messageCount, 0);
     assert.deepEqual(stats.badges, []);
     assert.equal(stats.dice.totalRolls, 0);
+});
+
+test("computeGameStats sorts unsorted messages before truncating", () => {
+    // Créer des messages dans un ordre désordonné
+    const unsorted = [
+        roll({ results: [4], at: "2026-01-01T14:00:00Z" }),
+        roll({ results: [5], at: "2026-01-01T10:00:00Z" }),
+        roll({ results: [6], at: "2026-01-01T12:00:00Z" }),
+    ];
+    const stats = computeGameStats(unsorted, {
+        _id: "g1",
+        createdAt: new Date("2026-01-01T00:00:00Z"),
+        players: [{ _id: "u1" }],
+    });
+    // La première session devrait partir de 10:00 à 14:00 (2h), pas 14:00 à 10:00 (invalide).
+    assert.equal(stats.sessions.count, 1);
+    assert.ok(stats.sessions.longestDurationMs > 0);
+    // Vérifier que les statistiques ne sont pas corrompues par le désordre
+    assert.equal(stats.dice.totalRolls, 3);
 });
