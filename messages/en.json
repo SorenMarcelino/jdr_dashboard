@@ -108,7 +108,63 @@
             "back": "Back to game",
             "loading": "Loading statistics…",
             "error": "Could not load statistics.",
-            "empty": "Not enough activity for statistics yet."
+            "empty": "Not enough activity for statistics yet.",
+            "duration": {
+                "d": "d",
+                "h": "h",
+                "min": "min"
+            },
+            "cards": {
+                "rolls": "Dice rolls",
+                "rollsHint": "{dice} dice rolled",
+                "pips": "Total pips",
+                "sessions": "Sessions",
+                "campaign": "Campaign duration"
+            },
+            "luck": {
+                "player": "Player",
+                "dice": "Dice",
+                "index": "Luck index",
+                "natMax": "Max nat.",
+                "natOne": "Nat. 1",
+                "coldStreak": "Cold streak",
+                "caveat": "The index compares actual results to what a fair die would produce, in standard deviations. It's only meaningful with a large number of rolls."
+            },
+            "badges": {
+                "none": "Not enough activity yet to award badges.",
+                "blessed": {
+                    "title": "The Blessed",
+                    "hint": "best luck index"
+                },
+                "cursed": {
+                    "title": "The Cursed",
+                    "hint": "worst luck index"
+                },
+                "critic": {
+                    "title": "The Critic",
+                    "hint": "most critical successes"
+                },
+                "chatterbox": {
+                    "title": "The Chatterbox",
+                    "hint": "most messages"
+                },
+                "novelist": {
+                    "title": "The Novelist",
+                    "hint": "longest messages"
+                },
+                "slowpoke": {
+                    "title": "The Slowpoke",
+                    "hint": "slowest to reply"
+                },
+                "highRoller": {
+                    "title": "The High Roller",
+                    "hint": "most dice rolled"
+                },
+                "nightOwl": {
+                    "title": "The Night Owl",
+                    "hint": "most active late at night"
+                }
+            }
         }
     },
     "bento": {

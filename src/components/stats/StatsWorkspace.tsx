@@ -7,12 +7,16 @@ import { ArrowLeft } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { API_URL } from "@/lib/api";
 import type { GameStats } from "@/types/stats";
+import { StatCard, formatDuration } from "@/components/stats/StatCard";
+import { BadgeShowcase } from "@/components/stats/BadgeShowcase";
+import { LuckTable } from "@/components/stats/LuckTable";
 
 export function StatsWorkspace({ gameId }: { gameId: string }) {
     const [stats, setStats] = useState<GameStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const t = useTranslations("game.stats");
+    const durationLabels = { d: t("duration.d"), h: t("duration.h"), min: t("duration.min") };
 
     useEffect(() => {
         axios
@@ -76,10 +80,16 @@ export function StatsWorkspace({ gameId }: { gameId: string }) {
         <div className="flex flex-col h-svh bg-muted">
             {header}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {/* Task 7 remplace ce bloc par les badges et les cartes. */}
-                <pre className="text-xs bg-background rounded-lg p-3 overflow-x-auto">
-                    {JSON.stringify(stats, null, 2)}
-                </pre>
+                <BadgeShowcase badges={stats.badges} players={stats.chat.byPlayer} />
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <StatCard label={t("cards.rolls")} value={String(stats.dice.totalRolls)} hint={t("cards.rollsHint", { dice: stats.dice.totalDice })} />
+                    <StatCard label={t("cards.pips")} value={stats.dice.totalPips.toLocaleString()} />
+                    <StatCard label={t("cards.sessions")} value={String(stats.sessions.count)} hint={formatDuration(stats.sessions.avgDurationMs, durationLabels)} />
+                    <StatCard label={t("cards.campaign")} value={formatDuration(stats.sessions.campaignDurationMs, durationLabels)} />
+                </div>
+
+                <LuckTable players={stats.dice.byPlayer} />
             </div>
         </div>
     );

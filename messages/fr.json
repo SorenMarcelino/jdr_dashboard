@@ -108,7 +108,63 @@
             "back": "Retour à la partie",
             "loading": "Chargement des statistiques…",
             "error": "Impossible de charger les statistiques.",
-            "empty": "Pas encore assez d'activité pour des statistiques."
+            "empty": "Pas encore assez d'activité pour des statistiques.",
+            "duration": {
+                "d": "j",
+                "h": "h",
+                "min": "min"
+            },
+            "cards": {
+                "rolls": "Jets de dés",
+                "rollsHint": "{dice} dés lancés",
+                "pips": "Points cumulés",
+                "sessions": "Sessions",
+                "campaign": "Durée de campagne"
+            },
+            "luck": {
+                "player": "Joueur",
+                "dice": "Dés",
+                "index": "Indice de chance",
+                "natMax": "Max nat.",
+                "natOne": "1 nat.",
+                "coldStreak": "Série froide",
+                "caveat": "L'indice compare les résultats obtenus à ceux attendus d'un dé équitable, en écarts-types. Il n'a de sens qu'avec beaucoup de dés."
+            },
+            "badges": {
+                "none": "Pas encore assez d'activité pour décerner des badges.",
+                "blessed": {
+                    "title": "Le Béni des Dés",
+                    "hint": "meilleur indice de chance"
+                },
+                "cursed": {
+                    "title": "Le Maudit",
+                    "hint": "pire indice de chance"
+                },
+                "critic": {
+                    "title": "Le Critique",
+                    "hint": "le plus de réussites critiques"
+                },
+                "chatterbox": {
+                    "title": "Le Bavard",
+                    "hint": "le plus de messages"
+                },
+                "novelist": {
+                    "title": "Le Romancier",
+                    "hint": "les messages les plus longs"
+                },
+                "slowpoke": {
+                    "title": "Le Temporisateur",
+                    "hint": "le plus lent à répondre"
+                },
+                "highRoller": {
+                    "title": "Le Flambeur",
+                    "hint": "le plus de dés lancés"
+                },
+                "nightOwl": {
+                    "title": "Le Noctambule",
+                    "hint": "le plus actif tard le soir"
+                }
+            }
         }
     },
     "bento": {
