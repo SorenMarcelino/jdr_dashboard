@@ -5,6 +5,7 @@ import { gameSheetRouter } from "./CharacterSheetRoute.mjs";
 import { chatRouter } from "./ChatRoute.mjs";
 import { scenarioRouter } from "./ScenarioRoute.mjs";
 import { knowledgeEntryRouter } from "./KnowledgeEntryRoute.mjs";
+import { statsRouter } from "./StatsRoute.mjs";
 import { validate } from "../middlewares/validate.mjs";
 import { createGameSchema, joinGameSchema } from "../validation/schemas.mjs";
 
@@ -26,5 +27,8 @@ router.use("/:gameId", scenarioRouter);
 
 // Routes règles/lore pour une partie
 router.use("/:gameId", knowledgeEntryRouter);
+
+// Statistiques de la partie
+router.use("/:gameId", statsRouter);
 
 export default router;
