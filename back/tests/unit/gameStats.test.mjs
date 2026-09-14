@@ -7,6 +7,7 @@ import {
     SESSION_GAP_MS,
     median,
     computeChatStats,
+    computeSessionStats,
 } from "../../services/gameStatsService.mjs";
 
 // Fabrique un message de jet de dés.
@@ -240,4 +241,61 @@ test("French elisions are split correctly, no apostrophes in topWords", () => {
     // No word should contain an apostrophe
     const hasApostrophe = stats.topWords.some((w) => w.word.includes("'"));
     assert.ok(!hasApostrophe, "topWords should not contain apostrophes");
+});
+
+const GAME = { createdAt: new Date("2026-01-01T00:00:00Z") };
+
+test("a gap of exactly SESSION_GAP_MS stays in the same session", () => {
+    const stats = computeSessionStats([
+        text({ at: "2026-01-01T10:00:00Z" }),
+        text({ at: "2026-01-01T14:00:00Z" }), // pile +4 h
+    ], GAME);
+    assert.equal(stats.count, 1);
+});
+
+test("3h59 is one session, 4h01 is two", () => {
+    const under = computeSessionStats([
+        text({ at: "2026-01-01T10:00:00Z" }),
+        text({ at: "2026-01-01T13:59:00Z" }),
+    ], GAME);
+    assert.equal(under.count, 1);
+
+    const over = computeSessionStats([
+        text({ at: "2026-01-01T10:00:00Z" }),
+        text({ at: "2026-01-01T14:01:00Z" }),
+    ], GAME);
+    assert.equal(over.count, 2);
+});
+
+test("session durations are measured from first to last message", () => {
+    const stats = computeSessionStats([
+        text({ at: "2026-01-01T10:00:00Z" }),
+        text({ at: "2026-01-01T12:00:00Z" }), // session 1 : 2 h
+        text({ at: "2026-01-05T10:00:00Z" }),
+        text({ at: "2026-01-05T14:00:00Z" }), // session 2 : 4 h
+    ], GAME);
+    assert.equal(stats.count, 2);
+    assert.equal(stats.longestDurationMs, 4 * 3600_000);
+    assert.equal(stats.avgDurationMs, 3 * 3600_000);
+});
+
+test("a lone message forms a session of zero duration", () => {
+    const stats = computeSessionStats([text({ at: "2026-01-01T10:00:00Z" })], GAME);
+    assert.equal(stats.count, 1);
+    assert.equal(stats.longestDurationMs, 0);
+});
+
+test("campaignDurationMs runs from game creation to the last message", () => {
+    const stats = computeSessionStats([
+        text({ at: "2026-01-03T00:00:00Z" }),
+    ], GAME);
+    assert.equal(stats.campaignDurationMs, 2 * 24 * 3600_000);
+});
+
+test("computeSessionStats on an empty list returns zeroed aggregates", () => {
+    const stats = computeSessionStats([], GAME);
+    assert.equal(stats.count, 0);
+    assert.equal(stats.avgDurationMs, 0);
+    assert.equal(stats.firstActivityAt, null);
+    assert.equal(stats.lastActivityAt, null);
 });

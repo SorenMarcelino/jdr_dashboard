@@ -251,3 +251,48 @@ export function computeChatStats(messages) {
         topEmojis: top(emojiCounts, 10).map(([emoji, count]) => ({ emoji, count })),
     };
 }
+
+// Aucune donnée de présence n'est persistée : les « sessions » sont déduites
+// des horodatages de messages. Approximation assumée — un joueur silencieux
+// plus de SESSION_GAP_MS est compté comme parti.
+export function computeSessionStats(messages, game) {
+    const all = [...messages].sort(byDateAsc);
+
+    if (all.length === 0) {
+        return {
+            count: 0,
+            avgDurationMs: 0,
+            longestDurationMs: 0,
+            firstActivityAt: null,
+            lastActivityAt: null,
+            campaignDurationMs: 0,
+        };
+    }
+
+    const sessions = [];
+    let start = new Date(all[0].createdAt);
+    let end = start;
+
+    for (let i = 1; i < all.length; i++) {
+        const at = new Date(all[i].createdAt);
+        // Strictement supérieur : une coupure de pile 4 h reste la même session.
+        if (at - end > SESSION_GAP_MS) {
+            sessions.push(end - start);
+            start = at;
+        }
+        end = at;
+    }
+    sessions.push(end - start);
+
+    const firstActivityAt = new Date(all[0].createdAt);
+    const lastActivityAt = new Date(all[all.length - 1].createdAt);
+
+    return {
+        count: sessions.length,
+        avgDurationMs: sessions.reduce((a, b) => a + b, 0) / sessions.length,
+        longestDurationMs: Math.max(...sessions),
+        firstActivityAt,
+        lastActivityAt,
+        campaignDurationMs: lastActivityAt - new Date(game.createdAt),
+    };
+}
