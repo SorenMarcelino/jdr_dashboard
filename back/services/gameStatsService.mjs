@@ -316,6 +316,10 @@ export const BADGE_THRESHOLDS = {
     critic: 20,       // dés d20 lancés
     chatterbox: 30,   // messages
     novelist: 10,     // messages texte
+    // Non lu par ce module : le badge Noctambule est calculé côté client, car
+    // « tard le soir » dépend du fuseau du lecteur, que le backend ignore.
+    // Cette entrée documente le seuil pour rester alignée avec
+    // NIGHT_OWL_MIN_MESSAGES dans src/components/stats/BadgeShowcase.tsx.
     nightOwl: 20,     // messages
     highRoller: 1,    // jets
     slowpoke: 20,     // messages
@@ -355,7 +359,12 @@ export function computeBadges(dice, chat) {
     const novelist = pick(chat.byPlayer, (p) => p.textMessages >= BADGE_THRESHOLDS.novelist, (p) => p.avgLength);
     add("novelist", novelist, novelist?.avgLength);
 
-    const slowpoke = pick(chat.byPlayer, (p) => p.messages >= BADGE_THRESHOLDS.slowpoke, (p) => p.medianReplyMs);
+    // median([]) vaut 0, donc un joueur sans délai de réponse observé (aucun
+    // message répondant à un autre joueur dans la fenêtre de session) score 0
+    // au même titre qu'un joueur réellement lent. On exige un délai strictement
+    // positif pour être éligible, sinon le badge se décerne sur une absence de
+    // preuve plutôt que sur une lenteur réelle.
+    const slowpoke = pick(chat.byPlayer, (p) => p.messages >= BADGE_THRESHOLDS.slowpoke && p.medianReplyMs > 0, (p) => p.medianReplyMs);
     add("slowpoke", slowpoke, slowpoke?.medianReplyMs);
 
     // Le plus gros lot de dés lancé d'un coup — pas le plus gros total lancé

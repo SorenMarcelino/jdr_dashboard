@@ -386,6 +386,62 @@ test("highRoller measures the biggest single batch, not the career total", () =>
     assert.equal(badges.find((b) => b.id === "highRoller").value, 10);
 });
 
+test("no slowpoke badge is awarded when no player has any reply delay", () => {
+    // Chaque joueur franchit le seuil de messages, mais tous les messages
+    // proviennent du même joueur donc aucun replyDelay n'est jamais enregistré
+    // (medianReplyMs reste à 0 pour tout le monde).
+    const messages = manyTexts(BADGE_THRESHOLDS.slowpoke, "u1", "Alice");
+    const badges = computeBadges(computeDiceStats(messages), computeChatStats(messages));
+    assert.equal(badges.find((b) => b.id === "slowpoke"), undefined);
+});
+
+test("slowpoke is still awarded to the player with the longest real reply delay", () => {
+    const messages = [
+        text({ userId: "u1", username: "Alice", at: "2026-01-01T10:00:00Z" }),
+        text({ userId: "u2", username: "Bob", at: "2026-01-01T10:00:10Z" }), // Bob répond vite
+        ...manyTexts(BADGE_THRESHOLDS.slowpoke - 1, "u1", "Alice", 11),
+        ...manyTexts(BADGE_THRESHOLDS.slowpoke - 1, "u2", "Bob", 15),
+    ];
+    const badges = computeBadges(computeDiceStats(messages), computeChatStats(messages));
+    assert.ok(badges.find((b) => b.id === "slowpoke"));
+});
+
+test("computeGameStats output matches the documented contract's key sets", () => {
+    const messages = [
+        text({ userId: "u1", username: "Alice", content: "salut a tous", at: "2026-01-01T10:00:00Z" }),
+        roll({ userId: "u1", username: "Alice", diceType: "d20", results: [4, 12], at: "2026-01-01T10:00:05Z" }),
+        text({ userId: "u2", username: "Bob", content: "bonsoir la table", at: "2026-01-01T10:01:00Z" }),
+    ];
+    const stats = computeGameStats(messages, {
+        _id: "g1",
+        createdAt: new Date("2026-01-01T00:00:00Z"),
+        players: [{ _id: "u1" }, { _id: "u2" }],
+    });
+
+    assert.deepEqual(Object.keys(stats).sort(), ["badges", "chat", "dice", "meta", "sessions"]);
+    assert.deepEqual(Object.keys(stats.meta).sort(), ["gameId", "messageCount", "playerCount", "truncated"]);
+    assert.deepEqual(
+        Object.keys(stats.dice).sort(),
+        ["bestRoll", "byDiceType", "byPlayer", "d20Histogram", "totalDice", "totalPips", "totalRolls", "worstRoll"]
+    );
+    assert.deepEqual(
+        Object.keys(stats.chat).sort(),
+        ["byPlayer", "heatmap", "medianDelayMs", "topEmojis", "topWords", "totalMessages"]
+    );
+    assert.deepEqual(
+        Object.keys(stats.sessions).sort(),
+        ["avgDurationMs", "campaignDurationMs", "count", "firstActivityAt", "lastActivityAt", "longestDurationMs"]
+    );
+    assert.deepEqual(
+        Object.keys(stats.dice.byPlayer[0]).sort(),
+        ["biggestBatch", "coldStreak", "d20Dice", "d20Nat20", "dice", "luckIndex", "natMax", "natOne", "pips", "rolls", "userId", "username"]
+    );
+    assert.deepEqual(
+        Object.keys(stats.chat.byPlayer[0]).sort(),
+        ["avgLength", "diceMessages", "hours", "medianReplyMs", "messages", "share", "textMessages", "userId", "username"]
+    );
+});
+
 test("computeGameStats assembles every section and reports meta", () => {
     const messages = [text({ content: "salut" }), roll({ results: [4] })];
     const stats = computeGameStats(messages, {
