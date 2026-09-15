@@ -6,8 +6,12 @@ import type { DicePlayerStats } from "@/types/stats";
 export function LuckTable({ players }: { players: DicePlayerStats[] }) {
     const t = useTranslations("game.stats.luck");
 
-    const tone = (z: number) =>
-        z > 1.5 ? "text-chart-2" : z < -1.5 ? "text-chart-1" : "text-foreground";
+    // Sous 50 dés (le seuil des badges de chance), |z| > 1,5 se produit chez
+    // ~13 % des joueurs parfaitement équitables : colorer l'indice à cet
+    // effectif ferait passer du bruit pour un constat. On garde le nombre
+    // affiché, mais en couleur neutre en dessous du seuil.
+    const tone = (z: number, dice: number) =>
+        dice < 50 ? "text-foreground" : z > 1.5 ? "text-chart-2" : z < -1.5 ? "text-chart-1" : "text-foreground";
 
     return (
         <div className="bg-background rounded-lg border overflow-x-auto">
@@ -27,7 +31,7 @@ export function LuckTable({ players }: { players: DicePlayerStats[] }) {
                         <tr key={p.userId} className="border-b last:border-0">
                             <td className="p-2 font-medium">{p.username}</td>
                             <td className="p-2 text-right tabular-nums text-muted-foreground">{p.dice}</td>
-                            <td className={`p-2 text-right tabular-nums font-bold ${tone(p.luckIndex)}`}>
+                            <td className={`p-2 text-right tabular-nums font-bold ${tone(p.luckIndex, p.dice)}`}>
                                 {p.luckIndex > 0 ? "+" : ""}{p.luckIndex.toFixed(2)}
                             </td>
                             <td className="p-2 text-right tabular-nums">{p.natMax}</td>

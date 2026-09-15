@@ -109,6 +109,7 @@
             "loading": "Loading statistics…",
             "error": "Could not load statistics.",
             "empty": "Not enough activity for statistics yet.",
+            "truncated": "Statistics only cover the game's most recent messages.",
             "duration": {
                 "d": "d",
                 "h": "h",
@@ -119,7 +120,8 @@
                 "rollsHint": "{dice} dice rolled",
                 "pips": "Total pips",
                 "sessions": "Sessions",
-                "campaign": "Campaign duration"
+                "campaign": "Campaign duration",
+                "medianDelay": "Median delay between messages"
             },
             "luck": {
                 "player": "Player",
@@ -128,7 +130,7 @@
                 "natMax": "Max nat.",
                 "natOne": "Nat. 1",
                 "coldStreak": "Cold streak",
-                "caveat": "The index compares actual results to what a fair die would produce, in standard deviations. It's only meaningful with a large number of rolls."
+                "caveat": "The index compares actual results to what a fair die would produce, in standard deviations; it stays valid at any sample size, but only a large number of rolls can tell a real deviation apart from chance."
             },
             "badges": {
                 "none": "Not enough activity yet to award badges.",
@@ -158,11 +160,11 @@
                 },
                 "highRoller": {
                     "title": "The High Roller",
-                    "hint": "most dice rolled"
+                    "hint": "biggest single handful of dice"
                 },
                 "nightOwl": {
                     "title": "The Night Owl",
-                    "hint": "most active late at night"
+                    "hint": "highest share of messages at night"
                 }
             },
             "charts": {
@@ -180,6 +182,24 @@
                 "fri": "Fri",
                 "sat": "Sat",
                 "sun": "Sun"
+            },
+            "records": {
+                "title": "Campaign records",
+                "best": "Best roll",
+                "worst": "Worst roll"
+            },
+            "words": {
+                "wordsTitle": "Most used words",
+                "emojisTitle": "Most used emojis"
+            },
+            "chatTable": {
+                "title": "Messages per player",
+                "player": "Player",
+                "messages": "Messages",
+                "text": "Text",
+                "dice": "Rolls",
+                "avgLength": "Avg. length",
+                "replyDelay": "Median reply"
             }
         }
     },

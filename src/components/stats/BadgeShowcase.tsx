@@ -14,7 +14,8 @@ const BADGE_EMOJI: Record<string, string> = {
     nightOwl: "🌙",
 };
 
-// Doit rester aligné sur BADGE_THRESHOLDS.nightOwl côté backend.
+// Doit rester aligné sur BADGE_THRESHOLDS.nightOwl côté backend, qui documente
+// ce même seuil sans l'appliquer : le badge est calculé ici, pas côté serveur.
 export const NIGHT_OWL_MIN_MESSAGES = 20;
 
 // Le Noctambule se calcule ici et non côté serveur : « tard le soir » dépend du

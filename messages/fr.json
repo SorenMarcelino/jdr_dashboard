@@ -109,6 +109,7 @@
             "loading": "Chargement des statistiques…",
             "error": "Impossible de charger les statistiques.",
             "empty": "Pas encore assez d'activité pour des statistiques.",
+            "truncated": "Les statistiques ne portent que sur les messages les plus récents de la partie.",
             "duration": {
                 "d": "j",
                 "h": "h",
@@ -119,7 +120,8 @@
                 "rollsHint": "{dice} dés lancés",
                 "pips": "Points cumulés",
                 "sessions": "Sessions",
-                "campaign": "Durée de campagne"
+                "campaign": "Durée de campagne",
+                "medianDelay": "Délai médian entre messages"
             },
             "luck": {
                 "player": "Joueur",
@@ -128,7 +130,7 @@
                 "natMax": "Max nat.",
                 "natOne": "1 nat.",
                 "coldStreak": "Série froide",
-                "caveat": "L'indice compare les résultats obtenus à ceux attendus d'un dé équitable, en écarts-types. Il n'a de sens qu'avec beaucoup de dés."
+                "caveat": "L'indice compare les résultats obtenus à ceux attendus d'un dé équitable, en écarts-types ; il reste juste quel que soit le nombre de dés, mais il en faut beaucoup pour distinguer un vrai écart d'un simple hasard."
             },
             "badges": {
                 "none": "Pas encore assez d'activité pour décerner des badges.",
@@ -158,11 +160,11 @@
                 },
                 "highRoller": {
                     "title": "Le Flambeur",
-                    "hint": "le plus de dés lancés"
+                    "hint": "le plus gros lot de dés d'un coup"
                 },
                 "nightOwl": {
                     "title": "Le Noctambule",
-                    "hint": "le plus actif tard le soir"
+                    "hint": "la plus forte part de messages la nuit"
                 }
             },
             "charts": {
@@ -180,6 +182,24 @@
                 "fri": "Ven",
                 "sat": "Sam",
                 "sun": "Dim"
+            },
+            "records": {
+                "title": "Records de la campagne",
+                "best": "Meilleur jet",
+                "worst": "Pire jet"
+            },
+            "words": {
+                "wordsTitle": "Mots les plus utilisés",
+                "emojisTitle": "Emojis les plus utilisés"
+            },
+            "chatTable": {
+                "title": "Messages par joueur",
+                "player": "Joueur",
+                "messages": "Messages",
+                "text": "Texte",
+                "dice": "Jets",
+                "avgLength": "Longueur moy.",
+                "replyDelay": "Délai médian"
             }
         }
     },

@@ -14,6 +14,9 @@ import { DiceHistogram } from "@/components/stats/DiceHistogram";
 import { DiceTypeChart } from "@/components/stats/DiceTypeChart";
 import { SpeechShareChart } from "@/components/stats/SpeechShareChart";
 import { ActivityHeatmap } from "@/components/stats/ActivityHeatmap";
+import { RecordsCard } from "@/components/stats/RecordsCard";
+import { WordCloud } from "@/components/stats/WordCloud";
+import { ChatTable } from "@/components/stats/ChatTable";
 
 export function StatsWorkspace({ gameId }: { gameId: string }) {
     const [stats, setStats] = useState<GameStats | null>(null);
@@ -86,20 +89,33 @@ export function StatsWorkspace({ gameId }: { gameId: string }) {
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 <BadgeShowcase badges={stats.badges} players={stats.chat.byPlayer} />
 
+                {stats.meta.truncated && (
+                    <p className="text-[11px] text-muted-foreground bg-background rounded-lg border p-2">
+                        {t("truncated")}
+                    </p>
+                )}
+
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <StatCard label={t("cards.rolls")} value={String(stats.dice.totalRolls)} hint={t("cards.rollsHint", { dice: stats.dice.totalDice })} />
                     <StatCard label={t("cards.pips")} value={stats.dice.totalPips.toLocaleString()} />
                     <StatCard label={t("cards.sessions")} value={String(stats.sessions.count)} hint={formatDuration(stats.sessions.avgDurationMs, durationLabels)} />
                     <StatCard label={t("cards.campaign")} value={formatDuration(stats.sessions.campaignDurationMs, durationLabels)} />
+                    <StatCard label={t("cards.medianDelay")} value={formatDuration(stats.chat.medianDelayMs, durationLabels)} />
                 </div>
 
                 <LuckTable players={stats.dice.byPlayer} />
+
+                <RecordsCard bestRoll={stats.dice.bestRoll} worstRoll={stats.dice.worstRoll} />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <DiceHistogram histogram={stats.dice.d20Histogram} />
                     <DiceTypeChart data={stats.dice.byDiceType} />
                     <SpeechShareChart players={stats.chat.byPlayer} />
                 </div>
+
+                <WordCloud topWords={stats.chat.topWords} topEmojis={stats.chat.topEmojis} />
+
+                <ChatTable players={stats.chat.byPlayer} />
 
                 <ActivityHeatmap heatmap={stats.chat.heatmap} />
             </div>

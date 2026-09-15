@@ -3,8 +3,7 @@
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { useTranslations } from "next-intl";
 import type { ChatPlayerStats } from "@/types/stats";
-
-const PALETTE = [1, 2, 3, 4, 5].map((n) => `hsl(var(--chart-${n}))`);
+import { chartFill } from "@/components/stats/chartPalette";
 
 export function SpeechShareChart({ players }: { players: ChatPlayerStats[] }) {
     const t = useTranslations("game.stats.charts");
@@ -16,7 +15,7 @@ export function SpeechShareChart({ players }: { players: ChatPlayerStats[] }) {
                 <PieChart>
                     <Pie data={players} dataKey="messages" nameKey="username" innerRadius={40} outerRadius={70}>
                         {players.map((p, i) => (
-                            <Cell key={p.userId} fill={PALETTE[i % PALETTE.length]} />
+                            <Cell key={p.userId} fill={chartFill(i)} />
                         ))}
                     </Pie>
                     <Legend wrapperStyle={{ fontSize: 11 }} />

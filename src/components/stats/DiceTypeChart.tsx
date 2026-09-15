@@ -2,8 +2,7 @@
 
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { useTranslations } from "next-intl";
-
-const PALETTE = [1, 2, 3, 4, 5].map((n) => `hsl(var(--chart-${n}))`);
+import { chartFill } from "@/components/stats/chartPalette";
 
 export function DiceTypeChart({ data }: { data: { diceType: string; dice: number }[] }) {
     const t = useTranslations("game.stats.charts");
@@ -15,7 +14,7 @@ export function DiceTypeChart({ data }: { data: { diceType: string; dice: number
                 <PieChart>
                     <Pie data={data} dataKey="dice" nameKey="diceType" innerRadius={40} outerRadius={70}>
                         {data.map((entry, i) => (
-                            <Cell key={entry.diceType} fill={PALETTE[i % PALETTE.length]} />
+                            <Cell key={entry.diceType} fill={chartFill(i)} />
                         ))}
                     </Pie>
                     <Legend wrapperStyle={{ fontSize: 11 }} />
