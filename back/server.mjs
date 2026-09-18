@@ -14,6 +14,7 @@ import characterSheetRoute from "./routes/CharacterSheetRoute.mjs";
 import './utils/loadEnvironment.mjs'; // Configuration dotenv centralisée
 import logger from "./utils/logger.mjs";
 import {errorHandler} from "./middlewares/ErrorHandler.mjs";
+import { createGlobalLimiter } from "./middlewares/rateLimiters.mjs";
 import { seedMagnusArchives } from "./seeds/magnusArchivesSeed.mjs";
 import { seedCallOfCthulhu } from "./seeds/callOfCthulhuSeed.mjs";
 import { setupSocketHandlers } from "./socket/socketHandler.mjs";
@@ -58,18 +59,16 @@ app.use(
     })
 );
 
+// Avant les rate limiters : le limiter global lit l'access token.
+app.use(cookieParser());
+
 // Rate limiting pour prévenir les attaques par brute force.
-// Les routes d'auth ont leur limiter dédié (authLimiter/refreshLimiter) et
-// sont exclues du compteur global : sinon une rafale de refresh ratés (après
-// logout/expiration) épuisait le quota IP et bloquait /auth/login en 429.
-const limiter = rateLimit({
+// Compteur global par utilisateur connecté (par IP pour les anonymes), voir
+// middlewares/rateLimiters.mjs.
+const limiter = createGlobalLimiter({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: isProd ? 100 : 500,
-    message: 'Too many requests from this IP, please try again later.',
-    skip: (req) =>
-        req.path === '/auth/login' ||
-        req.path === '/auth/signup' ||
-        req.path === '/auth/refresh',
+    userMax: isProd ? 1000 : 5000,
+    anonMax: isProd ? 100 : 500,
 });
 
 const authLimiter = rateLimit({
@@ -95,7 +94,6 @@ app.use(limiter);
 
 // Middlewares
 app.use(express.json({ limit: '10mb' })); // Limite la taille des requêtes
-app.use(cookieParser());
 
 // Logging HTTP (désactivé en environnement de test)
 if (NODE_ENV !== 'test') {
