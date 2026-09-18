@@ -4,6 +4,7 @@ import {
     diceMean,
     diceStdDev,
     computeDiceStats,
+    computeDiceBreakdown,
     SESSION_GAP_MS,
     median,
     computeChatStats,
@@ -419,10 +420,10 @@ test("computeGameStats output matches the documented contract's key sets", () =>
     });
 
     assert.deepEqual(Object.keys(stats).sort(), ["badges", "chat", "dice", "meta", "sessions"]);
-    assert.deepEqual(Object.keys(stats.meta).sort(), ["gameId", "messageCount", "playerCount", "truncated"]);
+    assert.deepEqual(Object.keys(stats.meta).sort(), ["gameId", "gameName", "messageCount", "playerCount", "truncated"]);
     assert.deepEqual(
         Object.keys(stats.dice).sort(),
-        ["bestRoll", "byDiceType", "byPlayer", "d20Histogram", "totalDice", "totalPips", "totalRolls", "worstRoll"]
+        ["bestRoll", "breakdown", "byDiceType", "byPlayer", "d20Histogram", "totalDice", "totalPips", "totalRolls", "worstRoll"]
     );
     assert.deepEqual(
         Object.keys(stats.chat).sort(),
@@ -446,9 +447,11 @@ test("computeGameStats assembles every section and reports meta", () => {
     const messages = [text({ content: "salut" }), roll({ results: [4] })];
     const stats = computeGameStats(messages, {
         _id: "g1",
+        name: "La Nuit des Masques",
         createdAt: new Date("2026-01-01T00:00:00Z"),
         players: [{ _id: "u1" }, { _id: "u2" }],
     });
+    assert.equal(stats.meta.gameName, "La Nuit des Masques");
     assert.equal(stats.meta.messageCount, 2);
     assert.equal(stats.meta.playerCount, 2);
     assert.equal(stats.meta.truncated, false);
@@ -486,4 +489,85 @@ test("computeGameStats sorts unsorted messages before truncating", () => {
     assert.ok(stats.sessions.longestDurationMs > 0);
     // Vérifier que les statistiques ne sont pas corrompues par le désordre
     assert.equal(stats.dice.totalRolls, 3);
+});
+
+// ── Détail des dés par joueur × type (export + tableau de la page) ─────────
+
+const rowOf = (breakdown, userId, diceType) =>
+    breakdown.find((r) => r.userId === userId && r.diceType === diceType);
+
+test("computeDiceBreakdown lists global, per type, per player and per player × type rows", () => {
+    const breakdown = computeDiceBreakdown([
+        roll({ userId: "u1", username: "Alice", diceType: "d6", results: [2, 6] }),
+        roll({ userId: "u1", username: "Alice", diceType: "d20", results: [20] }),
+        roll({ userId: "u2", username: "Bob", diceType: "d6", results: [1] }),
+    ]);
+
+    // Ordre : global, types globaux (ordre du registre), puis chaque joueur.
+    assert.deepEqual(
+        breakdown.map((r) => [r.userId, r.diceType]),
+        [
+            [null, null], [null, "d6"], [null, "d20"],
+            ["u1", null], ["u1", "d6"], ["u1", "d20"],
+            ["u2", null], ["u2", "d6"],
+        ]
+    );
+
+    const aliceD6 = rowOf(breakdown, "u1", "d6");
+    assert.equal(aliceD6.username, "Alice");
+    assert.equal(aliceD6.rolls, 1);
+    assert.equal(aliceD6.dice, 2);
+    assert.equal(aliceD6.average, 4);
+    assert.deepEqual(aliceD6.best, { result: 6, diceType: "d6" });
+    assert.deepEqual(aliceD6.worst, { result: 2, diceType: "d6" });
+
+    const globalD6 = rowOf(breakdown, null, "d6");
+    assert.equal(globalD6.username, null);
+    assert.equal(globalD6.rolls, 2);
+    assert.equal(globalD6.dice, 3);
+    assert.equal(globalD6.average, 3);
+});
+
+test("all-types rows have no raw average, only the percentage", () => {
+    const breakdown = computeDiceBreakdown([
+        roll({ diceType: "d6", results: [6] }),
+        roll({ diceType: "d100", results: [1] }),
+    ]);
+    const all = rowOf(breakdown, null, null);
+    assert.equal(all.average, null);
+    // d6 à 6 = 100 % du max, d100 à 1 = 0 % : moyenne 50 %.
+    assert.equal(all.averagePct, 50);
+});
+
+test("averagePct is 50 on a perfectly uniform sample", () => {
+    const breakdown = computeDiceBreakdown([roll({ diceType: "d6", results: [1, 2, 3, 4, 5, 6] })]);
+    assert.equal(rowOf(breakdown, null, "d6").averagePct, 50);
+    assert.equal(rowOf(breakdown, null, "d6").average, 3.5);
+});
+
+test("across dice types, best and worst compare in standard deviations", () => {
+    // Un 80 sur d100 est moins remarquable qu'un 20 naturel sur d20.
+    const breakdown = computeDiceBreakdown([
+        roll({ diceType: "d100", results: [80] }),
+        roll({ diceType: "d20", results: [20] }),
+        // 30 sur d100 (−0,7 σ) est moins bas qu'un 1 sur d4 (−1,3 σ).
+        roll({ diceType: "d100", results: [30] }),
+        roll({ diceType: "d4", results: [1] }),
+    ]);
+    const all = rowOf(breakdown, null, null);
+    assert.deepEqual(all.best, { result: 20, diceType: "d20" });
+    assert.deepEqual(all.worst, { result: 1, diceType: "d4" });
+});
+
+test("computeDiceBreakdown ignores non-dice messages and unknown dice types", () => {
+    const breakdown = computeDiceBreakdown([
+        text({ content: "salut" }),
+        roll({ diceType: "d7", results: [3] }),
+    ]);
+    assert.deepEqual(breakdown, []);
+});
+
+test("computeDiceStats exposes the breakdown", () => {
+    const stats = computeDiceStats([roll({ results: [4] })]);
+    assert.deepEqual(stats.breakdown, computeDiceBreakdown([roll({ results: [4] })]));
 });

@@ -138,7 +138,86 @@ export function computeDiceStats(messages) {
         d20Histogram,
         bestRoll,
         worstRoll,
+        breakdown: computeDiceBreakdown(rolls),
     };
+}
+
+// Détail des dés par joueur × type de dé, avec les agrégats « tous joueurs »
+// (userId null) et « tous types » (diceType null). Alimente le tableau de la
+// page et l'export CSV/JSON.
+//
+// Ordre des lignes : global, puis chaque type (ordre du registre), puis pour
+// chaque joueur (le plus gros lanceur d'abord) sa ligne tous types et ses types.
+//
+// Sur une ligne « tous types », une moyenne brute mélangerait des d6 et des
+// d100 : `average` y vaut null. `averagePct` (face ramenée à 0–100 % du max,
+// 50 = chance normale) reste comparable partout. Meilleur et pire se comparent
+// en écarts-types, comme bestRoll/worstRoll.
+export function computeDiceBreakdown(messages) {
+    const rolls = messages.filter(isDiceRoll).sort(byDateAsc);
+    const rows = new Map();
+
+    const rowFor = (userId, username, diceType) => {
+        const key = `${userId ?? "*"}|${diceType ?? "*"}`;
+        if (!rows.has(key)) {
+            rows.set(key, {
+                userId, username, diceType,
+                rolls: 0, dice: 0, pips: 0, pctSum: 0,
+                best: null, worst: null,
+            });
+        }
+        return rows.get(key);
+    };
+
+    for (const m of rolls) {
+        const { diceType, results } = m.diceRoll;
+        const { faces } = DICE_REGISTRY[diceType];
+        const userId = String(m.userId);
+        const targets = [
+            rowFor(null, null, null),
+            rowFor(null, null, diceType),
+            rowFor(userId, m.username, null),
+            rowFor(userId, m.username, diceType),
+        ];
+
+        for (const row of targets) row.rolls += 1;
+
+        for (const r of results) {
+            const z = (r - diceMean(faces)) / diceStdDev(faces);
+            const pct = ((r - 1) / (faces - 1)) * 100;
+            for (const row of targets) {
+                row.dice += 1;
+                row.pips += r;
+                row.pctSum += pct;
+                if (!row.best || z > row.best.z) row.best = { result: r, diceType, z };
+                if (!row.worst || z < row.worst.z) row.worst = { result: r, diceType, z };
+            }
+        }
+    }
+
+    const typeOrder = Object.keys(DICE_REGISTRY);
+    const byType = (a, b) => typeOrder.indexOf(a.diceType) - typeOrder.indexOf(b.diceType);
+    const all = [...rows.values()];
+    const totalsOf = (userId) => all.filter((r) => r.userId === userId && r.diceType === null);
+    const typesOf = (userId) => all.filter((r) => r.userId === userId && r.diceType !== null).sort(byType);
+
+    const players = all
+        .filter((r) => r.userId !== null && r.diceType === null)
+        .sort((a, b) => b.dice - a.dice);
+
+    const ordered = [
+        ...totalsOf(null),
+        ...typesOf(null),
+        ...players.flatMap((p) => [p, ...typesOf(p.userId)]),
+    ];
+
+    return ordered.map(({ pips, pctSum, best, worst, ...row }) => ({
+        ...row,
+        average: row.diceType === null ? null : pips / row.dice,
+        averagePct: pctSum / row.dice,
+        best: { result: best.result, diceType: best.diceType },
+        worst: { result: worst.result, diceType: worst.diceType },
+    }));
 }
 
 // Au-delà de cette coupure sans message, on considère qu'une nouvelle session
@@ -395,6 +474,7 @@ export function computeGameStats(messages, game) {
     return {
         meta: {
             gameId: String(game._id),
+            gameName: game.name ?? "",
             playerCount: (game.players ?? []).length,
             messageCount: window.length,
             truncated,

@@ -200,6 +200,29 @@
                 "dice": "Jets",
                 "avgLength": "Longueur moy.",
                 "replyDelay": "Délai médian"
+            },
+            "export": {
+                "button": "Exporter",
+                "csv": "Tableur (CSV)",
+                "json": "Données complètes (JSON)"
+            },
+            "breakdown": {
+                "title": "Dés par joueur et par type",
+                "hint": "Moyenne en % : la face obtenue ramenée à l’échelle du dé (50 % = chance normale), comparable entre types de dés. Meilleur et pire se comparent en écarts-types.",
+                "allPlayers": "Tous les joueurs",
+                "allTypes": "Tous types",
+                "columns": {
+                    "player": "Joueur",
+                    "diceType": "Type de dé",
+                    "rolls": "Jets",
+                    "dice": "Dés",
+                    "average": "Moyenne",
+                    "averagePct": "Moyenne (%)",
+                    "best": "Meilleur",
+                    "bestDie": "Dé du meilleur",
+                    "worst": "Pire",
+                    "worstDie": "Dé du pire"
+                }
             }
         }
     },

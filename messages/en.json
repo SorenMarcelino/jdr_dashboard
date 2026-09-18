@@ -200,6 +200,29 @@
                 "dice": "Rolls",
                 "avgLength": "Avg. length",
                 "replyDelay": "Median reply"
+            },
+            "export": {
+                "button": "Export",
+                "csv": "Spreadsheet (CSV)",
+                "json": "Full data (JSON)"
+            },
+            "breakdown": {
+                "title": "Dice by player and type",
+                "hint": "Average %: the face rolled scaled to the die (50% = normal luck), comparable across dice types. Best and worst compare in standard deviations.",
+                "allPlayers": "All players",
+                "allTypes": "All types",
+                "columns": {
+                    "player": "Player",
+                    "diceType": "Dice type",
+                    "rolls": "Rolls",
+                    "dice": "Dice",
+                    "average": "Average",
+                    "averagePct": "Average (%)",
+                    "best": "Best",
+                    "bestDie": "Best die",
+                    "worst": "Worst",
+                    "worstDie": "Worst die"
+                }
             }
         }
     },

@@ -37,6 +37,27 @@ export type ChatPlayerStats = {
     hours: number[];
 };
 
+/** Une face remarquable : sa valeur et le dé qui l'a donnée. */
+export type DiceFace = { result: number; diceType: string };
+
+/**
+ * Une ligne du détail des dés. `userId`/`username` null = tous les joueurs,
+ * `diceType` null = tous les types.
+ */
+export type DiceBreakdownRow = {
+    userId: string | null;
+    username: string | null;
+    diceType: string | null;
+    rolls: number;
+    dice: number;
+    /** Moyenne brute des faces ; null sur les lignes tous types. */
+    average: number | null;
+    /** Moyenne des faces ramenées à 0–100 % du max (50 = chance normale). */
+    averagePct: number;
+    best: DiceFace;
+    worst: DiceFace;
+};
+
 export type Badge = {
     id: string;
     userId: string;
@@ -45,7 +66,7 @@ export type Badge = {
 };
 
 export type GameStats = {
-    meta: { gameId: string; playerCount: number; messageCount: number; truncated: boolean };
+    meta: { gameId: string; gameName: string; playerCount: number; messageCount: number; truncated: boolean };
     dice: {
         totalRolls: number;
         totalDice: number;
@@ -55,6 +76,7 @@ export type GameStats = {
         d20Histogram: number[];
         bestRoll: RollRecord | null;
         worstRoll: RollRecord | null;
+        breakdown: DiceBreakdownRow[];
     };
     chat: {
         totalMessages: number;
