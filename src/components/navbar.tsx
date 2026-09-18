@@ -33,6 +33,9 @@ export function Navbar({ game }: { game?: NavbarGame }) {
                     setUsername(data.user.username);
                 }
             } catch (error) {
+                // 401 = visiteur non connecté : résultat attendu de la sonde
+                // /auth/verify, pas une erreur à journaliser.
+                if (axios.isAxiosError(error) && error.response?.status === 401) return;
                 console.error(error);
             }
         };
