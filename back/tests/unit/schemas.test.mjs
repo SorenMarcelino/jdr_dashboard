@@ -10,6 +10,7 @@ import {
     createKnowledgeEntrySchema,
     updateKnowledgeEntrySchema,
     reorderKnowledgeEntriesSchema,
+    savedColorsSchema,
 } from "../../validation/schemas.mjs";
 
 test("signupSchema accepts valid payload", () => {
@@ -98,4 +99,27 @@ test("reorderKnowledgeEntriesSchema requires a type and a non-empty order list",
     assert.ok(r.success);
     assert.ok(!reorderKnowledgeEntriesSchema.safeParse({ type: "lore", orders: [] }).success);
     assert.ok(!reorderKnowledgeEntriesSchema.safeParse({ orders: [{ entryId: "abc123", order: 0 }] }).success);
+});
+
+test("savedColorsSchema accepts #rgb and #rrggbb in any case", () => {
+    assert.equal(savedColorsSchema.safeParse({ colors: ["#abc", "#A1B2C3"] }).success, true);
+});
+
+test("savedColorsSchema accepts an empty list", () => {
+    assert.equal(savedColorsSchema.safeParse({ colors: [] }).success, true);
+});
+
+test("savedColorsSchema rejects non-hex values", () => {
+    for (const bad of ["red", "#12", "#1234", "#ggg000", "rgb(0,0,0)", "#abc;color:red"]) {
+        assert.equal(savedColorsSchema.safeParse({ colors: [bad] }).success, false, bad);
+    }
+});
+
+test("savedColorsSchema rejects more than 24 colors", () => {
+    const colors = Array.from({ length: 25 }, (_, i) => `#0000${i.toString(16).padStart(2, "0")}`);
+    assert.equal(savedColorsSchema.safeParse({ colors }).success, false);
+});
+
+test("savedColorsSchema rejects a missing colors field", () => {
+    assert.equal(savedColorsSchema.safeParse({}).success, false);
 });

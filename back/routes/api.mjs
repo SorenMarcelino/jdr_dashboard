@@ -1,8 +1,8 @@
 import express from "express";
 import { requireAuth } from "../middlewares/AuthMiddleware.mjs";
-import { getAllUsers, searchUsers, updateUserProfile } from "../services/userService.mjs";
+import { getAllUsers, searchUsers, updateUserProfile, getSavedColors, setSavedColors } from "../services/userService.mjs";
 import { validate } from "../middlewares/validate.mjs";
-import { updateProfileSchema } from "../validation/schemas.mjs";
+import { updateProfileSchema, savedColorsSchema } from "../validation/schemas.mjs";
 import { asyncHandler } from "../utils/asyncHandler.mjs";
 
 const router = express.Router();
@@ -30,6 +30,18 @@ router.put("/profile", requireAuth, validate(updateProfileSchema), asyncHandler(
         message: "Profile updated successfully",
         user: updatedUser,
     });
+}));
+
+// Couleurs sauvegardées de la palette de l'éditeur
+router.get("/profile/saved-colors", requireAuth, asyncHandler(async (req, res) => {
+    const colors = await getSavedColors(req.user._id);
+    return res.status(200).json({ success: true, colors });
+}));
+
+// Remplace la liste entière (normalisée par le service)
+router.put("/profile/saved-colors", requireAuth, validate(savedColorsSchema), asyncHandler(async (req, res) => {
+    const colors = await setSavedColors(req.user._id, req.body.colors);
+    return res.status(200).json({ success: true, colors });
 }));
 
 // Recherche d'utilisateurs

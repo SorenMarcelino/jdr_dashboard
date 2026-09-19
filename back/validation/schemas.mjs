@@ -137,3 +137,12 @@ export const updateNpcSheetSchema = z.object({
     npcName: z.string().trim().min(1).max(120).optional(),
     values: freeObject.optional(),
 });
+
+// ── Couleurs sauvegardées (palette de l'éditeur) ────────────────────────
+// La normalisation (minuscules, #rgb → #rrggbb, doublons) est faite par le
+// service ; le schéma ne vérifie que la forme.
+const hexColor = z.string().regex(/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/, "Invalid hex color");
+
+export const savedColorsSchema = z.object({
+    colors: z.array(hexColor).max(24),
+});

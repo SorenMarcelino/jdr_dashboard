@@ -81,5 +81,56 @@ export const searchUsers = async (searchTerm) => {
     }).select('-password').limit(20);
 };
 
+export const MAX_SAVED_COLORS = 24;
 
+/**
+ * Normalise les couleurs de la palette : minuscules, #rgb → #rrggbb,
+ * valeurs invalides ignorées, doublons retirés (la première occurrence
+ * gagne), 24 au plus.
+ */
+export const normalizeSavedColors = (colors) => {
+    const unique = new Set();
+    for (const raw of colors) {
+        let hex = String(raw).trim().toLowerCase();
+        if (/^#[0-9a-f]{3}$/.test(hex)) {
+            hex = "#" + [...hex.slice(1)].map((c) => c + c).join("");
+        }
+        if (/^#[0-9a-f]{6}$/.test(hex)) unique.add(hex);
+    }
+    return [...unique].slice(0, MAX_SAVED_COLORS);
+};
+
+/**
+ * Couleurs sauvegardées de l'utilisateur
+ */
+export const getSavedColors = async (userId) => {
+    const user = await User.findById(userId).select('savedColors');
+
+    if (!user) {
+        const error = new Error('User not found');
+        error.status = 404;
+        throw error;
+    }
+
+    return [...user.savedColors];
+};
+
+/**
+ * Remplace les couleurs sauvegardées de l'utilisateur
+ */
+export const setSavedColors = async (userId, colors) => {
+    const user = await User.findByIdAndUpdate(
+        userId,
+        { savedColors: normalizeSavedColors(colors) },
+        { new: true, runValidators: true }
+    ).select('savedColors');
+
+    if (!user) {
+        const error = new Error('User not found');
+        error.status = 404;
+        throw error;
+    }
+
+    return [...user.savedColors];
+};
 
