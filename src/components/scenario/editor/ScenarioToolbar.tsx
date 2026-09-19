@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import {
     Bold, Italic, Heading1, Heading2, Heading3,
     List, ListOrdered, Quote, Minus, Link, UserCircle, StickyNote, Undo2, Redo2,
-    Palette, IndentIncrease, IndentDecrease, EyeOff, ScrollText, Landmark,
+    Palette, IndentIncrease, IndentDecrease, EyeOff, ScrollText, Landmark, Highlighter,
 } from "lucide-react";
 import { ColorPalette } from "@/components/ui/ColorPalette";
 import { useDismiss } from "@/hooks/use-dismiss";
@@ -119,6 +119,27 @@ export function ScenarioToolbar({ editor, onAddPageLink, onAddNpcRef, onAddAnnot
                                 onChange={(color) => {
                                     if (color) editor.chain().focus().setColor(color).run();
                                     else editor.chain().focus().unsetColor().run();
+                                    setOpenPopover(null);
+                                }}
+                            />
+                        </div>
+                    )}
+                </div>
+                <div className="relative">
+                    <ToolbarButton
+                        onClick={() => setOpenPopover((v) => (v === "highlight" ? null : "highlight"))}
+                        isActive={editor.isActive("highlight")}
+                        title={t("highlight")}
+                    >
+                        <Highlighter size={iconSize} />
+                    </ToolbarButton>
+                    {openPopover === "highlight" && (
+                        <div className="absolute left-0 top-full z-10 mt-1 rounded-md border bg-background p-2 shadow-md">
+                            <ColorPalette
+                                value={editor.getAttributes("highlight").color ?? null}
+                                onChange={(color) => {
+                                    if (color) editor.chain().focus().setHighlight({ color }).run();
+                                    else editor.chain().focus().unsetHighlight().run();
                                     setOpenPopover(null);
                                 }}
                             />

@@ -6,6 +6,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { TextStyle } from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
 import axios from "axios";
+import { ScenarioHighlight } from "../editor/extensions/ScenarioHighlight";
 import { useTranslations } from "next-intl";
 import { useScenario } from "@/contexts/ScenarioContext";
 import { ScenarioPageLinkMark } from "../editor/extensions/ScenarioPageLinkMark";
@@ -55,7 +56,7 @@ export function ScenarioReader({ gameId, scenarioId }: Props) {
 
     const editor = useEditor({
         immediatelyRender: false,
-        extensions: [StarterKit, TextStyle, Color, IndentExtension, GmOnlyBlock, HeadingId, ScenarioPageLinkMark, NpcReferenceMark, AnnotationMark, KnowledgeReferenceMark],
+        extensions: [StarterKit, TextStyle, Color, ScenarioHighlight, IndentExtension, GmOnlyBlock, HeadingId, ScenarioPageLinkMark, NpcReferenceMark, AnnotationMark, KnowledgeReferenceMark],
         editable: false,
         editorProps: {
             attributes: {

@@ -7,6 +7,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { TextStyle } from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
 import axios from "axios";
+import { ScenarioHighlight } from "./extensions/ScenarioHighlight";
 import { useTranslations, useFormatter } from "next-intl";
 import { useScenario } from "@/contexts/ScenarioContext";
 import { ScenarioToolbar } from "./ScenarioToolbar";
@@ -52,6 +53,7 @@ export function ScenarioEditor({ gameId, scenarioId }: Props) {
             StarterKit,
             TextStyle,
             Color,
+            ScenarioHighlight,
             IndentExtension,
             GmOnlyBlock,
             HeadingId,

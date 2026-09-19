@@ -224,6 +224,7 @@
             "heading2": "Heading 2",
             "heading3": "Heading 3",
             "textColor": "Text color",
+            "highlight": "Highlight",
             "increaseIndent": "Increase indent (Tab)",
             "decreaseIndent": "Decrease indent (Shift+Tab)",
             "bulletList": "Bullet list",

@@ -224,6 +224,7 @@
             "heading2": "Titre 2",
             "heading3": "Titre 3",
             "textColor": "Couleur du texte",
+            "highlight": "Surligner",
             "increaseIndent": "Augmenter le retrait (Tab)",
             "decreaseIndent": "Diminuer le retrait (Shift+Tab)",
             "bulletList": "Liste",
