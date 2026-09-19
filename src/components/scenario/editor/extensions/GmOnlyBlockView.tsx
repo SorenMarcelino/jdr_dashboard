@@ -115,6 +115,7 @@ export function GmOnlyBlockView({ node, editor, updateAttributes }: NodeViewProp
                     <button
                         type="button"
                         title={t("customize")}
+                        aria-expanded={open}
                         onClick={() => setOpen((v) => !v)}
                         className="scenario-gm-only-pill"
                     >

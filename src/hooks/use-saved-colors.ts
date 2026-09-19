@@ -12,6 +12,10 @@ const EMPTY: string[] = [];
 // et un ajout dans une palette apparaît aussitôt dans les autres. La
 // déconnexion recharge la page (navbar), ce qui vide le store.
 let colors: string[] = EMPTY;
+// Passe à true quand le GET initial a réussi : évite qu'un addColor/removeColor
+// déclenché avant (ou pendant un GET en échec) n'écrase la liste côté serveur
+// avec un PUT partant d'une liste vide.
+let loaded = false;
 let loadPromise: Promise<void> | null = null;
 const listeners = new Set<() => void>();
 
@@ -31,7 +35,10 @@ function load() {
     if (!loadPromise) {
         loadPromise = axios
             .get<{ colors: string[] }>(ENDPOINT)
-            .then((res) => setColors(res.data.colors))
+            .then((res) => {
+                setColors(res.data.colors);
+                loaded = true;
+            })
             // Échec : on réessaiera au prochain montage d'une palette.
             .catch(() => {
                 loadPromise = null;
@@ -60,12 +67,22 @@ export function useSavedColors() {
     }, []);
 
     const addColor = useCallback((color: string) => {
-        const next = addSavedColor(colors, color);
-        if (next !== colors) void save(next);
+        void (async () => {
+            // Attend le GET initial pour ne pas écraser les couleurs déjà
+            // sauvegardées avec un PUT parti d'une liste vide.
+            await load();
+            if (!loaded) return;
+            const next = addSavedColor(colors, color);
+            if (next !== colors) void save(next);
+        })();
     }, []);
 
     const removeColor = useCallback((color: string) => {
-        void save(removeSavedColor(colors, color));
+        void (async () => {
+            await load();
+            if (!loaded) return;
+            void save(removeSavedColor(colors, color));
+        })();
     }, []);
 
     return { colors: current, addColor, removeColor };

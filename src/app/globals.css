@@ -301,13 +301,13 @@ body {
    style inline par la NodeView) ou, par défaut, le token destructive. */
 .scenario-gm-only-block {
   --gm-color: hsl(var(--destructive));
-  @apply relative my-3 rounded-md border-l-4 px-4 pb-3 pt-2;
+  @apply relative my-3 rounded-md border-l-4 px-4 pb-3 pt-7;
   border-left-color: color-mix(in srgb, var(--gm-color) 40%, transparent);
   background-color: color-mix(in srgb, var(--gm-color) 5%, transparent);
 }
 
 .scenario-gm-only-header {
-  @apply relative mb-1;
+  @apply absolute left-3 top-2;
 }
 
 .scenario-gm-only-pill {

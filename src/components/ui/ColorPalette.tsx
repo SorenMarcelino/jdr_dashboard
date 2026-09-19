@@ -49,20 +49,51 @@ export function ColorPalette({ value, onChange }: Props) {
     const inputRef = useRef<HTMLInputElement>(null);
     const current = normalizeHex(value);
 
-    // Événement natif `change` (et non `input`, que React expose en onChange) :
-    // il ne part qu'une fois, à la fermeture du sélecteur du système.
+    // Refs à jour à chaque rendu : l'effet ci-dessous ne s'abonne qu'une
+    // fois (deps vides), sans se réabonner à chaque changement de callback.
+    const onChangeRef = useRef(onChange);
+    onChangeRef.current = onChange;
+    const addColorRef = useRef(addColor);
+    addColorRef.current = addColor;
+
+    // Sur macOS le sélecteur système est non modal : chaque couleur choisie
+    // ne déclenche que `input`, et `change` n'arrive qu'à la fermeture du
+    // panneau. Le geste naturel pour fermer — recliquer dans la page —
+    // déclenche useDismiss (mousedown extérieur) qui démonte la popover
+    // avant que `change` n'ait eu lieu. On mémorise donc la valeur à chaque
+    // `input`, et si elle n'a pas encore été validée par `change` au moment
+    // du démontage, on la valide nous-mêmes dans le cleanup.
     useEffect(() => {
         const input = inputRef.current;
         if (!input) return;
-        const onCommit = () => {
-            const hex = normalizeHex(input.value);
-            if (!hex) return;
-            addColor(hex);
-            onChange(hex);
+        const pendingRef = { current: null as string | null };
+        const commit = (hex: string) => {
+            const normalized = normalizeHex(hex);
+            if (!normalized) return;
+            addColorRef.current(normalized);
+            onChangeRef.current(normalized);
         };
+        const onInput = () => {
+            pendingRef.current = input.value;
+        };
+        const onCommit = () => {
+            commit(input.value);
+            pendingRef.current = null;
+        };
+        input.addEventListener("input", onInput);
         input.addEventListener("change", onCommit);
-        return () => input.removeEventListener("change", onCommit);
-    }, [addColor, onChange]);
+        return () => {
+            input.removeEventListener("input", onInput);
+            input.removeEventListener("change", onCommit);
+            // Le panneau a été fermé par un clic extérieur (useDismiss) sans
+            // que `change` n'ait eu le temps de partir : on applique quand
+            // même la dernière couleur choisie.
+            if (pendingRef.current !== null) {
+                commit(pendingRef.current);
+                pendingRef.current = null;
+            }
+        };
+    }, []);
 
     return (
         <div className="flex w-[196px] flex-col gap-2">
