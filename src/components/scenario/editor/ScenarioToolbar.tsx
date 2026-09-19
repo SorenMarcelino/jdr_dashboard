@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Editor } from "@tiptap/react";
 import { useTranslations } from "next-intl";
 import {
@@ -8,17 +8,8 @@ import {
     List, ListOrdered, Quote, Minus, Link, UserCircle, StickyNote, Undo2, Redo2,
     Palette, IndentIncrease, IndentDecrease, EyeOff, ScrollText, Landmark,
 } from "lucide-react";
-
-const TEXT_COLOR_KEYS: { key: string; value: string | null }[] = [
-    { key: "colorDefault", value: null },
-    { key: "colorRed", value: "#ef4444" },
-    { key: "colorOrange", value: "#f97316" },
-    { key: "colorYellow", value: "#eab308" },
-    { key: "colorGreen", value: "#22c55e" },
-    { key: "colorBlue", value: "#3b82f6" },
-    { key: "colorPurple", value: "#a855f7" },
-    { key: "colorPink", value: "#ec4899" },
-];
+import { ColorPalette } from "@/components/ui/ColorPalette";
+import { useDismiss } from "@/hooks/use-dismiss";
 
 type Props = {
     editor: Editor | null;
@@ -64,7 +55,10 @@ function ToolbarButton({
 
 export function ScenarioToolbar({ editor, onAddPageLink, onAddNpcRef, onAddAnnotation, onAddRuleRef, onAddLoreRef }: Props) {
     const [, setTick] = useState(0);
-    const [colorPickerOpen, setColorPickerOpen] = useState(false);
+    const [openPopover, setOpenPopover] = useState<"textColor" | "highlight" | null>(null);
+    const popoverRef = useRef<HTMLDivElement>(null);
+    const closePopover = useCallback(() => setOpenPopover(null), []);
+    useDismiss(popoverRef, openPopover !== null, closePopover);
     const t = useTranslations("scenario.toolbar");
 
     useEffect(() => {
@@ -108,37 +102,29 @@ export function ScenarioToolbar({ editor, onAddPageLink, onAddNpcRef, onAddAnnot
 
             <div className="w-px h-5 bg-border mx-1" />
 
-            {/* Couleur de texte */}
-            <div className="relative">
-                <ToolbarButton
-                    onClick={() => setColorPickerOpen((v) => !v)}
-                    isActive={!!editor.getAttributes("textStyle").color}
-                    title={t("textColor")}
-                >
-                    <Palette size={iconSize} />
-                </ToolbarButton>
-                {colorPickerOpen && (
-                    <div className="absolute top-full left-0 mt-1 flex gap-1 p-2 bg-background border rounded-md shadow-md z-10">
-                        {TEXT_COLOR_KEYS.map((color) => (
-                            <button
-                                key={color.key}
-                                type="button"
-                                title={t(color.key)}
-                                onMouseDown={(e) => {
-                                    e.preventDefault();
-                                    if (color.value === null) {
-                                        editor.chain().focus().unsetColor().run();
-                                    } else {
-                                        editor.chain().focus().setColor(color.value).run();
-                                    }
-                                    setColorPickerOpen(false);
+            {/* Couleur du texte */}
+            <div ref={popoverRef} className="flex items-center gap-0.5">
+                <div className="relative">
+                    <ToolbarButton
+                        onClick={() => setOpenPopover((v) => (v === "textColor" ? null : "textColor"))}
+                        isActive={!!editor.getAttributes("textStyle").color}
+                        title={t("textColor")}
+                    >
+                        <Palette size={iconSize} />
+                    </ToolbarButton>
+                    {openPopover === "textColor" && (
+                        <div className="absolute left-0 top-full z-10 mt-1 rounded-md border bg-background p-2 shadow-md">
+                            <ColorPalette
+                                value={editor.getAttributes("textStyle").color ?? null}
+                                onChange={(color) => {
+                                    if (color) editor.chain().focus().setColor(color).run();
+                                    else editor.chain().focus().unsetColor().run();
+                                    setOpenPopover(null);
                                 }}
-                                className="w-5 h-5 rounded-full border border-border"
-                                style={{ backgroundColor: color.value ?? "transparent" }}
                             />
-                        ))}
-                    </div>
-                )}
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div className="w-px h-5 bg-border mx-1" />

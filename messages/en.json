@@ -1,6 +1,18 @@
 {
     "common": {
-        "toggleTheme": "Toggle theme"
+        "toggleTheme": "Toggle theme",
+        "colorPalette": {
+            "default": "Default",
+            "add": "Add a color",
+            "remove": "Remove {color}",
+            "red": "Red",
+            "orange": "Orange",
+            "yellow": "Yellow",
+            "green": "Green",
+            "blue": "Blue",
+            "purple": "Purple",
+            "pink": "Pink"
+        }
     },
     "navbar": {
         "greeting": "Hello {username}",
@@ -212,14 +224,6 @@
             "heading2": "Heading 2",
             "heading3": "Heading 3",
             "textColor": "Text color",
-            "colorDefault": "Default",
-            "colorRed": "Red",
-            "colorOrange": "Orange",
-            "colorYellow": "Yellow",
-            "colorGreen": "Green",
-            "colorBlue": "Blue",
-            "colorPurple": "Purple",
-            "colorPink": "Pink",
             "increaseIndent": "Increase indent (Tab)",
             "decreaseIndent": "Decrease indent (Shift+Tab)",
             "bulletList": "Bullet list",
