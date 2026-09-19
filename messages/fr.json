@@ -244,6 +244,15 @@
             "title": "Sommaire",
             "show": "Afficher le sommaire",
             "hide": "Masquer le sommaire"
+        },
+        "gmOnly": {
+            "defaultLabel": "MJ uniquement",
+            "customize": "Personnaliser la section",
+            "color": "Couleur",
+            "emoji": "Emoji",
+            "customEmoji": "Autre emoji…",
+            "text": "Texte",
+            "reset": "Réinitialiser"
         }
     },
     "knowledge": {

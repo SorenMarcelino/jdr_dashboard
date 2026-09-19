@@ -244,6 +244,15 @@
             "title": "Outline",
             "show": "Show outline",
             "hide": "Hide outline"
+        },
+        "gmOnly": {
+            "defaultLabel": "GM only",
+            "customize": "Customize section",
+            "color": "Color",
+            "emoji": "Emoji",
+            "customEmoji": "Other emoji…",
+            "text": "Text",
+            "reset": "Reset"
         }
     },
     "knowledge": {
