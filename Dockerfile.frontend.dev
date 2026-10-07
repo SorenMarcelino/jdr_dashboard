@@ -1,0 +1,22 @@
+# Frontend de DÉVELOPPEMENT (docker-compose.yml) : `next dev` avec rechargement
+# à chaud. Le code source est monté en volume sur /app par docker-compose ;
+# node_modules et .next restent dans des volumes anonymes initialisés depuis
+# cette image, donc indépendants de ceux de l'hôte.
+# Pour la production, voir Dockerfile.frontend (build standalone).
+FROM node:20-alpine
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# Créé dans l'image pour que le volume anonyme /app/.next en hérite.
+RUN mkdir -p .next
+
+ENV NEXT_TELEMETRY_DISABLED=1
+
+EXPOSE 3000
+
+# Reste en root : le volume .next doit être inscriptible par next dev
+# (en utilisateur node, il échoue en EACCES sur /app/.next/cache).
+# --hostname 0.0.0.0 : joignable depuis l'hôte via le port publié.
+CMD ["npm", "run", "front", "--", "--hostname", "0.0.0.0", "--port", "3000"]
