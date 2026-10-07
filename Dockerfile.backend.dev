@@ -1,0 +1,19 @@
+# Backend de DÉVELOPPEMENT (docker-compose.yml) : redémarre à chaque
+# modification grâce à `node --watch`. Le code source est monté en volume sur
+# /app par docker-compose ; node_modules reste dans un volume anonyme
+# initialisé depuis cette image. NODE_ENV, PORT, MONGODB_URI… viennent de
+# docker-compose.yml. Pour la production, voir Dockerfile.backend.
+FROM node:20-slim
+WORKDIR /app
+
+# Toutes les dépendances (dev comprises) : tests et outillage dans le conteneur.
+COPY package.json package-lock.json ./
+RUN npm ci
+
+EXPOSE 5050
+
+# Healthcheck via l'endpoint /health (fetch natif Node 20, pas de curl requis)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+    CMD node -e "fetch('http://localhost:5050/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+
+CMD ["node", "--watch", "back/server.mjs"]
