@@ -12,10 +12,14 @@ import { BentoGrid } from "@/components/bento/BentoGrid";
 import { SocketProvider } from "@/contexts/SocketContext";
 import { ChatPanel } from "@/components/chat/ChatPanel";
 import { StagePanel } from "@/components/stage/StagePanel";
-import Link from "next/link";
 import { resolveSystemId } from "@/lib/system-id";
 import { getGameTheme } from "@/config/gameThemes";
 import { useGameTheme } from "@/hooks/use-game-theme";
+import { SessionHeader } from "@/components/game/session-header";
+import { PlayerSelector } from "@/components/game/player-selector";
+import { GameSkinProvider } from "@/themes/game-skin-context";
+import { getGameSkin } from "@/themes/registry";
+import { cn } from "@/lib/utils";
 import { API_URL } from "@/lib/api";
 
 const DiceScene = dynamic(() => import("@/components/dice/DiceScene").then((m) => m.DiceScene), { ssr: false });
@@ -76,6 +80,10 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
 
     // Thème visuel propre au système de jeu (posé sur <html> le temps de la partie)
     useGameTheme(getGameTheme(game?.characterSheet));
+    // Composants propres à l'univers (en-tête, cadres, fiche, chat…)
+    const skin = getGameSkin(game?.characterSheet);
+    const SkinSessionHeader = skin.SessionHeader ?? SessionHeader;
+    const SkinPlayerSelector = skin.PlayerSelector ?? PlayerSelector;
 
     if (loading) {
         return (
@@ -128,21 +136,11 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
 
     // Header du panneau fiche (MJ : sélecteur de joueur)
     const sheetHeaderRight = isMJ && game.players.length > 0 ? (
-        <div className="flex gap-1">
-            {game.players.map((player) => (
-                <button
-                    key={player._id}
-                    onClick={() => setSelectedPlayer(player)}
-                    className={`px-2 py-0.5 rounded-full text-xs font-medium border transition-colors
-                        ${selectedPlayer?._id === player._id
-                            ? "bg-primary text-primary-foreground border-primary"
-                            : "bg-background border-muted-foreground/30 hover:border-primary"
-                        }`}
-                >
-                    {player.username}
-                </button>
-            ))}
-        </div>
+        <SkinPlayerSelector
+            players={game.players}
+            selectedId={selectedPlayer?._id}
+            onSelect={(id) => setSelectedPlayer(game.players.find((p) => p._id === id) ?? null)}
+        />
     ) : undefined;
 
     const bentoItems = [
@@ -165,65 +163,31 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
             id: "chat",
             title: t("chatTitle"),
             defaultLayout: { x: 8, y: 5, w: 4, h: 5, minW: 2, minH: 2 },
-            content: <ChatPanel gameId={gameId} currentUserId={currentUser._id} />,
+            content: <ChatPanel gameId={gameId} currentUserId={currentUser._id} gmUserId={game.createdBy._id} />,
         },
     ];
 
     return (
         <SocketProvider>
-            <div className="flex flex-col h-svh overflow-hidden bg-muted">
-                <Navbar game={game} />
+            <GameSkinProvider skin={skin}>
+                <div className={cn("flex flex-col h-svh overflow-hidden bg-muted", skin.pageClassName)}>
+                    <Navbar game={game} />
 
-                {/* Barre de contexte */}
-                <div className="shrink-0 flex items-center justify-between px-4 py-2 border-b bg-background">
-                    <div className="flex items-center gap-3">
-                        <h1 className="text-sm font-bold">{game.name}</h1>
-                        {isMJ && (
-                            <span className="text-xs bg-primary text-primary-foreground rounded-full px-2 py-0.5 font-semibold">{t("gmBadge")}</span>
-                        )}
-                        <span className="text-xs text-muted-foreground">{game.characterSheet}</span>
+                    {/* Barre de contexte */}
+                    <SkinSessionHeader game={game} gameId={gameId} isMJ={isMJ} />
+
+                    {/* Bento dashboard */}
+                    <div className="flex-1 overflow-hidden p-3">
+                        <BentoGrid
+                            items={bentoItems}
+                            storageKey={`bento-layout-${gameId}-${isMJ ? "mj" : "player"}`}
+                        />
                     </div>
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                        <Link
-                            href={`/game/${gameId}/rules`}
-                            className="px-2.5 py-1 rounded-md bg-muted hover:bg-accent text-foreground font-medium transition-colors"
-                        >
-                            {t("rulesLink")}
-                        </Link>
-                        <Link
-                            href={`/game/${gameId}/lore`}
-                            className="px-2.5 py-1 rounded-md bg-muted hover:bg-accent text-foreground font-medium transition-colors"
-                        >
-                            {t("loreLink")}
-                        </Link>
-                        {isMJ && (
-                            <>
-                                <Link
-                                    href={`/game/${gameId}/scenario`}
-                                    className="px-2.5 py-1 rounded-md bg-muted hover:bg-accent text-foreground font-medium transition-colors"
-                                >
-                                    {t("scenariosLink")}
-                                </Link>
-                                <div className="flex items-center gap-2">
-                                    <span>{t("codeLabel")}</span>
-                                    <span className="font-mono font-bold tracking-widest bg-muted px-2 py-0.5 rounded">{game.inviteCode}</span>
-                                </div>
-                            </>
-                        )}
-                    </div>
-                </div>
 
-                {/* Bento dashboard */}
-                <div className="flex-1 overflow-hidden p-3">
-                    <BentoGrid
-                        items={bentoItems}
-                        storageKey={`bento-layout-${gameId}-${isMJ ? "mj" : "player"}`}
-                    />
+                    {/* 3D Dice overlay */}
+                    <DiceScene gameId={gameId} currentUserId={currentUser._id} />
                 </div>
-
-                {/* 3D Dice overlay */}
-                <DiceScene gameId={gameId} currentUserId={currentUser._id} />
-            </div>
+            </GameSkinProvider>
         </SocketProvider>
     );
 }

@@ -30,7 +30,7 @@ export type Template = {
     fields: FieldDef[];
 };
 
-type Instance = {
+export type SheetInstance = {
     _id?: string;
     systemId: string;
     values: Record<string, unknown>;
@@ -38,7 +38,7 @@ type Instance = {
 
 type Props = {
     template: Template;
-    instance: Instance | null;
+    instance: SheetInstance | null;
     isEditable: boolean;
     onSave: (values: Record<string, unknown>) => Promise<void>;
 };

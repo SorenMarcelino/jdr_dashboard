@@ -8,19 +8,25 @@ import { MessageList } from "./MessageList";
 import { ChatInput } from "./ChatInput";
 import { DiceBar } from "./DiceBar";
 import { API_URL } from "@/lib/api";
+import { useGameSkin } from "@/themes/game-skin-context";
 
 const API = API_URL;
 
 type Props = {
     gameId: string;
     currentUserId: string;
+    /** userId du MJ : ses messages peuvent être rendus comme de la narration. */
+    gmUserId?: string;
 };
 
-export function ChatPanel({ gameId, currentUserId }: Props) {
+export function ChatPanel({ gameId, currentUserId, gmUserId }: Props) {
     const { connected, joinGame, leaveGame, sendMessage, rollDice, onChatMessage, onDiceRollResult } = useSocket();
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [hasMore, setHasMore] = useState(false);
     const loadingRef = useRef(false);
+    const skin = useGameSkin();
+    const SkinDiceBar = skin.DiceBar ?? DiceBar;
+    const SkinChatInput = skin.ChatInput ?? ChatInput;
 
     // Load message history
     const loadMessages = useCallback(async (before?: string) => {
@@ -92,11 +98,12 @@ export function ChatPanel({ gameId, currentUserId }: Props) {
             <MessageList
                 messages={messages}
                 currentUserId={currentUserId}
+                gmUserId={gmUserId}
                 onLoadMore={handleLoadMore}
                 hasMore={hasMore}
             />
-            <DiceBar onRoll={handleRoll} disabled={!connected} />
-            <ChatInput onSend={handleSend} disabled={!connected} />
+            <SkinDiceBar onRoll={handleRoll} disabled={!connected} />
+            <SkinChatInput onSend={handleSend} disabled={!connected} />
         </div>
     );
 }

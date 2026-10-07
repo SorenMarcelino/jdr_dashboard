@@ -3,18 +3,26 @@ import { resolveSystemId } from "@/lib/system-id";
 /**
  * Thèmes visuels par système de jeu.
  *
- * Chaque systemId listé ici possède un bloc de variables CSS dédié dans
- * globals.css, ciblé par le sélecteur `[data-game-theme="<systemId>"]`
- * (variantes clair + sombre). L'attribut est posé sur `<html>` pendant une
- * partie via le hook `useGameTheme`, ce qui surcharge la palette shadcn/ui
- * (couleurs, rayons…) pour toute l'UI, portals compris.
+ * Chaque systemId listé ici possède une feuille de style dédiée
+ * (`src/themes/<systemId>/theme.css`), ciblée par le sélecteur
+ * `[data-game-theme="<systemId>"]`. L'attribut est posé sur `<html>` pendant
+ * une partie via le hook `useGameTheme`, ce qui surcharge la palette shadcn/ui
+ * (couleurs, rayons, polices…) pour toute l'UI, portals compris.
  *
- * Pour ajouter un thème : ajouter le systemId ici puis le bloc CSS
- * correspondant dans globals.css.
+ * `colorScheme` force le mode clair/sombre le temps de la partie, pour les
+ * thèmes conçus pour un seul mode.
+ *
+ * Pour ajouter un thème : l'ajouter ici, créer sa feuille de style et
+ * l'importer dans `src/app/layout.tsx` (cf. aussi `src/themes/registry.ts`
+ * pour les composants propres à l'univers).
  */
-const THEMED_SYSTEMS = new Set<string>([
-    "magnus_archives",
-]);
+type GameThemeConfig = {
+    colorScheme?: "light" | "dark";
+};
+
+const GAME_THEMES: Record<string, GameThemeConfig> = {
+    magnus_archives: { colorScheme: "dark" },
+};
 
 /**
  * Retourne le systemId à appliquer comme thème de jeu, ou `null` si le système
@@ -23,5 +31,10 @@ const THEMED_SYSTEMS = new Set<string>([
 export function getGameTheme(characterSheet?: string | null): string | null {
     if (!characterSheet) return null;
     const systemId = resolveSystemId(characterSheet);
-    return THEMED_SYSTEMS.has(systemId) ? systemId : null;
+    return systemId in GAME_THEMES ? systemId : null;
+}
+
+/** Mode clair/sombre imposé par le thème, ou `undefined` s'il suit la préférence. */
+export function getGameThemeColorScheme(theme: string | null): "light" | "dark" | undefined {
+    return theme ? GAME_THEMES[theme]?.colorScheme : undefined;
 }

@@ -5,6 +5,7 @@ import axios from "axios";
 import { useTranslations } from "next-intl";
 import { GenericCharacterSheet, Template as SheetTemplate } from "./GenericCharacterSheet";
 import { API_URL } from "@/lib/api";
+import { useGameSkin } from "@/themes/game-skin-context";
 
 type Template = SheetTemplate & {
     systemId: string;
@@ -33,6 +34,7 @@ export function CharacterSheetViewer({ systemId, gameId, playerId, isEditable = 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const t = useTranslations("characterSheet");
+    const Sheet = useGameSkin().CharacterSheet ?? GenericCharacterSheet;
 
     useEffect(() => {
         const load = async () => {
@@ -95,7 +97,10 @@ export function CharacterSheetViewer({ systemId, gameId, playerId, isEditable = 
     if (!template) return <p className="text-sm text-muted-foreground">{t("templateNotFound")}</p>;
 
     return (
-        <GenericCharacterSheet
+        <Sheet
+            // Remonte la fiche quand le MJ change de joueur : son état local
+            // est initialisé une seule fois à partir de l'instance.
+            key={instance?._id ?? playerId ?? "me"}
             template={template}
             instance={instance}
             isEditable={isEditable}

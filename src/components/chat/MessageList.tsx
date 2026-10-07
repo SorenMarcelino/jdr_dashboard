@@ -4,18 +4,23 @@ import { useRef, useEffect } from "react";
 import type { ChatMessage } from "@/contexts/SocketContext";
 import { TextMessage } from "./TextMessage";
 import { DiceRollMessage } from "./DiceRollMessage";
+import { useGameSkin } from "@/themes/game-skin-context";
 
 type Props = {
     messages: ChatMessage[];
     currentUserId: string;
+    gmUserId?: string;
     onLoadMore?: () => void;
     hasMore?: boolean;
 };
 
-export function MessageList({ messages, currentUserId, onLoadMore, hasMore }: Props) {
+export function MessageList({ messages, currentUserId, gmUserId, onLoadMore, hasMore }: Props) {
     const bottomRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const prevLengthRef = useRef(0);
+    const skin = useGameSkin();
+    const Text = skin.TextMessage ?? TextMessage;
+    const Roll = skin.DiceRollMessage ?? DiceRollMessage;
 
     // Auto-scroll on new messages
     useEffect(() => {
@@ -48,13 +53,14 @@ export function MessageList({ messages, currentUserId, onLoadMore, hasMore }: Pr
                     Charger plus...
                 </button>
             )}
-            {messages.map((msg) =>
-                msg.type === "text" ? (
-                    <TextMessage key={msg._id} message={msg} isOwn={msg.userId === currentUserId} />
-                ) : (
-                    <DiceRollMessage key={msg._id} message={msg} isOwn={msg.userId === currentUserId} />
-                )
-            )}
+            {messages.map((msg) => {
+                const props = {
+                    message: msg,
+                    isOwn: msg.userId === currentUserId,
+                    isGm: !!gmUserId && msg.userId === gmUserId,
+                };
+                return msg.type === "text" ? <Text key={msg._id} {...props} /> : <Roll key={msg._id} {...props} />;
+            })}
             <div ref={bottomRef} />
         </div>
     );

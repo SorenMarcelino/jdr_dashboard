@@ -290,5 +290,90 @@
             "loading": "Chargement...",
             "notFound": "Entrée introuvable"
         }
+    },
+    "skins": {
+        "magnus": {
+            "systemLabel": "The Magnus Archives · Cypher System",
+            "boardTab": "Tableau",
+            "sectionsNav": "Sections de la partie",
+            "inviteCode": "Code d'invitation",
+            "copyCode": "Copier le code d'invitation",
+            "codeCopied": "Code copié",
+            "panelIndex": "F·{n}",
+            "chooseSheet": "Choisir la fiche affichée",
+            "sheet": {
+                "fileTitle": "Fiche d'enquêteur",
+                "name": "nom",
+                "descriptor": "descripteur",
+                "type": "type",
+                "focus": "focus",
+                "afterName": ",",
+                "beforeFocus": "qui",
+                "tier": "Rang",
+                "effort": "Effort",
+                "xp": "XP",
+                "might": "Puissance",
+                "speed": "Célérité",
+                "intellect": "Intellect",
+                "pool": "Réserve",
+                "poolMax": "Maximum de {pool}",
+                "edge": "Atout",
+                "decrease": "Retirer 1 point de {pool}",
+                "increase": "Ajouter 1 point de {pool}",
+                "recovery": "Jets de récupération",
+                "recoveryAction": "1 action",
+                "recovery10min": "10 min",
+                "recovery1hour": "1 heure",
+                "recovery10hours": "10 heures",
+                "damageTrack": "Piste de dégâts",
+                "damage": {
+                    "Hale": "Indemne",
+                    "Hurt": "Blessé",
+                    "Impaired": "Affaibli",
+                    "Debilitated": "Diminué",
+                    "Dead": "Mort"
+                },
+                "damageNote": {
+                    "Hale": "Aucune pénalité.",
+                    "Hurt": "Uniquement pour certains personnages.",
+                    "Impaired": "Effort +1 par niveau ; les effets mineurs et majeurs sont ignorés ; un 17–20 en combat n'inflige que +1 dégât.",
+                    "Debilitated": "Déplacement limité à une distance immédiate ; immobile si la réserve de Célérité est à 0.",
+                    "Dead": "Le personnage est mort."
+                },
+                "stress": "Stress",
+                "stressBox": "Stress {n}",
+                "skills": "Compétences",
+                "trained": "Entraîné",
+                "specialized": "Spécialisé",
+                "inability": "Inapte",
+                "abilities": "Capacités spéciales",
+                "cyphers": "Cyphers",
+                "dossier": "Dossier personnel",
+                "portrait": "Portrait (URL)",
+                "background": "Historique",
+                "arcs": "Arcs narratifs",
+                "notes": "Notes",
+                "equipment": "Équipement"
+            },
+            "chat": {
+                "title": "Transcription",
+                "gm": "Le MJ",
+                "empty": "Rien n'a encore été consigné.",
+                "loadMore": "Remonter la bande…",
+                "inputLabel": "Consigner une déclaration",
+                "placeholder": "Ce que fait votre personnage…",
+                "send": "Consigner",
+                "roll": "Lancer {dice}",
+                "rollGroup": "Dés",
+                "quantity": "Nombre de dés",
+                "less": "Un dé de moins",
+                "more": "Un dé de plus",
+                "verdict": {
+                    "intrusion": "Intrusion du MJ",
+                    "minor": "Effet mineur",
+                    "major": "Effet majeur"
+                }
+            }
+        }
     }
 }

@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { GridLayout, type Layout, type LayoutItem } from "react-grid-layout";
 import { DetachedWindowPortal } from "@/hooks/use-detached-window";
 import { useTranslations } from "next-intl";
+import { useGameSkin } from "@/themes/game-skin-context";
 
 type BentoItem = {
     id: string;
@@ -84,6 +85,8 @@ export function BentoGrid({ items, storageKey }: Props) {
     // reflow) et rendus via DetachedWindowPortal. Fermer la fenêtre les
     // réintègre à leur place (leur layout est conservé).
     const [detachedIds, setDetachedIds] = useState<Set<string>>(new Set());
+    // Cadre des widgets : fourni par le skin de l'univers s'il en a un.
+    const SkinShell = useGameSkin().WidgetShell;
 
     // Charger le layout sauvegardé ou utiliser le défaut
     const defaultLayout: LayoutItem[] = items.map((item) => ({
@@ -189,13 +192,25 @@ export function BentoGrid({ items, storageKey }: Props) {
             >
                 {dockedItems.map((item) => (
                     <div key={item.id}>
-                        <BentoWidgetShell
-                            title={item.title}
-                            headerRight={item.headerRight}
-                            onDetach={() => detachItem(item.id)}
-                        >
-                            {item.content}
-                        </BentoWidgetShell>
+                        {SkinShell ? (
+                            <SkinShell
+                                id={item.id}
+                                index={items.indexOf(item)}
+                                title={item.title}
+                                headerRight={item.headerRight}
+                                onDetach={() => detachItem(item.id)}
+                            >
+                                {item.content}
+                            </SkinShell>
+                        ) : (
+                            <BentoWidgetShell
+                                title={item.title}
+                                headerRight={item.headerRight}
+                                onDetach={() => detachItem(item.id)}
+                            >
+                                {item.content}
+                            </BentoWidgetShell>
+                        )}
                     </div>
                 ))}
             </GridLayout>
@@ -208,9 +223,15 @@ export function BentoGrid({ items, storageKey }: Props) {
                     title={item.title}
                     onClose={() => reattachItem(item.id)}
                 >
-                    <div className="h-full bg-background text-foreground overflow-auto">
-                        {item.content}
-                    </div>
+                    {SkinShell ? (
+                        <SkinShell id={item.id} index={items.indexOf(item)} title={item.title} detached>
+                            {item.content}
+                        </SkinShell>
+                    ) : (
+                        <div className="h-full bg-background text-foreground overflow-auto">
+                            {item.content}
+                        </div>
+                    )}
                 </DetachedWindowPortal>
             ))}
         </div>

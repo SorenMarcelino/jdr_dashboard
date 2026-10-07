@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Archivo_Narrow, Courier_Prime, Geist, Geist_Mono, Old_Standard_TT } from "next/font/google";
 import { headers } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import "./globals.css";
+// Feuilles de style des thèmes de jeu (actives seulement sous data-game-theme)
+import "@/themes/magnus_archives/theme.css";
 import React from "react";
 import { Providers } from "@/components/providers";
 
@@ -15,6 +17,31 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
     variable: "--font-geist-mono",
     subsets: ["latin"],
+});
+
+// Polices du thème Magnus Archives : pas de préchargement, elles ne sont
+// téléchargées que lorsqu'une page thématisée les utilise.
+const oldStandard = Old_Standard_TT({
+    variable: "--font-old-standard",
+    subsets: ["latin"],
+    weight: ["400", "700"],
+    style: ["normal", "italic"],
+    preload: false,
+});
+
+const courierPrime = Courier_Prime({
+    variable: "--font-courier-prime",
+    subsets: ["latin"],
+    weight: ["400", "700"],
+    style: ["normal", "italic"],
+    preload: false,
+});
+
+const archivoNarrow = Archivo_Narrow({
+    variable: "--font-archivo-narrow",
+    subsets: ["latin"],
+    weight: ["400", "600", "700"],
+    preload: false,
 });
 
 export const metadata: Metadata = {
@@ -30,8 +57,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     const messages = await getMessages();
 
     return (
-        <html lang={locale} suppressHydrationWarning>
-            <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        // Variables de police sur <html> : les thèmes de jeu (posés sur <html>)
+        // les référencent dans leurs propres variables.
+        <html
+            lang={locale}
+            className={`${geistSans.variable} ${geistMono.variable} ${oldStandard.variable} ${courierPrime.variable} ${archivoNarrow.variable}`}
+            suppressHydrationWarning
+        >
+            <body className="antialiased">
                 <NextIntlClientProvider locale={locale} messages={messages}>
                     <Providers nonce={nonce}>{children}</Providers>
                 </NextIntlClientProvider>

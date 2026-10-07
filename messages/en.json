@@ -290,5 +290,90 @@
             "loading": "Loading...",
             "notFound": "Entry not found"
         }
+    },
+    "skins": {
+        "magnus": {
+            "systemLabel": "The Magnus Archives · Cypher System",
+            "boardTab": "Board",
+            "sectionsNav": "Game sections",
+            "inviteCode": "Invite code",
+            "copyCode": "Copy invite code",
+            "codeCopied": "Code copied",
+            "panelIndex": "F·{n}",
+            "chooseSheet": "Choose the displayed sheet",
+            "sheet": {
+                "fileTitle": "Investigator file",
+                "name": "name",
+                "descriptor": "descriptor",
+                "type": "type",
+                "focus": "focus",
+                "afterName": "is a",
+                "beforeFocus": "who",
+                "tier": "Tier",
+                "effort": "Effort",
+                "xp": "XP",
+                "might": "Might",
+                "speed": "Speed",
+                "intellect": "Intellect",
+                "pool": "Pool",
+                "poolMax": "{pool} maximum",
+                "edge": "Edge",
+                "decrease": "Remove 1 point of {pool}",
+                "increase": "Add 1 point of {pool}",
+                "recovery": "Recovery rolls",
+                "recoveryAction": "1 action",
+                "recovery10min": "10 min",
+                "recovery1hour": "1 hour",
+                "recovery10hours": "10 hours",
+                "damageTrack": "Damage track",
+                "damage": {
+                    "Hale": "Hale",
+                    "Hurt": "Hurt",
+                    "Impaired": "Impaired",
+                    "Debilitated": "Debilitated",
+                    "Dead": "Dead"
+                },
+                "damageNote": {
+                    "Hale": "No penalty.",
+                    "Hurt": "Only available for some characters.",
+                    "Impaired": "+1 Effort per level; ignore minor and major effect results; a combat roll of 17–20 deals only +1 damage.",
+                    "Debilitated": "Can move only an immediate distance; cannot move if Speed Pool is 0.",
+                    "Dead": "The character is dead."
+                },
+                "stress": "Stress",
+                "stressBox": "Stress {n}",
+                "skills": "Skills",
+                "trained": "Trained",
+                "specialized": "Specialized",
+                "inability": "Inability",
+                "abilities": "Special abilities",
+                "cyphers": "Cyphers",
+                "dossier": "Personal file",
+                "portrait": "Portrait (URL)",
+                "background": "Background",
+                "arcs": "Narrative arcs",
+                "notes": "Notes",
+                "equipment": "Equipment"
+            },
+            "chat": {
+                "title": "Transcript",
+                "gm": "The GM",
+                "empty": "Nothing has been recorded yet.",
+                "loadMore": "Rewind the tape…",
+                "inputLabel": "Make a statement",
+                "placeholder": "What does your character do…",
+                "send": "Record",
+                "roll": "Roll {dice}",
+                "rollGroup": "Dice",
+                "quantity": "Number of dice",
+                "less": "One die less",
+                "more": "One die more",
+                "verdict": {
+                    "intrusion": "GM intrusion",
+                    "minor": "Minor effect",
+                    "major": "Major effect"
+                }
+            }
+        }
     }
 }
