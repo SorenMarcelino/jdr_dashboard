@@ -22,6 +22,16 @@ type Props = {
 const COLS = 12;
 const MARGIN: [number, number] = [8, 8];
 
+/** Mêmes widgets aux mêmes positions et tailles (l'ordre est ignoré). */
+function sameGeometry(a: readonly LayoutItem[], b: readonly LayoutItem[]) {
+    if (a.length !== b.length) return false;
+    const byId = new Map(a.map((l) => [l.i, l]));
+    return b.every((l) => {
+        const o = byId.get(l.i);
+        return !!o && o.x === l.x && o.y === l.y && o.w === l.w && o.h === l.h;
+    });
+}
+
 function BentoWidgetShell({
     title,
     headerRight,
@@ -79,8 +89,7 @@ function BentoWidgetShell({
 
 export function BentoGrid({ items, storageKey }: Props) {
     const containerRef = useRef<HTMLDivElement>(null);
-    const [containerWidth, setContainerWidth] = useState(0);
-    const [rowHeight, setRowHeight] = useState(60);
+    const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
     // Widgets détachés dans une fenêtre navigateur : retirés du grid (qui
     // reflow) et rendus via DetachedWindowPortal. Fermer la fenêtre les
     // réintègre à leur place (leur layout est conservé).
@@ -114,25 +123,36 @@ export function BentoGrid({ items, storageKey }: Props) {
         }
     });
 
-    // Observer la largeur du conteneur
+    // Observer la taille du conteneur. Un seul observer pour toute la vie du
+    // composant, et aucun setState quand le layout change : sinon chaque
+    // onLayoutChange relance une mesure, et GridLayout ↔ BentoGrid bouclent.
     useEffect(() => {
         const el = containerRef.current;
         if (!el) return;
 
         const update = () => {
-            setContainerWidth(el.offsetWidth);
-            // Adapter la hauteur des lignes à la fenêtre disponible
-            const availableH = el.offsetHeight;
-            const maxRow = Math.max(...layout.map((l) => l.y + l.h), 1);
-            const rh = Math.floor((availableH - MARGIN[1] * (maxRow + 1)) / maxRow);
-            setRowHeight(Math.max(rh, 40));
+            const width = el.offsetWidth;
+            const height = el.offsetHeight;
+            // Conteneur masqué (largeur 0) : on garde la dernière mesure plutôt
+            // que de démonter le grid, qui re-émettrait son layout au remontage.
+            if (width === 0) return;
+            setContainerSize((prev) =>
+                prev.width === width && prev.height === height ? prev : { width, height }
+            );
         };
 
         update();
         const ro = new ResizeObserver(update);
         ro.observe(el);
         return () => ro.disconnect();
-    }, [layout]);
+    }, []);
+
+    // Adapter la hauteur des lignes à la fenêtre disponible (dérivé, pas d'état)
+    const maxRow = Math.max(...layout.map((l) => l.y + l.h), 1);
+    const rowHeight = Math.max(
+        Math.floor((containerSize.height - MARGIN[1] * (maxRow + 1)) / maxRow),
+        40
+    );
 
     const handleLayoutChange = useCallback(
         (newLayout: Layout) => {
@@ -142,6 +162,9 @@ export function BentoGrid({ items, storageKey }: Props) {
             setLayout((prev) => {
                 const detachedEntries = prev.filter((l) => detachedIds.has(l.i));
                 const merged = [...newLayout, ...detachedEntries];
+                // Rien n'a bougé : on garde la même référence, sinon le cycle
+                // GridLayout → onLayoutChange → setLayout → mesure peut boucler.
+                if (sameGeometry(prev, merged)) return prev;
                 if (storageKey) {
                     localStorage.setItem(storageKey, JSON.stringify(merged));
                 }
@@ -164,7 +187,7 @@ export function BentoGrid({ items, storageKey }: Props) {
         });
     }, []);
 
-    if (containerWidth === 0) {
+    if (containerSize.width === 0) {
         return <div ref={containerRef} className="h-full w-full" />;
     }
 
@@ -175,7 +198,7 @@ export function BentoGrid({ items, storageKey }: Props) {
         <div ref={containerRef} className="h-full w-full overflow-auto">
             <GridLayout
                 layout={layout.filter((l) => !detachedIds.has(l.i))}
-                width={containerWidth}
+                width={containerSize.width}
                 gridConfig={{
                     cols: COLS,
                     rowHeight,
