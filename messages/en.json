@@ -150,9 +150,7 @@
     },
     "chat": {
         "messagePlaceholder": "Message...",
-        "rolled": "rolled",
-        "tens": "tens",
-        "units": "units"
+        "rolled": "rolled"
     },
     "scenario": {
         "workspace": {
@@ -372,6 +370,94 @@
                     "intrusion": "GM intrusion",
                     "minor": "Minor effect",
                     "major": "Major effect"
+                }
+            }
+        },
+        "hydre": {
+            "systemLabel": "Hydra · Monster Hunters",
+            "boardTab": "Board",
+            "sectionsNav": "Game sections",
+            "inviteCode": "Invite code",
+            "copyCode": "Copy invite code",
+            "codeCopied": "Code copied",
+            "chooseSheet": "Choose the displayed sheet",
+            "sheet": {
+                "fileTitle": "Hydra hunter sheet",
+                "characteristics": "Characteristics",
+                "characteristic": {
+                    "charisma": "Charisma",
+                    "dexterity": "Dexterity",
+                    "endurance": "Endurance",
+                    "strength": "Strength",
+                    "intelligence": "Intelligence"
+                },
+                "hp": "Hit points",
+                "wounds": "Wounds",
+                "woundsLess": "Remove a wound",
+                "woundsMore": "Add a wound",
+                "protection": "Protection",
+                "protectionHint": "Melee / ranged",
+                "protectionMelee": "Protection against melee weapons",
+                "protectionRanged": "Protection against ranged weapons",
+                "initiative": "Initiative",
+                "initiativeDice": "+1D6",
+                "name": "Name",
+                "concept": "Concept",
+                "age": "Age",
+                "awesome": "I am awesome",
+                "awesomeHint": "because…",
+                "outcast": "But I can never again mingle with those who ignore the occult because…",
+                "skills": "Skills",
+                "total": "Total",
+                "skillNames": {
+                    "crafting": "Craft, build",
+                    "ranged_combat": "Ranged combat",
+                    "melee_combat": "Melee combat",
+                    "nature_lore": "Nature lore",
+                    "secrets_lore": "Secrets lore",
+                    "occult_lore": "Occult lore",
+                    "athletics": "Run, jump",
+                    "stealth": "Stealth",
+                    "law": "Law",
+                    "dodge": "Dodge",
+                    "intimidate": "Intimidate",
+                    "read_write": "Read, write",
+                    "persuade": "Lie, persuade",
+                    "perception": "Perception",
+                    "pilot": "Pilot",
+                    "psychology": "Psychology",
+                    "reflexes": "Reflexes",
+                    "locks_traps": "Locks and traps",
+                    "heal": "Heal",
+                    "survival": "Survival",
+                    "vigor": "Vigor",
+                    "steal": "Steal",
+                    "willpower": "Willpower"
+                },
+                "special": "Special skills",
+                "weapons": "Weapons",
+                "weaponRow": "Weapon {n}",
+                "damage": "Damage",
+                "damageBonus": "Damage bonus",
+                "possessions": "Possessions",
+                "encumbrance": "Encumbrance",
+                "notes": "Notes",
+                "description": "Description",
+                "portrait": "Portrait (URL)"
+            },
+            "chat": {
+                "gm": "The GM",
+                "inputLabel": "Write in the logbook",
+                "placeholder": "What does your hunter do…",
+                "send": "Write",
+                "roll": "Roll {dice}",
+                "rollGroup": "Dice",
+                "quantity": "Number of dice",
+                "less": "One die less",
+                "more": "One die more",
+                "verdict": {
+                    "critSuccess": "Critical success",
+                    "critFailure": "Critical failure"
                 }
             }
         }

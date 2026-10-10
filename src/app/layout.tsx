@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Archivo_Narrow, Courier_Prime, Geist, Geist_Mono, Old_Standard_TT } from "next/font/google";
+import { Archivo_Narrow, Caveat, Courier_Prime, EB_Garamond, Geist, Geist_Mono, IM_Fell_English_SC, Old_Standard_TT } from "next/font/google";
 import { headers } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import "./globals.css";
 // Feuilles de style des thèmes de jeu (actives seulement sous data-game-theme)
 import "@/themes/magnus_archives/theme.css";
+import "@/themes/hydre/theme.css";
 import React from "react";
 import { Providers } from "@/components/providers";
 
@@ -44,6 +45,30 @@ const archivoNarrow = Archivo_Narrow({
     preload: false,
 });
 
+// Polices du thème Hydre (mêmes principes) : capitales victoriennes pour les
+// titres, Garamond pour le texte, écriture manuscrite pour les valeurs de fiche.
+const imFellSc = IM_Fell_English_SC({
+    variable: "--font-im-fell-sc",
+    subsets: ["latin"],
+    weight: "400",
+    preload: false,
+});
+
+const ebGaramond = EB_Garamond({
+    variable: "--font-eb-garamond",
+    subsets: ["latin"],
+    weight: ["400", "600", "700"],
+    style: ["normal", "italic"],
+    preload: false,
+});
+
+const caveat = Caveat({
+    variable: "--font-caveat",
+    subsets: ["latin"],
+    weight: ["400", "600"],
+    preload: false,
+});
+
 export const metadata: Metadata = {
     title: "JDR Dashboard",
     description: "Gestion de parties de jeu de rôle en ligne",
@@ -61,7 +86,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         // les référencent dans leurs propres variables.
         <html
             lang={locale}
-            className={`${geistSans.variable} ${geistMono.variable} ${oldStandard.variable} ${courierPrime.variable} ${archivoNarrow.variable}`}
+            className={`${geistSans.variable} ${geistMono.variable} ${oldStandard.variable} ${courierPrime.variable} ${archivoNarrow.variable} ${imFellSc.variable} ${ebGaramond.variable} ${caveat.variable}`}
             suppressHydrationWarning
         >
             <body className="antialiased">

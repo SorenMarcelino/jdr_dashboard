@@ -1,6 +1,7 @@
 const SYSTEM_ID_MAP: Record<string, string> = {
     "Magnus Archives": "magnus_archives",
     "magnus_archives": "magnus_archives",
+    "Hydre": "hydre",
 };
 
 export function resolveSystemId(characterSheet: string): string {

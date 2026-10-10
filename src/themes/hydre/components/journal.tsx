@@ -5,9 +5,10 @@ import { useFormatter, useTranslations } from "next-intl";
 import { DICE_CONFIGS, DICE_LIST, type DiceType } from "@/config/diceConfig";
 import { cn } from "@/lib/utils";
 import type { ChatInputProps, ChatMessageProps, DiceBarProps } from "@/themes/types";
+import { GearMedallion } from "./ornaments";
 
-// Transcription d'enregistrement : chaque échange est une ligne horodatée,
-// le MJ parle en italique de titrage, les jets reçoivent un tampon de verdict.
+// Carnet de chasse : chaque échange est une entrée du journal de l'expédition,
+// le MJ narre en italique, les jets s'inscrivent dans un médaillon de laiton.
 
 function TimeStamp({ iso }: { iso: string }) {
     const format = useFormatter();
@@ -18,58 +19,43 @@ function TimeStamp({ iso }: { iso: string }) {
     );
 }
 
-const ROW = "grid grid-cols-[3rem_minmax(0,1fr)] gap-2 border-b border-dotted border-border pb-2";
+const ROW = "grid grid-cols-[3rem_minmax(0,1fr)] gap-2 border-b border-[color:var(--hydre-brass-dark)]/25 pb-2";
 
-export function ArchivesTextMessage({ message, isGm }: ChatMessageProps) {
-    const t = useTranslations("skins.magnus.chat");
+export function HydreTextMessage({ message, isGm }: ChatMessageProps) {
+    const t = useTranslations("skins.hydre.chat");
 
     return (
         <div className={ROW}>
             <TimeStamp iso={message.createdAt} />
             <div className="min-w-0">
-                <p
-                    className={cn(
-                        "archives-label text-[13px] font-bold uppercase",
-                        isGm && "text-[color:var(--archives-signal-ink)]"
-                    )}
-                >
+                <p className={cn("hydre-display text-[13px] uppercase tracking-wide", isGm ? "text-[color:var(--hydre-plaque)]" : "text-[color:var(--hydre-slate)]")}>
                     {isGm ? t("gm") : message.username}
                 </p>
-                <p
-                    className={cn(
-                        "break-words",
-                        isGm ? "archives-display text-[17px] italic leading-snug" : "text-sm leading-relaxed"
-                    )}
-                >
-                    {message.content}
-                </p>
+                <p className={cn("break-words leading-snug", isGm ? "text-[17px] italic" : "text-[15px]")}>{message.content}</p>
             </div>
         </div>
     );
 }
 
-type Verdict = "intrusion" | "minor" | "major";
+type Verdict = "critSuccess" | "critFailure";
 
-// Cypher System : sur un d20 seul, 1 = intrusion du MJ, 17–18 = effet
-// mineur, 19–20 = effet majeur. La difficulté n'est pas connue ici, donc pas
-// de réussite/échec.
-function cypherVerdict(diceType: string, results: number[]): Verdict | null {
-    if (diceType !== "d20" || results.length !== 1) return null;
-    const value = results[0];
-    if (value === 1) return "intrusion";
-    if (value >= 19) return "major";
-    if (value >= 17) return "minor";
+// HYDRE : sur 1d100, 01–05 = succès critique, 96–00 = échec critique.
+// Le score visé n'est pas connu ici, donc pas de réussite/échec simple.
+function hydreVerdict(diceType: string, total: number): Verdict | null {
+    if (diceType !== "d100") return null;
+    if (total <= 5) return "critSuccess";
+    if (total >= 96) return "critFailure";
     return null;
 }
 
-export function ArchivesDiceRollMessage({ message, isGm }: ChatMessageProps) {
-    const t = useTranslations("skins.magnus.chat");
+export function HydreDiceRollMessage({ message, isGm }: ChatMessageProps) {
+    const t = useTranslations("skins.hydre.chat");
 
     const roll = message.diceRoll;
     if (!roll) return null;
 
     const isPercentile = DICE_CONFIGS[roll.diceType as DiceType]?.display === "percentile";
-    const verdict = cypherVerdict(roll.diceType, roll.results);
+    const verdict = hydreVerdict(roll.diceType, roll.total);
     const diceLabel = roll.quantity > 1 ? `${roll.quantity}${roll.diceType}` : roll.diceType;
 
     const details = !isPercentile && roll.results.length > 1 ? roll.results.join(" + ") : null;
@@ -77,10 +63,12 @@ export function ArchivesDiceRollMessage({ message, isGm }: ChatMessageProps) {
     return (
         <div className={ROW}>
             <TimeStamp iso={message.createdAt} />
-            <div className="flex flex-wrap items-center gap-3 border border-foreground px-3 py-2">
-                <span className="archives-display min-w-[2.5rem] text-center text-4xl leading-none">{roll.total}</span>
-                <div className="min-w-0 flex-1 basis-32">
-                    <p className="archives-label text-sm font-bold uppercase">
+            <div className="flex flex-wrap items-center gap-3">
+                <GearMedallion className="w-16 shrink-0">
+                    <span className="hydre-hand text-3xl leading-none text-[color:var(--hydre-slate)]">{roll.total}</span>
+                </GearMedallion>
+                <div className="min-w-0 flex-1 basis-28">
+                    <p className="hydre-display text-sm uppercase tracking-wide">
                         {isGm ? t("gm") : message.username} · {diceLabel}
                     </p>
                     {details && <p className="text-xs text-muted-foreground">{details}</p>}
@@ -88,10 +76,10 @@ export function ArchivesDiceRollMessage({ message, isGm }: ChatMessageProps) {
                 {verdict && (
                     <span
                         className={cn(
-                            "archives-label border-[1.5px] px-2 py-1 text-sm font-bold uppercase",
-                            verdict === "intrusion"
+                            "hydre-display rounded-sm border-[1.5px] px-2 py-1 text-sm uppercase",
+                            verdict === "critFailure"
                                 ? "border-destructive text-destructive"
-                                : "border-[color:var(--archives-signal-ink)] text-[color:var(--archives-signal-ink)]"
+                                : "border-[color:var(--hydre-slate)] text-[color:var(--hydre-slate)]"
                         )}
                     >
                         {t(`verdict.${verdict}`)}
@@ -102,9 +90,9 @@ export function ArchivesDiceRollMessage({ message, isGm }: ChatMessageProps) {
     );
 }
 
-/** Touches de dés façon magnétophone : un appui lance, avec le nombre de dés choisi. */
-export function ArchivesDiceBar({ onRoll, disabled }: DiceBarProps) {
-    const t = useTranslations("skins.magnus.chat");
+/** Rangée de boutons de laiton : un appui lance, avec le nombre de dés choisi. */
+export function HydreDiceBar({ onRoll, disabled }: DiceBarProps) {
+    const t = useTranslations("skins.hydre.chat");
     const [quantity, setQuantity] = useState(1);
     const quantityId = useId();
 
@@ -114,10 +102,10 @@ export function ArchivesDiceBar({ onRoll, disabled }: DiceBarProps) {
     };
 
     return (
-        <div className="flex flex-col gap-2 border-t border-foreground px-3 pb-2 pt-3">
+        <div className="flex flex-col gap-2 border-t border-[color:var(--hydre-brass-dark)]/40 px-3 pb-2 pt-3">
             <div className="flex items-center gap-2">
                 <span id={quantityId} className="text-xs">{t("quantity")}</span>
-                <div role="group" aria-labelledby={quantityId} className="flex items-center border border-foreground">
+                <div role="group" aria-labelledby={quantityId} className="flex items-center rounded-sm border border-[color:var(--hydre-brass-dark)]/60">
                     <button
                         type="button"
                         onClick={() => setQuantity((q) => Math.max(1, q - 1))}
@@ -127,7 +115,7 @@ export function ArchivesDiceBar({ onRoll, disabled }: DiceBarProps) {
                     >
                         −
                     </button>
-                    <span className="archives-display w-7 text-center text-lg" aria-live="polite">{quantity}</span>
+                    <span className="hydre-hand w-7 text-center text-xl text-[color:var(--hydre-slate)]" aria-live="polite">{quantity}</span>
                     <button
                         type="button"
                         onClick={() => setQuantity((q) => Math.min(10, q + 1))}
@@ -139,7 +127,7 @@ export function ArchivesDiceBar({ onRoll, disabled }: DiceBarProps) {
                     </button>
                 </div>
             </div>
-            <div role="group" aria-label={t("rollGroup")} className="flex gap-[3px]">
+            <div role="group" aria-label={t("rollGroup")} className="flex gap-1">
                 {DICE_LIST.map((dice) => {
                     const q = Math.min(quantity, dice.maxQuantity);
                     return (
@@ -149,7 +137,11 @@ export function ArchivesDiceBar({ onRoll, disabled }: DiceBarProps) {
                             onClick={() => roll(dice.type, dice.maxQuantity)}
                             disabled={disabled}
                             aria-label={t("roll", { dice: q > 1 ? `${q}${dice.type}` : dice.type })}
-                            className="archives-key archives-label h-11 min-w-0 flex-1 bg-[color:var(--archives-ink)] text-base font-bold text-[color:var(--archives-paper-light)] disabled:opacity-40"
+                            className={cn(
+                                "hydre-brass hydre-display h-10 min-w-0 flex-1 rounded-sm text-base disabled:opacity-40",
+                                // Le d100 est le dé du système : il est mis en avant.
+                                dice.type === "d100" && "flex-[1.4] ring-1 ring-[color:var(--hydre-plaque)]"
+                            )}
                         >
                             {dice.type}
                         </button>
@@ -160,8 +152,8 @@ export function ArchivesDiceBar({ onRoll, disabled }: DiceBarProps) {
     );
 }
 
-export function ArchivesChatInput({ onSend, disabled }: ChatInputProps) {
-    const t = useTranslations("skins.magnus.chat");
+export function HydreChatInput({ onSend, disabled }: ChatInputProps) {
+    const t = useTranslations("skins.hydre.chat");
     const [value, setValue] = useState("");
     const inputId = useId();
 
@@ -184,12 +176,12 @@ export function ArchivesChatInput({ onSend, disabled }: ChatInputProps) {
                     onChange={(e) => setValue(e.target.value)}
                     disabled={disabled}
                     placeholder={t("placeholder")}
-                    className="archives-line h-10 min-w-0 flex-1 px-0.5 text-[15px] placeholder:text-muted-foreground/80"
+                    className="hydre-line h-10 min-w-0 flex-1 px-0.5 text-[16px] placeholder:text-muted-foreground/80"
                 />
                 <button
                     type="submit"
                     disabled={disabled || !value.trim()}
-                    className="archives-label h-10 shrink-0 bg-primary px-4 text-sm font-semibold text-primary-foreground disabled:opacity-40"
+                    className="hydre-brass hydre-display h-10 shrink-0 rounded-sm px-4 text-sm uppercase disabled:opacity-40"
                 >
                     {t("send")}
                 </button>

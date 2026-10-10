@@ -1,0 +1,259 @@
+/* ───────────────────────────────────────────────────────────────────
+   Thème de jeu — HYDRE, Chasseurs de monstres
+   Le cabinet d'un chasseur du club, en 1889 : boiseries sombres, laiton
+   et engrenages, documents sur parchemin à l'encre sépia, titres en
+   ardoise comme dans le livre de base.
+   Toujours sombre (cf. colorScheme dans src/config/gameThemes.ts).
+
+   Deux matières, comme le skin Magnus :
+   - le cabinet (racine) : fond de page, en-têtes, scène ;
+   - le parchemin (bg-card, bg-popover, .hydre-paper) : les tokens sont
+     redéfinis pour ses descendants, de sorte que text-muted-foreground,
+     border, primary… restent lisibles sur papier.
+
+   CSS brut (pas de @layer/@apply : fichier importé hors de globals.css).
+   ─────────────────────────────────────────────────────────────────── */
+
+:root[data-game-theme="hydre"],
+[data-game-theme="hydre"] {
+    --background: 26 33.3% 8.2%;
+    --foreground: 40 50% 83.5%;
+    --card: 42 52.9% 86.7%;
+    --card-foreground: 28 35.3% 13.3%;
+    --popover: 41 59.3% 89.4%;
+    --popover-foreground: 28 35.3% 13.3%;
+    --primary: 39 50.7% 57.1%;
+    --primary-foreground: 26 33.3% 8.2%;
+    --secondary: 26 31.3% 13.1%;
+    --secondary-foreground: 40 50% 83.5%;
+    --muted: 27 33.3% 10.6%;
+    --muted-foreground: 35 20.9% 56.9%;
+    --accent: 28 31.8% 17.3%;
+    --accent-foreground: 41 63.6% 87.1%;
+    --destructive: 10 58.8% 44.7%;
+    --destructive-foreground: 42 60% 91.2%;
+    --border: 30 32.1% 22%;
+    --input: 30 30.4% 27.1%;
+    --ring: 39 50.7% 57.1%;
+    --chart-1: 10 58.8% 44.7%;
+    --chart-2: 39 50.7% 57.1%;
+    --chart-3: 193 21.9% 58.8%;
+    --chart-4: 40 59.4% 63.3%;
+    --chart-5: 277 25.1% 58.6%;
+    --radius: 0.25rem;
+    --sidebar-background: 28 36.2% 9.2%;
+    --sidebar-foreground: 40 50% 83.5%;
+    --sidebar-primary: 39 50.7% 57.1%;
+    --sidebar-primary-foreground: 26 33.3% 8.2%;
+    --sidebar-accent: 28 31.8% 17.3%;
+    --sidebar-accent-foreground: 41 63.6% 87.1%;
+    --sidebar-border: 30 32.1% 22%;
+    --sidebar-ring: 39 50.7% 57.1%;
+
+    /* Tokens propres au skin (composants src/themes/hydre) */
+    --hydre-wood: #1C140E;
+    --hydre-wood-raised: #261B13;
+    --hydre-leather: #2E2118;
+    --hydre-parchment: #EFE4CB;
+    --hydre-parchment-light: #F6EEDB;
+    --hydre-parchment-dark: #E4D4B0;
+    --hydre-ink: #2E2116;
+    --hydre-brass: #C9A25A;
+    --hydre-brass-light: #E6C987;
+    --hydre-brass-dark: #7A5C28;
+    --hydre-plaque: #4A2A1A;
+    --hydre-plaque-text: #F3E6C9;
+    --hydre-slate: #3E5862;
+    --hydre-blood: #8A2A1C;
+    --hydre-font-display: var(--font-im-fell-sc), "Times New Roman", serif;
+    --hydre-font-text: var(--font-eb-garamond), Georgia, serif;
+    --hydre-font-hand: var(--font-caveat), "Bradley Hand", cursive;
+
+    color-scheme: dark;
+}
+
+/* Matière parchemin : tokens redéfinis pour tout ce qui est posé dessus. */
+[data-game-theme="hydre"] .bg-card,
+[data-game-theme="hydre"] .bg-popover,
+[data-game-theme="hydre"] .hydre-paper,
+[data-game-theme="hydre"].bg-card {
+    --background: 42 52.9% 86.7%;
+    --foreground: 28 35.3% 13.3%;
+    --card: 42 52.9% 86.7%;
+    --card-foreground: 28 35.3% 13.3%;
+    --popover: 41 59.3% 89.4%;
+    --popover-foreground: 28 35.3% 13.3%;
+    --primary: 20 48% 19.6%;
+    --primary-foreground: 41 63.6% 87.1%;
+    --secondary: 42 47.3% 78.4%;
+    --secondary-foreground: 28 35.3% 13.3%;
+    --muted: 42 47.3% 78.4%;
+    --muted-foreground: 31 25.1% 33.5%;
+    --accent: 41 46.2% 74.5%;
+    --accent-foreground: 28 35.3% 13.3%;
+    --destructive: 8 66.3% 32.5%;
+    --destructive-foreground: 42 60% 91.2%;
+    --border: 37 32.4% 57.1%;
+    --input: 33 23.8% 49.4%;
+    --ring: 197 22.5% 31.4%;
+    --chart-1: 8 66.3% 32.5%;
+    --chart-2: 197 22.5% 31.4%;
+    --chart-3: 38 51.7% 28.4%;
+    --chart-4: 43 68.3% 32.2%;
+    --chart-5: 261 29.3% 32.2%;
+    color: hsl(var(--foreground));
+    color-scheme: light;
+}
+
+/* Grain du parchemin : vignettage roussi sur les bords. */
+[data-game-theme="hydre"] .hydre-paper,
+[data-game-theme="hydre"] .bg-card.hydre-aged {
+    background-color: var(--hydre-parchment);
+    background-image:
+        radial-gradient(ellipse at 50% 40%, transparent 55%, rgba(122, 92, 40, 0.16) 100%),
+        radial-gradient(circle at 15% 85%, rgba(122, 92, 40, 0.07) 0, transparent 35%);
+}
+
+/* Variante parchemin clair (carnet de chasse). */
+[data-game-theme="hydre"] .hydre-paper-light {
+    --background: 42 60% 91.2%;
+    --card: 42 60% 91.2%;
+    background-color: var(--hydre-parchment-light);
+}
+
+[data-game-theme="hydre"] body,
+body[data-game-theme="hydre"] {
+    font-family: var(--hydre-font-text);
+}
+
+/* Emplacement de drag du tableau de bord */
+[data-game-theme="hydre"] .react-grid-item.react-grid-placeholder {
+    border-radius: 0.25rem;
+    border: 1px dashed var(--hydre-brass);
+    background: rgba(201, 162, 90, 0.08);
+}
+
+/* ── Utilitaires du skin ─────────────────────────────────────────── */
+
+.hydre-display {
+    font-family: var(--hydre-font-display);
+}
+
+.hydre-text {
+    font-family: var(--hydre-font-text);
+}
+
+.hydre-hand {
+    font-family: var(--hydre-font-hand);
+}
+
+/* Plaque de laiton à pans coupés (bandeaux de section de la fiche) :
+   le liseré est le fond du parent, la plaque est inset de 1.5px. */
+.hydre-plaque {
+    clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 10px 100%, 0 50%);
+    background: var(--hydre-brass);
+    padding: 1.5px;
+}
+.hydre-plaque > span {
+    display: block;
+    clip-path: polygon(9px 0, calc(100% - 9px) 0, 100% 50%, calc(100% - 9px) 100%, 9px 100%, 0 50%);
+    background: linear-gradient(to bottom, #5A3522, var(--hydre-plaque) 55%, #3A2014);
+    color: var(--hydre-plaque-text);
+}
+
+/* Bouton de laiton (dés, onglets, envoi) */
+.hydre-brass {
+    background: linear-gradient(to bottom, var(--hydre-brass-light), var(--hydre-brass) 45%, var(--hydre-brass-dark));
+    color: var(--hydre-wood);
+    border: 1px solid var(--hydre-brass-dark);
+    box-shadow: inset 0 1px 0 rgba(255, 245, 210, 0.55), 0 1px 0 rgba(0, 0, 0, 0.35);
+    transition: transform 80ms ease-out, filter 120ms ease-out;
+}
+.hydre-brass:hover:not(:disabled) {
+    filter: brightness(1.06);
+}
+.hydre-brass:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+/* Filet de laiton (séparateurs, cadres) */
+.hydre-rule {
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--hydre-brass) 12%, var(--hydre-brass-light) 50%, var(--hydre-brass) 88%, transparent);
+}
+
+/* Champ « à remplir » à la main : une ligne d'encre */
+.hydre-line {
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid rgba(46, 33, 22, 0.55);
+    border-radius: 0;
+    color: inherit;
+    outline: none;
+}
+.hydre-line:focus-visible {
+    border-bottom: 2px solid var(--hydre-slate);
+}
+.hydre-line:disabled {
+    opacity: 1;
+    border-bottom-style: dotted;
+}
+
+/* Case blanche des compétences et des dégâts */
+.hydre-box {
+    background: rgba(255, 252, 244, 0.85);
+    border: 1px solid rgba(122, 92, 40, 0.45);
+    border-radius: 2px;
+    color: inherit;
+    outline: none;
+}
+.hydre-box:focus-visible {
+    border-color: var(--hydre-slate);
+    box-shadow: 0 0 0 1px var(--hydre-slate);
+}
+.hydre-box:disabled {
+    opacity: 1;
+    background: rgba(255, 252, 244, 0.45);
+}
+
+/* Zone de texte réglée (lignes d'un carnet) */
+.hydre-ruled {
+    background-color: transparent;
+    background-image: repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent calc(1.5em - 1px),
+        rgba(122, 92, 40, 0.3) calc(1.5em - 1px),
+        rgba(122, 92, 40, 0.3) 1.5em
+    );
+    background-attachment: local;
+    line-height: 1.5em;
+    border: 0;
+    border-radius: 0;
+    color: inherit;
+    resize: vertical;
+    outline: none;
+}
+.hydre-ruled:focus-visible {
+    box-shadow: inset 0 -2px 0 var(--hydre-slate);
+}
+
+/* Pas de flèches sur les champs numériques de la fiche : on écrit le chiffre */
+[data-game-theme="hydre"] input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+[data-game-theme="hydre"] input[type="number"]::-webkit-inner-spin-button,
+[data-game-theme="hydre"] input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+[data-game-theme="hydre"] :focus-visible {
+    outline-color: var(--hydre-brass);
+}
+[data-game-theme="hydre"] .bg-card :focus-visible,
+[data-game-theme="hydre"] .hydre-paper :focus-visible {
+    outline-color: var(--hydre-slate);
+}

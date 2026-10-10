@@ -150,9 +150,7 @@
     },
     "chat": {
         "messagePlaceholder": "Message...",
-        "rolled": "a lancé",
-        "tens": "dizaines",
-        "units": "unités"
+        "rolled": "a lancé"
     },
     "scenario": {
         "workspace": {
@@ -372,6 +370,94 @@
                     "intrusion": "Intrusion du MJ",
                     "minor": "Effet mineur",
                     "major": "Effet majeur"
+                }
+            }
+        },
+        "hydre": {
+            "systemLabel": "Hydre · Chasseurs de monstres",
+            "boardTab": "Tableau",
+            "sectionsNav": "Sections de la partie",
+            "inviteCode": "Code d'invitation",
+            "copyCode": "Copier le code d'invitation",
+            "codeCopied": "Code copié",
+            "chooseSheet": "Choisir la fiche affichée",
+            "sheet": {
+                "fileTitle": "Fiche de chasseur de l'Hydre",
+                "characteristics": "Caractéristiques",
+                "characteristic": {
+                    "charisma": "Charisme",
+                    "dexterity": "Dextérité",
+                    "endurance": "Endurance",
+                    "strength": "Force",
+                    "intelligence": "Intelligence"
+                },
+                "hp": "Points de vie",
+                "wounds": "Blessures",
+                "woundsLess": "Retirer une blessure",
+                "woundsMore": "Ajouter une blessure",
+                "protection": "Protection",
+                "protectionHint": "Arme blanche / à distance",
+                "protectionMelee": "Protection contre les armes blanches",
+                "protectionRanged": "Protection contre les armes à distance",
+                "initiative": "Initiative",
+                "initiativeDice": "+1D6",
+                "name": "Nom",
+                "concept": "Concept",
+                "age": "Âge",
+                "awesome": "Je suis génial·e",
+                "awesomeHint": "parce que…",
+                "outcast": "Mais je ne pourrai plus jamais me mêler à ceux qui ignorent l'existence de l'occulte parce que…",
+                "skills": "Compétences",
+                "total": "Total",
+                "skillNames": {
+                    "crafting": "Artisanat, construire",
+                    "ranged_combat": "Combat à distance",
+                    "melee_combat": "Combat rapproché",
+                    "nature_lore": "Connaissance de la nature",
+                    "secrets_lore": "Connaissance des secrets",
+                    "occult_lore": "Connaissances occultes",
+                    "athletics": "Courir, sauter",
+                    "stealth": "Discrétion",
+                    "law": "Droit",
+                    "dodge": "Esquiver",
+                    "intimidate": "Intimider",
+                    "read_write": "Lire, écrire",
+                    "persuade": "Mentir, convaincre",
+                    "perception": "Perception",
+                    "pilot": "Piloter",
+                    "psychology": "Psychologie",
+                    "reflexes": "Réflexes",
+                    "locks_traps": "Serrures et pièges",
+                    "heal": "Soigner",
+                    "survival": "Survie",
+                    "vigor": "Vigueur",
+                    "steal": "Voler",
+                    "willpower": "Volonté"
+                },
+                "special": "Compétences spéciales",
+                "weapons": "Armes",
+                "weaponRow": "Arme {n}",
+                "damage": "Dégâts",
+                "damageBonus": "Bonus aux dégâts",
+                "possessions": "Possessions",
+                "encumbrance": "Encombrement",
+                "notes": "Notes",
+                "description": "Description",
+                "portrait": "Portrait (URL)"
+            },
+            "chat": {
+                "gm": "Le MJ",
+                "inputLabel": "Inscrire au carnet",
+                "placeholder": "Ce que fait votre chasseur…",
+                "send": "Inscrire",
+                "roll": "Lancer {dice}",
+                "rollGroup": "Dés",
+                "quantity": "Nombre de dés",
+                "less": "Un dé de moins",
+                "more": "Un dé de plus",
+                "verdict": {
+                    "critSuccess": "Succès critique",
+                    "critFailure": "Échec critique"
                 }
             }
         }

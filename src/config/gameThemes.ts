@@ -22,6 +22,7 @@ type GameThemeConfig = {
 
 const GAME_THEMES: Record<string, GameThemeConfig> = {
     magnus_archives: { colorScheme: "dark" },
+    hydre: { colorScheme: "dark" },
 };
 
 /**

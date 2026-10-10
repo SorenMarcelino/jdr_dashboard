@@ -1,6 +1,7 @@
 import { resolveSystemId } from "@/lib/system-id";
 import { DEFAULT_SKIN } from "./game-skin-context";
 import { magnusArchivesSkin } from "./magnus_archives";
+import { hydreSkin } from "./hydre";
 import type { GameSkin } from "./types";
 
 /**
@@ -11,6 +12,7 @@ import type { GameSkin } from "./types";
  */
 const SKINS: Record<string, GameSkin> = {
     magnus_archives: magnusArchivesSkin,
+    hydre: hydreSkin,
 };
 
 export function getGameSkin(characterSheet?: string | null): GameSkin {

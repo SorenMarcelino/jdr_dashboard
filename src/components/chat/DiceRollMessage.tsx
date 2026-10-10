@@ -31,17 +31,7 @@ export function DiceRollMessage({ message }: { message: ChatMessage; isOwn: bool
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
-                    {isPercentile ? (
-                        <>
-                            <span className="text-xs text-muted-foreground">
-                                {(() => {
-                                    const tens = roll.total === 100 ? 0 : Math.floor(roll.total / 10) * 10;
-                                    const units = roll.total === 100 ? 0 : roll.total % 10;
-                                    return `${t("tens")}: ${tens === 0 ? "00" : tens} | ${t("units")}: ${units}`;
-                                })()}
-                            </span>
-                        </>
-                    ) : (
+                    {!isPercentile && (
                         <div className="flex gap-1 flex-wrap">
                             {roll.results.map((r, i) => (
                                 <span key={i} className={`inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold bg-muted ${colorClass}`}>

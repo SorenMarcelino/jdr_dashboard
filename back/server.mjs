@@ -16,6 +16,7 @@ import logger from "./utils/logger.mjs";
 import {errorHandler} from "./middlewares/ErrorHandler.mjs";
 import { seedMagnusArchives } from "./seeds/magnusArchivesSeed.mjs";
 import { seedCallOfCthulhu } from "./seeds/callOfCthulhuSeed.mjs";
+import { seedHydre } from "./seeds/hydreSeed.mjs";
 import { setupSocketHandlers } from "./socket/socketHandler.mjs";
 
 const app = express();
@@ -125,6 +126,7 @@ async function runSeeds() {
     if (isProd) return;
     await seedMagnusArchives();
     await seedCallOfCthulhu();
+    await seedHydre();
 }
 
 // Connexion MongoDB puis démarrage du serveur

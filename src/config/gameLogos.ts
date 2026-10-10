@@ -35,6 +35,11 @@ const SYSTEM_LOGOS: Record<string, GameLogo> = {
         vertical: { src: "/images/logos/magnus_archives/magnus-archives-vertical.png", width: 1254, height: 1254 },
         label: "The Magnus Archives",
     },
+    hydre: {
+        horizontal: { src: "/images/logos/hydre/hydre-horizontal.png", width: 1890, height: 574 },
+        vertical: { src: "/images/logos/hydre/hydre-vertical.png", width: 1254, height: 1254 },
+        label: "Hydre – Chasseurs de monstres",
+    },
 };
 
 /**
