@@ -185,18 +185,25 @@ body {
   color: inherit;
 }
 
+/* Bloc « MJ uniquement ». --gm-color vaut la couleur choisie (posée en
+   style inline par la NodeView) ou, par défaut, le token destructive. */
 .scenario-gm-only-block {
-  @apply relative my-3 rounded-md border-l-4 border-destructive/40 bg-destructive/5 px-4 pb-3 pt-7;
+  --gm-color: hsl(var(--destructive));
+  @apply relative my-3 rounded-md border-l-4 px-4 pb-3 pt-7;
+  border-left-color: color-mix(in srgb, var(--gm-color) 40%, transparent);
+  background-color: color-mix(in srgb, var(--gm-color) 5%, transparent);
 }
 
-.scenario-gm-only-block::before {
-  @apply absolute left-3 top-2 rounded-full bg-destructive/15 px-2 py-0.5 text-[11px] font-medium text-destructive;
+.scenario-gm-only-header {
+  @apply absolute left-3 top-2;
 }
 
-html[lang="fr"] .scenario-gm-only-block::before {
-    content: "🙈 MJ uniquement";
+.scenario-gm-only-pill {
+  @apply inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium;
+  color: var(--gm-color);
+  background-color: color-mix(in srgb, var(--gm-color) 15%, transparent);
 }
 
-html[lang="en"] .scenario-gm-only-block::before {
-    content: "🙈 GM only";
+button.scenario-gm-only-pill:hover {
+  background-color: color-mix(in srgb, var(--gm-color) 25%, transparent);
 }

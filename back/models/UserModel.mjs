@@ -23,7 +23,11 @@ const userSchema = new mongoose.Schema({
     refreshToken: {
         type: String,
         default: null
-    }
+    },
+    savedColors: {
+        type: [String],
+        default: [],
+    },
 }, {
     timestamps: true // Ajoute automatiquement createdAt et updatedAt
 });

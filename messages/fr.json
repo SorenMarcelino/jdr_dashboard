@@ -1,6 +1,18 @@
 {
     "common": {
-        "toggleTheme": "Changer de thème"
+        "toggleTheme": "Changer de thème",
+        "colorPalette": {
+            "default": "Défaut",
+            "add": "Ajouter une couleur",
+            "remove": "Retirer {color}",
+            "red": "Rouge",
+            "orange": "Orange",
+            "yellow": "Jaune",
+            "green": "Vert",
+            "blue": "Bleu",
+            "purple": "Violet",
+            "pink": "Rose"
+        }
     },
     "navbar": {
         "greeting": "Bonjour {username}",
@@ -213,14 +225,7 @@
             "heading2": "Titre 2",
             "heading3": "Titre 3",
             "textColor": "Couleur du texte",
-            "colorDefault": "Défaut",
-            "colorRed": "Rouge",
-            "colorOrange": "Orange",
-            "colorYellow": "Jaune",
-            "colorGreen": "Vert",
-            "colorBlue": "Bleu",
-            "colorPurple": "Violet",
-            "colorPink": "Rose",
+            "highlight": "Surligner",
             "increaseIndent": "Augmenter le retrait (Tab)",
             "decreaseIndent": "Diminuer le retrait (Shift+Tab)",
             "bulletList": "Liste",
@@ -240,6 +245,15 @@
             "title": "Sommaire",
             "show": "Afficher le sommaire",
             "hide": "Masquer le sommaire"
+        },
+        "gmOnly": {
+            "defaultLabel": "MJ uniquement",
+            "customize": "Personnaliser la section",
+            "color": "Couleur",
+            "emoji": "Emoji",
+            "customEmoji": "Autre emoji…",
+            "text": "Texte",
+            "reset": "Réinitialiser"
         }
     },
     "knowledge": {

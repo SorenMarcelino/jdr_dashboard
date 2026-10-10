@@ -12,7 +12,7 @@
     "typecheck": "tsc --noEmit",
     "gen-secrets": "node -e \"const c=require('crypto');for(const k of ['TOKEN_KEY','REFRESH_TOKEN_KEY'])console.log(k+'='+c.randomBytes(48).toString('hex'))\"",
     "test": "node back/tests/run-all-tests.mjs",
-    "test:unit": "node --test back/tests/unit/",
+    "test:unit": "node --test \"back/tests/unit/*.test.mjs\" \"src/**/*.test.mjs\"",
     "test:create-user": "node back/tests/test-create-user.mjs",
     "test:refresh": "node -r dotenv/config back/tests/test-refresh.mjs dotenv_config_path=.env.test"
   },
@@ -39,6 +39,7 @@
     "@tailwindcss/container-queries": "^0.1.1",
     "@tailwindcss/typography": "^0.5.19",
     "@tiptap/extension-color": "^3.20.5",
+    "@tiptap/extension-highlight": "^3.29.2",
     "@tiptap/extension-placeholder": "^3.20.5",
     "@tiptap/extension-text-style": "^3.20.5",
     "@tiptap/pm": "^3.20.5",
