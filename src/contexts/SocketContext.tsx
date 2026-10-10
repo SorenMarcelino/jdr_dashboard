@@ -3,13 +3,14 @@
 import { createContext, useContext, useEffect, useRef, useState, useCallback, type ReactNode } from "react";
 import { io, type Socket } from "socket.io-client";
 import { SOCKET_URL } from "@/lib/api";
+import type { TarotDrawData, TarotGrant, TarotState } from "@/config/tarot";
 
 export type ChatMessage = {
     _id: string;
     gameId: string;
     userId: string;
     username: string;
-    type: "text" | "dice-roll";
+    type: "text" | "dice-roll" | "tarot";
     content?: string;
     diceRoll?: {
         diceType: string;
@@ -17,6 +18,7 @@ export type ChatMessage = {
         results: number[];
         total: number;
     };
+    tarot?: TarotDrawData;
     createdAt: string;
 };
 
@@ -72,11 +74,16 @@ type SocketContextValue = {
     setStage: (gameId: string, media: { kind: StageMediaKind; url: string; title: string }) => void;
     clearStage: (gameId: string) => void;
     controlStage: (gameId: string, action: StageControlAction, positionSec: number) => void;
+    requestTarot: (gameId: string) => void;
+    grantTarot: (gameId: string, grant: TarotGrant) => void;
+    drawTarot: (gameId: string) => void;
+    resetTarot: (gameId: string) => void;
     onChatMessage: (cb: (msg: ChatMessage) => void) => () => void;
     onDiceRollStart: (cb: (data: DiceRollStartData) => void) => () => void;
     onDiceRollResult: (cb: (msg: ChatMessage) => void) => () => void;
     onStageUpdate: (cb: (state: StageState) => void) => () => void;
     onStageControl: (cb: (control: StageControl) => void) => () => void;
+    onTarotState: (cb: (state: TarotState) => void) => () => void;
 };
 
 const SocketContext = createContext<SocketContextValue | null>(null);
@@ -141,6 +148,22 @@ export function SocketProvider({ children }: { children: ReactNode }) {
         []
     );
 
+    const requestTarot = useCallback((gameId: string) => {
+        socketRef.current?.emit("tarot:get", { gameId });
+    }, []);
+
+    const grantTarot = useCallback((gameId: string, grant: TarotGrant) => {
+        socketRef.current?.emit("tarot:grant", { gameId, ...grant });
+    }, []);
+
+    const drawTarot = useCallback((gameId: string) => {
+        socketRef.current?.emit("tarot:draw", { gameId });
+    }, []);
+
+    const resetTarot = useCallback((gameId: string) => {
+        socketRef.current?.emit("tarot:reset", { gameId });
+    }, []);
+
     const onChatMessage = useCallback((cb: (msg: ChatMessage) => void) => {
         const socket = socketRef.current;
         if (!socket) return () => {};
@@ -176,6 +199,13 @@ export function SocketProvider({ children }: { children: ReactNode }) {
         return () => { socket.off("stage:control", cb); };
     }, []);
 
+    const onTarotState = useCallback((cb: (state: TarotState) => void) => {
+        const socket = socketRef.current;
+        if (!socket) return () => {};
+        socket.on("tarot:state", cb);
+        return () => { socket.off("tarot:state", cb); };
+    }, []);
+
     return (
         <SocketContext.Provider value={{
             socket: socketRef.current,
@@ -188,11 +218,16 @@ export function SocketProvider({ children }: { children: ReactNode }) {
             setStage,
             clearStage,
             controlStage,
+            requestTarot,
+            grantTarot,
+            drawTarot,
+            resetTarot,
             onChatMessage,
             onDiceRollStart,
             onDiceRollResult,
             onStageUpdate,
             onStageControl,
+            onTarotState,
         }}>
             {children}
         </SocketContext.Provider>

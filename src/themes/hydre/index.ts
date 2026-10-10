@@ -4,6 +4,8 @@ import { HydrePlayerSelector } from "./components/player-selector";
 import { HydreWidgetShell } from "./components/widget-shell";
 import { HydreCharacterSheet } from "./components/character-sheet";
 import { HydreChatInput, HydreDiceBar, HydreDiceRollMessage, HydreTextMessage } from "./components/journal";
+import { HydreTarotTable } from "./components/tarot/tarot-table";
+import { HydreTarotMessage } from "./components/tarot/tarot-message";
 
 /**
  * Skin « cabinet du club » d'HYDRE – Chasseurs de monstres : boiseries
@@ -21,4 +23,6 @@ export const hydreSkin: GameSkin = {
     DiceBar: HydreDiceBar,
     ChatInput: HydreChatInput,
     CharacterSheet: HydreCharacterSheet,
+    TarotTable: HydreTarotTable,
+    TarotMessage: HydreTarotMessage,
 };

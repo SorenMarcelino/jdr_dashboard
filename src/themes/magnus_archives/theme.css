@@ -67,6 +67,12 @@
     --archives-font-display: var(--font-old-standard), "Times New Roman", serif;
     --archives-font-text: var(--font-courier-prime), "Courier New", monospace;
     --archives-font-label: var(--font-archivo-narrow), "Arial Narrow", sans-serif;
+    --archives-font-typewriter: var(--font-special-elite), var(--font-courier-prime), "Courier New", monospace;
+    --archives-font-pencil: var(--font-reenie-beanie), "Bradley Hand", cursive;
+    --archives-font-marker: var(--font-permanent-marker), "Marker Felt", cursive;
+    --archives-stamp: #4E3F7E;
+    --archives-postit: #E3CF63;
+    --archives-tape: rgba(217, 207, 168, 0.88);
 
     color-scheme: dark;
 }
@@ -208,4 +214,48 @@ body[data-game-theme="magnus_archives"] {
 [data-game-theme="magnus_archives"] .bg-card :focus-visible,
 [data-game-theme="magnus_archives"] .archives-paper :focus-visible {
     outline-color: var(--archives-signal-ink);
+}
+
+/* ── Tarot : déposition sur bande ───────────────────────────────────── */
+
+.archives-typewriter {
+    font-family: var(--archives-font-typewriter);
+}
+
+.archives-pencil {
+    font-family: var(--archives-font-pencil);
+}
+
+.archives-marker {
+    font-family: var(--archives-font-marker);
+}
+
+/* Ruban de masquage aux bords déchirés */
+.archives-tape {
+    background: var(--archives-tape);
+    clip-path: polygon(0 8%, 4% 0, 96% 6%, 100% 0, 98% 100%, 3% 94%);
+}
+
+/* Bobines du magnétophone et voyant d'enregistrement */
+@keyframes archives-reel {
+    to { transform: rotate(360deg); }
+}
+@keyframes archives-rec-blink {
+    50% { opacity: 0.25; }
+}
+.archives-reel {
+    animation: archives-reel 2.6s linear infinite;
+    animation-play-state: paused;
+}
+.archives-reel[data-running="true"] {
+    animation-play-state: running;
+}
+.archives-rec-light[data-running="true"] {
+    animation: archives-rec-blink 1.2s steps(2) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+    .archives-reel[data-running="true"],
+    .archives-rec-light[data-running="true"] {
+        animation: none;
+    }
 }

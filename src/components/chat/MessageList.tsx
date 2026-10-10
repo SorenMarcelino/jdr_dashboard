@@ -4,6 +4,7 @@ import { useRef, useEffect } from "react";
 import type { ChatMessage } from "@/contexts/SocketContext";
 import { TextMessage } from "./TextMessage";
 import { DiceRollMessage } from "./DiceRollMessage";
+import { TarotMessage } from "./TarotMessage";
 import { useGameSkin } from "@/themes/game-skin-context";
 
 type Props = {
@@ -21,6 +22,7 @@ export function MessageList({ messages, currentUserId, gmUserId, onLoadMore, has
     const skin = useGameSkin();
     const Text = skin.TextMessage ?? TextMessage;
     const Roll = skin.DiceRollMessage ?? DiceRollMessage;
+    const Tarot = skin.TarotMessage ?? TarotMessage;
 
     // Auto-scroll on new messages
     useEffect(() => {
@@ -59,7 +61,9 @@ export function MessageList({ messages, currentUserId, gmUserId, onLoadMore, has
                     isOwn: msg.userId === currentUserId,
                     isGm: !!gmUserId && msg.userId === gmUserId,
                 };
-                return msg.type === "text" ? <Text key={msg._id} {...props} /> : <Roll key={msg._id} {...props} />;
+                if (msg.type === "text") return <Text key={msg._id} {...props} />;
+                if (msg.type === "tarot") return <Tarot key={msg._id} {...props} />;
+                return <Roll key={msg._id} {...props} />;
             })}
             <div ref={bottomRef} />
         </div>

@@ -100,7 +100,8 @@
             "selectPlayer": "Select a player",
             "sheetTitleDefault": "Character sheet",
             "stageTitle": "Stage",
-            "chatTitle": "Chat / Dice"
+            "chatTitle": "Chat / Dice",
+            "tarotTitle": "Tarot reading"
         }
     },
     "bento": {
@@ -150,7 +151,9 @@
     },
     "chat": {
         "messagePlaceholder": "Message...",
-        "rolled": "rolled"
+        "rolled": "rolled",
+        "tarotDrawn": "{username} drew {count, plural, one {one card} other {# cards}}",
+        "tarotSecret": "{username} drew cards in secret"
     },
     "scenario": {
         "workspace": {
@@ -371,6 +374,216 @@
                     "minor": "Minor effect",
                     "major": "Major effect"
                 }
+            },
+            "tarot": {
+                "recorderLabel": "MAGNUS INSTITUTE · TAPE RECORDER 3",
+                "recordAria": "Record: turn over the next card",
+                "counterAria": "Tape counter {value}",
+                "statusIdle": "Tape stopped",
+                "statusMj": "Statement giver: {player} · {drawn}/{total}",
+                "statusRecording": "Recording… card {drawn}/{total}",
+                "statusStopped": "Tape stopped · {drawn}/{total}",
+                "remaining": "{count} left in the box",
+                "shuffle": "Gather and shuffle",
+                "formTitle": "FORM 7-B · READING PROTOCOL",
+                "spreadLegend": "Spread",
+                "spreads": {
+                    "unique": "One card",
+                    "trois": "Three cards",
+                    "croix": "The cross"
+                },
+                "allowReversed": "Reversed cards allowed",
+                "secret": "Confidential",
+                "drawer": "Statement giver",
+                "drawerSelf": "Me (the Archivist)",
+                "drawerNpc": "An NPC…",
+                "npcName": "NPC name",
+                "npcPlaceholder": "e.g. Jonah Magnus",
+                "grant": "GRANT THE READING",
+                "regrant": "NEW READING",
+                "stickyIdle": "No statement in progress. Wait for the Archivist.",
+                "stickyDrawer": "{name} — press REC for each card. One at a time.",
+                "stickyDrawerDone": "It’s on tape. Don’t touch anything.",
+                "stickySecret": "Confidential reading in progress. Do not interrupt.",
+                "stickyWatch": "{player} is recording a statement. Quiet.",
+                "tableLabel": "Drawn cards",
+                "tableEmpty": "Nothing on the desk for now.",
+                "slotEmpty": "here",
+                "reversedNote": "upside down?!",
+                "stamp": "MAGNUS INST. · {code}",
+                "backInstitute": "MAGNUS INSTITUTE",
+                "backSlip": "CONSULTATION SLIP",
+                "confidential": "CONFIDENTIAL",
+                "stampArchived": "FILED IN THE ARCHIVES",
+                "cardAria": "{position}: {name}",
+                "cardAriaReversed": "{position}: {name}, reversed",
+                "cardAriaHidden": "{position}: confidential card",
+                "sheetEmptyTitle": "NO STATEMENT",
+                "sheetEmptyMj": "Grant a reading from form 7-B: the statement giver turns their own cards over.",
+                "sheetEmptyPlayer": "The tape is blank. The Archivist will let you know.",
+                "statementPending": "STATEMENT PENDING",
+                "sheetWaiting": "{player} hasn’t turned over a card yet.",
+                "statementNo": "STATEMENT #{code}",
+                "page": "p. 1",
+                "cardLine": "Card: {name}",
+                "cardLineReversed": "Card: {name} (reversed)",
+                "regarding": "Regarding {of}",
+                "deponent": "Statement giver: {player}",
+                "click": "[CLICK]",
+                "intro": "ARCHIVIST: Statement of {player}, regarding {of}. Statement begins.",
+                "outro": "Statement ends.",
+                "attached": "Attached note · if {orientation}:",
+                "upright": "upright",
+                "reversed": "reversed",
+                "redactedNote": "Not for you.",
+                "redactedDest": "Confidential reading: only the GM and {player} can hear this tape.",
+                "msgDrew": "{player} draws {count, plural, one {one card} other {# cards}}.",
+                "msgStatic": "[static]",
+                "msgAltered": "TAPE CORRUPTED",
+                "msgAuthorized": "AUTHORISED LISTENING",
+                "positions": {
+                    "conseil": "Advice",
+                    "passe": "Past",
+                    "present": "Present",
+                    "avenir": "Future",
+                    "pour": "1 · For",
+                    "contre": "2 · Against",
+                    "jugement": "3 · Judgement",
+                    "issue": "4 · Outcome",
+                    "synthese": "5 · Synthesis"
+                },
+                "positionsOf": {
+                    "conseil": "the Advice",
+                    "passe": "the Past",
+                    "present": "the Present",
+                    "avenir": "the Future",
+                    "pour": "what helps",
+                    "contre": "what stands against",
+                    "jugement": "the judgement",
+                    "issue": "the outcome",
+                    "synthese": "the synthesis"
+                },
+                "cards": {
+                    "archiviste": {
+                        "name": "The Archivist",
+                        "up": "Everything will be written down. You become the witness of what happens, and nothing can be forgotten.",
+                        "kwUp": "witness. memory. too late to ignore.",
+                        "rev": "The witness falls silent. A truth sleeps in the archives, and no one will come to read it.",
+                        "kwRev": "silence — file lost"
+                    },
+                    "oeil": {
+                        "name": "The Eye",
+                        "up": "Knowing, and no longer being able to look away. You will be given an answer; it will come at a price.",
+                        "kwUp": "knowledge, confession… surveillance?",
+                        "rev": "What you refuse to see is already watching you. A muffled secret, a question no one asks: ignorance still protects you, for now.",
+                        "kwRev": "denial — secret — who watches whom?"
+                    },
+                    "spirale": {
+                        "name": "The Spiral",
+                        "up": "Nothing is what it seems. One corridor too many, a memory that lies. Doubt what you think you know.",
+                        "kwUp": "that door was NOT there yesterday",
+                        "rev": "The geometry settles. A simple truth pierces the fog — if you dare believe it.",
+                        "kwRev": "clarity, grounding"
+                    },
+                    "etranger": {
+                        "name": "The Stranger",
+                        "up": "An almost familiar face. Someone among you is not who they claim to be.",
+                        "kwUp": "mask. imposture. who is it?",
+                        "rev": "The mask slips. What was imitating a human gives itself away with a detail.",
+                        "kwRev": "look at its hands."
+                    },
+                    "enseveli": {
+                        "name": "The Buried",
+                        "up": "The pressure builds, the air runs out. An obligation is slowly burying you.",
+                        "kwUp": "suffocation. weight. depth.",
+                        "rev": "A way out opens in the rock. Climb while there is still air.",
+                        "kwRev": "breathe. climb."
+                    },
+                    "vaste": {
+                        "name": "The Vast",
+                        "up": "You are tiny before the immensity. Vertigo awaits whoever looks up.",
+                        "kwUp": "vertigo. falling. excess.",
+                        "rev": "The ground firms up under your feet. The horizon is a line again.",
+                        "kwRev": "grounding — don’t look down"
+                    },
+                    "solitaire": {
+                        "name": "The Lonely",
+                        "up": "You are alone, even among others. Fog rises between you and the people who matter.",
+                        "kwUp": "isolation. call someone.",
+                        "rev": "A hand held out in the fog. Someone is still looking for you; answer them.",
+                        "kwRev": "answer them."
+                    },
+                    "tenebres": {
+                        "name": "The Dark",
+                        "up": "What hides in the dark can see you perfectly well. Don’t turn off the lamp.",
+                        "kwUp": "darkness. blindness. presence.",
+                        "rev": "A glimmer breaks through. What was hidden lets itself be seen, for a moment.",
+                        "kwRev": "keep a lamp lit"
+                    },
+                    "traque": {
+                        "name": "The Hunt",
+                        "up": "Something has caught your scent. Running will only make the chase more beautiful.",
+                        "kwUp": "pursuit. prey. instinct.",
+                        "rev": "The hunter loses your trail — or you become the hunter.",
+                        "kwRev": "turn the tables?"
+                    },
+                    "carnage": {
+                        "name": "The Slaughter",
+                        "up": "Violence is near, brutal, senseless. Someone will bleed.",
+                        "kwUp": "violence. war. blood.",
+                        "rev": "The blade stays sheathed. Anger rumbles but does not strike yet.",
+                        "kwRev": "defuse. fast."
+                    },
+                    "chair": {
+                        "name": "The Flesh",
+                        "up": "The body is only matter, and matter can be worked. Someone is looking at you the way one looks at a cut of meat.",
+                        "kwUp": "body. appetite. transformation.",
+                        "rev": "The body resists. You are more than a piece of flesh.",
+                        "kwRev": "stay whole"
+                    },
+                    "corruption": {
+                        "name": "The Corruption",
+                        "up": "Something is slowly rotting, from the inside. A bond of love becomes a bond of dependence.",
+                        "kwUp": "contagion. hive. hold.",
+                        "rev": "The rot is contained. Cut away what is infected while there is still time.",
+                        "kwRev": "cleanse. burn?"
+                    },
+                    "desolation": {
+                        "name": "The Desolation",
+                        "up": "Everything you cherish can burn. Loss is the offering demanded of you.",
+                        "kwUp": "loss. fire. pain.",
+                        "rev": "The embers die out. What was meant to burn is spared, this time.",
+                        "kwRev": "spared — for now"
+                    },
+                    "toile": {
+                        "name": "The Web",
+                        "up": "An invisible hand wove this path. Someone led you here — and you thanked them.",
+                        "kwUp": "manipulation. debt. who pulls the thread?",
+                        "rev": "A thread snaps. You glimpse the weave: whoever pulls the strings can be defied, for a while.",
+                        "kwRev": "hold broken — at last"
+                    },
+                    "fin": {
+                        "name": "The End",
+                        "up": "Everything ends. It isn’t a threat: it’s a promise, and it will be kept.",
+                        "kwUp": "inevitable. don’t panic.",
+                        "rev": "A reprieve. The end steps back, but it has written down your name.",
+                        "kwRev": "reprieve — for how long?"
+                    },
+                    "extinction": {
+                        "name": "The Extinction",
+                        "up": "A world without you is being prepared. What is coming will leave no one to remember it.",
+                        "kwUp": "end of the world? a new fear.",
+                        "rev": "The future hesitates. Nothing is written yet, not even by the Archivist.",
+                        "kwRev": "does it really exist?"
+                    },
+                    "deposition": {
+                        "name": "The Statement",
+                        "up": "A story asks to be told. Someone will come to give a statement, and their words will come at a price.",
+                        "kwUp": "testimony. account. it’s recording.",
+                        "rev": "The tape stops. What isn’t told stays in the shadows.",
+                        "kwRev": "switch off the recorder"
+                    }
+                }
             }
         },
         "hydre": {
@@ -458,6 +671,276 @@
                 "verdict": {
                     "critSuccess": "Critical success",
                     "critFailure": "Critical failure"
+                }
+            },
+            "tarot": {
+                "deckLabel": "The deck",
+                "remaining": "{count} cards left to draw",
+                "shuffle": "Gather and shuffle",
+                "formTitle": "ORDINANCE",
+                "formSub": "from the game master",
+                "spreadLegend": "Spread",
+                "spreads": {
+                    "unique": "One card",
+                    "trois": "Three cards",
+                    "croix": "The cross"
+                },
+                "spreadsLower": {
+                    "unique": "one card",
+                    "trois": "three cards",
+                    "croix": "the cross"
+                },
+                "allowReversed": "Reversed cards allowed",
+                "secret": "Under sealed cover",
+                "drawer": "Querent",
+                "drawerSelf": "Me (game master)",
+                "drawerNpc": "An NPC…",
+                "npcName": "NPC name",
+                "npcPlaceholder": "e.g. Madame Roux",
+                "grant": "Grant the reading",
+                "regrant": "New reading",
+                "noteTitle": "Note from the game master",
+                "noteIdle": "No reading open. The game master will let you know.",
+                "noteDrawer": "{name}, draw the cards one by one. The club is watching.",
+                "noteDrawerDone": "It’s drawn. The result goes into the log.",
+                "noteSecret": "Reading under sealed cover. Patience.",
+                "noteWatch": "{player} is consulting the cards.",
+                "draw": "Draw a card · {next}/{total}",
+                "tableLabel": "Drawn cards",
+                "tableEmpty": "The desk blotter is empty.",
+                "sealed": "SEALED",
+                "cardAria": "{position}: {name}",
+                "cardAriaReversed": "{position}: {name}, reversed",
+                "cardAriaHidden": "{position}: sealed card",
+                "positions": {
+                    "conseil": "Advice",
+                    "passe": "Past",
+                    "present": "Present",
+                    "avenir": "Future",
+                    "pour": "I · For",
+                    "contre": "II · Against",
+                    "jugement": "III · Judgement",
+                    "issue": "IV · Outcome",
+                    "synthese": "V · Synthesis"
+                },
+                "emptyTitle": "NO READING",
+                "emptyMj": "Grant a reading from the ordinance: the querent draws their own cards.",
+                "emptyPlayer": "The blotter is waiting.",
+                "pendingTitle": "READING OPEN",
+                "waiting": "{player} hasn’t drawn a card yet.",
+                "readingTitle": "CARD {num} · {position}",
+                "upright": "Upright",
+                "reversed": "Reversed",
+                "uprightLower": "upright",
+                "reversedLower": "reversed",
+                "gibierLabel": "Foretold quarry",
+                "otherLabel": "If the card falls {orientation}",
+                "sealAria": "Seal of the Hydra",
+                "sealedTitle": "SEALED COVER",
+                "sealedDest": "For the game master and {player} only. In the hunting log, the table will only see this seal.",
+                "msgHeader": "{player} · {spread}",
+                "msgOmen": "foretold quarry: {gibier}",
+                "msgOpened": "Sealed cover · opened for you",
+                "msgSealedTo": "delivered to {player}",
+                "cards": {
+                    "mat": {
+                        "name": "The Fool",
+                        "sub": "The rail vagrant",
+                        "gibier": "will-o’-the-wisps",
+                        "up": "Setting off with neither map nor compass. The drive is there, caution is not: the novice hunter follows a light into the marshes.",
+                        "hUp": "Don’t follow the lights.",
+                        "rev": "The light leads to the abyss. Recklessness has a price, and someone will have to fish you out.",
+                        "hRev": "Rope. Lantern. Someone who can swim."
+                    },
+                    "bateleur": {
+                        "name": "The Magician",
+                        "sub": "The inventor",
+                        "gibier": "changelings",
+                        "up": "Everything is on the workbench: you only have to dare put the pieces together. A ruse, a device, a sleight of hand will open the way.",
+                        "hUp": "Rig up a trap.",
+                        "rev": "The illusion turns on its maker. Beware of whoever looks a little too much like you.",
+                        "hRev": "Which one is real?"
+                    },
+                    "papesse": {
+                        "name": "The Popess",
+                        "sub": "The librarian",
+                        "gibier": "the sibyl",
+                        "up": "The answer sleeps in a book no one has opened in a century. Read before you shoot.",
+                        "hUp": "Club archives, forbidden shelf.",
+                        "rev": "Knowledge guarded too jealously. Someone is keeping quiet about what they know — perhaps you.",
+                        "hRev": "She lies by omission."
+                    },
+                    "imperatrice": {
+                        "name": "The Empress",
+                        "sub": "The patroness",
+                        "gibier": "dryads",
+                        "up": "Powerful protection is on offer, as long as it is treated with care. The forest itself can become an ally.",
+                        "hUp": "Ask, don’t take.",
+                        "rev": "Generosity turns into blackmail. What grows fast smothers everything around it.",
+                        "hRev": "The roots are moving."
+                    },
+                    "empereur": {
+                        "name": "The Emperor",
+                        "sub": "The ironmaster",
+                        "gibier": "the Minotaur",
+                        "up": "Order, strength, the plan. Strike while the iron is hot: authority will follow you.",
+                        "hUp": "Hold the line.",
+                        "rev": "The tyrant shuts himself in his labyrinth. Rigidity becomes a prison.",
+                        "hRev": "Ariadne’s thread!"
+                    },
+                    "pape": {
+                        "name": "The Pope",
+                        "sub": "The club’s grand master",
+                        "gibier": "sphinxes",
+                        "up": "The club’s tradition has an answer. Listen to the elder, respect the rite.",
+                        "hUp": "Consult the grand master.",
+                        "rev": "The rule becomes an excuse. A badly solved riddle will cost dearly.",
+                        "hRev": "Reread the riddle."
+                    },
+                    "amoureux": {
+                        "name": "The Lover",
+                        "sub": "The oath",
+                        "gibier": "sirens",
+                        "up": "A choice of the heart commits the hunt. An oath binds two hunters, for the better.",
+                        "hUp": "Choose. Quickly.",
+                        "rev": "The song is too beautiful to be true. A promise draws you onto the rocks.",
+                        "hRev": "Wax in the ears."
+                    },
+                    "chariot": {
+                        "name": "The Chariot",
+                        "sub": "The winged wheel",
+                        "gibier": "what travels by rail",
+                        "up": "Full steam ahead. The chase picks up speed and the hunter keeps control of the machine.",
+                        "hUp": "Take the night train.",
+                        "rev": "The boiler runs wild. Too fast, too far: the train derails.",
+                        "hRev": "Brake. Now."
+                    },
+                    "justice": {
+                        "name": "Justice",
+                        "sub": "The precision scales",
+                        "gibier": "the Erinyes",
+                        "up": "Every act will be weighed to the gram. The hunt is just; stay just too.",
+                        "hUp": "Weigh before you strike.",
+                        "rev": "An old debt comes due. The furies never forget a crime.",
+                        "hRev": "What have we done?"
+                    },
+                    "hermite": {
+                        "name": "The Hermit",
+                        "sub": "The tracker’s lantern",
+                        "gibier": "what flees the light",
+                        "up": "The trail is followed alone, lantern low. Patience and observation: the truth waits at the end of a long hunt.",
+                        "hUp": "Follow the light, not the noise.",
+                        "rev": "Dangerous isolation. The hunter has strayed too far from the club; come back before the gas runs out.",
+                        "hRev": "Never go alone."
+                    },
+                    "roue": {
+                        "name": "The Wheel of Fortune",
+                        "sub": "The great cog",
+                        "gibier": "malfunctioning automatons",
+                        "up": "The mechanism turns. An opportunity arises: seize it before the teeth close.",
+                        "hUp": "Act fast, fate is turning.",
+                        "rev": "A cog jams. The best-oiled plan seizes up at the worst moment.",
+                        "hRev": "Check the equipment."
+                    },
+                    "force": {
+                        "name": "Strength",
+                        "sub": "The tamer",
+                        "gibier": "the Nemean lion",
+                        "up": "Will prevails over claw. Like the founder facing the Nemean lion, tame the beast instead of fleeing it.",
+                        "hUp": "A firm hand, a calm heart.",
+                        "rev": "The beast takes over: anger, recklessness, wounds.",
+                        "hRev": "Keep your nerve."
+                    },
+                    "pendu": {
+                        "name": "The Hanged Man",
+                        "sub": "The lifting crane",
+                        "gibier": "ghouls",
+                        "up": "Suspended, motionless: you must wait and see the world upside down to understand the prey.",
+                        "hUp": "Wait. Watch.",
+                        "rev": "Waiting becomes a trap. Those prowling beneath the gallows are only waiting for you to fall.",
+                        "hRev": "Don’t stay there."
+                    },
+                    "sansnom": {
+                        "name": "The Nameless Arcanum",
+                        "sub": "The winged hourglass",
+                        "gibier": "the walking dead",
+                        "up": "A necessary end. What must die will die — the beast, perhaps, or an old oath.",
+                        "hUp": "Cut clean.",
+                        "rev": "What was meant to die refuses to fall. The beast rises again.",
+                        "hRev": "It isn’t dead."
+                    },
+                    "temperance": {
+                        "name": "Temperance",
+                        "sub": "The alembic",
+                        "gibier": "undines",
+                        "up": "Measure, mix, distil. The right dose turns poison into remedy.",
+                        "hUp": "One drop, not two.",
+                        "rev": "The mixture turns. Calm waters hide what wants to drown you.",
+                        "hRev": "Don’t drink the water."
+                    },
+                    "diable": {
+                        "name": "The Devil",
+                        "sub": "The boiler",
+                        "gibier": "the satyr",
+                        "up": "Desire and steam drive the machine. A tempting bargain is offered; it comes with chains.",
+                        "hUp": "Read the contract.",
+                        "rev": "The chains loosen. What held you by the belly loses its grip.",
+                        "hRev": "Break the chain."
+                    },
+                    "maisondieu": {
+                        "name": "The Tower",
+                        "sub": "The lightning-struck iron tower",
+                        "gibier": "the escaped god",
+                        "up": "Lightning strikes what thought itself solid. A prison opens — and what comes out is very old.",
+                        "hUp": "Evacuate the tower.",
+                        "rev": "Disaster is narrowly avoided. The crack remains, somewhere.",
+                        "hRev": "Watch the cracks."
+                    },
+                    "etoile": {
+                        "name": "The Star",
+                        "sub": "The celestial lantern",
+                        "gibier": "the vouivre",
+                        "up": "A light guides the hunt. Hope is allowed, and the gem on the beast’s brow shines for you.",
+                        "hUp": "Follow the star.",
+                        "rev": "The light was a lure. What shines in the distance wants to be followed.",
+                        "hRev": "That is not a star."
+                    },
+                    "lune": {
+                        "name": "The Moon",
+                        "sub": "The night of transformations",
+                        "gibier": "the werewolf",
+                        "up": "Illusions and pretence. Beneath the factory smoke, the beast wears a man’s face, and its tracks lead elsewhere.",
+                        "hUp": "Eyes in the trees. Silver bullets.",
+                        "rev": "The veil tears: the creature gives itself away, an old fear rises to the surface.",
+                        "hRev": "It shows itself at last. Ready the rifles."
+                    },
+                    "soleil": {
+                        "name": "The Sun",
+                        "sub": "The cog-wheel sun",
+                        "gibier": "the phoenix",
+                        "up": "Broad daylight: the beast has no shadow left to hide in. Success, warmth, loyal companions.",
+                        "hUp": "Hunt at noon.",
+                        "rev": "Too much light blinds. What is reborn from its ashes rises stronger.",
+                        "hRev": "It comes back. Always."
+                    },
+                    "jugement": {
+                        "name": "Judgement",
+                        "sub": "The factory siren",
+                        "gibier": "revenants",
+                        "up": "The call rings out and the dead rise. A buried past comes back to demand justice.",
+                        "hUp": "Answer the call.",
+                        "rev": "The siren falls silent too soon. What should return stays underground — or knocks on the wrong door.",
+                        "hRev": "Who knocked?"
+                    },
+                    "monde": {
+                        "name": "The World",
+                        "sub": "The Lernaean Hydra",
+                        "gibier": "the Hydra itself",
+                        "up": "The hunt is accomplished, the circle closes. The club will remember this name.",
+                        "hUp": "Return to the club.",
+                        "rev": "Cut off one head, two grow back. Nothing is finished yet.",
+                        "hRev": "Cauterise!"
+                    }
                 }
             }
         }

@@ -9,7 +9,7 @@ import type { ChatInputProps, ChatMessageProps, DiceBarProps } from "@/themes/ty
 // Transcription d'enregistrement : chaque échange est une ligne horodatée,
 // le MJ parle en italique de titrage, les jets reçoivent un tampon de verdict.
 
-function TimeStamp({ iso }: { iso: string }) {
+export function TimeStamp({ iso }: { iso: string }) {
     const format = useFormatter();
     return (
         <time dateTime={iso} className="pt-0.5 text-xs text-muted-foreground">
@@ -18,7 +18,7 @@ function TimeStamp({ iso }: { iso: string }) {
     );
 }
 
-const ROW = "grid grid-cols-[3rem_minmax(0,1fr)] gap-2 border-b border-dotted border-border pb-2";
+export const ROW = "grid grid-cols-[3rem_minmax(0,1fr)] gap-2 border-b border-dotted border-border pb-2";
 
 export function ArchivesTextMessage({ message, isGm }: ChatMessageProps) {
     const t = useTranslations("skins.magnus.chat");

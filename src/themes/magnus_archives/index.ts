@@ -9,6 +9,8 @@ import {
     ArchivesDiceRollMessage,
     ArchivesTextMessage,
 } from "./components/transcript";
+import { ArchivesTarotTable } from "./components/tarot/tarot-table";
+import { ArchivesTarotMessage } from "./components/tarot/tarot-message";
 
 /**
  * Skin « dossier d'archives » de The Magnus Archives : bureau sombre,
@@ -26,4 +28,6 @@ export const magnusArchivesSkin: GameSkin = {
     DiceBar: ArchivesDiceBar,
     ChatInput: ArchivesChatInput,
     CharacterSheet: ArchivesCharacterSheet,
+    TarotTable: ArchivesTarotTable,
+    TarotMessage: ArchivesTarotMessage,
 };

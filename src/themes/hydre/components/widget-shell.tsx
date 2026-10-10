@@ -12,6 +12,7 @@ const SURFACE_BY_WIDGET: Record<string, Surface> = {
     sheet: "paper",
     chat: "paper-light",
     stage: "leather",
+    tarot: "leather",
 };
 
 const SURFACE_CLASS: Record<Surface, string> = {

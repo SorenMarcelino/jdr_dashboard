@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Archivo_Narrow, Caveat, Courier_Prime, EB_Garamond, Geist, Geist_Mono, IM_Fell_English_SC, Old_Standard_TT } from "next/font/google";
+import { Archivo_Narrow, Caveat, Courier_Prime, EB_Garamond, Geist, Geist_Mono, IM_Fell_English_SC, Old_Standard_TT, Permanent_Marker, Reenie_Beanie, Special_Elite } from "next/font/google";
 import { headers } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
@@ -45,6 +45,28 @@ const archivoNarrow = Archivo_Narrow({
     preload: false,
 });
 
+// Tarot Magnus : machine à écrire usée, crayon, feutre sur ruban de masquage.
+const specialElite = Special_Elite({
+    variable: "--font-special-elite",
+    subsets: ["latin"],
+    weight: "400",
+    preload: false,
+});
+
+const reenieBeanie = Reenie_Beanie({
+    variable: "--font-reenie-beanie",
+    subsets: ["latin"],
+    weight: "400",
+    preload: false,
+});
+
+const permanentMarker = Permanent_Marker({
+    variable: "--font-permanent-marker",
+    subsets: ["latin"],
+    weight: "400",
+    preload: false,
+});
+
 // Polices du thème Hydre (mêmes principes) : capitales victoriennes pour les
 // titres, Garamond pour le texte, écriture manuscrite pour les valeurs de fiche.
 const imFellSc = IM_Fell_English_SC({
@@ -86,7 +108,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         // les référencent dans leurs propres variables.
         <html
             lang={locale}
-            className={`${geistSans.variable} ${geistMono.variable} ${oldStandard.variable} ${courierPrime.variable} ${archivoNarrow.variable} ${imFellSc.variable} ${ebGaramond.variable} ${caveat.variable}`}
+            className={`${geistSans.variable} ${geistMono.variable} ${oldStandard.variable} ${courierPrime.variable} ${archivoNarrow.variable} ${specialElite.variable} ${reenieBeanie.variable} ${permanentMarker.variable} ${imFellSc.variable} ${ebGaramond.variable} ${caveat.variable}`}
             suppressHydrationWarning
         >
             <body className="antialiased">

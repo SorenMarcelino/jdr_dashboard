@@ -100,7 +100,8 @@
             "selectPlayer": "Sélectionner un joueur",
             "sheetTitleDefault": "Fiche de personnage",
             "stageTitle": "Scène",
-            "chatTitle": "Chat / Dés"
+            "chatTitle": "Chat / Dés",
+            "tarotTitle": "Cartomancie"
         }
     },
     "bento": {
@@ -150,7 +151,9 @@
     },
     "chat": {
         "messagePlaceholder": "Message...",
-        "rolled": "a lancé"
+        "rolled": "a lancé",
+        "tarotDrawn": "{username} a tiré {count, plural, one {une carte} other {# cartes}}",
+        "tarotSecret": "{username} a tiré des cartes en secret"
     },
     "scenario": {
         "workspace": {
@@ -371,6 +374,216 @@
                     "minor": "Effet mineur",
                     "major": "Effet majeur"
                 }
+            },
+            "tarot": {
+                "recorderLabel": "INSTITUT MAGNUS · MAGNÉTOPHONE 3",
+                "recordAria": "Enregistrer : retourner la carte suivante",
+                "counterAria": "Compteur de bande {value}",
+                "statusIdle": "Bande arrêtée",
+                "statusMj": "Déposant : {player} · {drawn}/{total}",
+                "statusRecording": "Enregistrement… carte {drawn}/{total}",
+                "statusStopped": "Bande arrêtée · {drawn}/{total}",
+                "remaining": "{count} encore dans la boîte",
+                "shuffle": "Ramasser et battre",
+                "formTitle": "FORMULAIRE 7-B · PROTOCOLE DE TIRAGE",
+                "spreadLegend": "Disposition",
+                "spreads": {
+                    "unique": "Une carte",
+                    "trois": "Trois cartes",
+                    "croix": "La croix"
+                },
+                "allowReversed": "Cartes à l’envers admises",
+                "secret": "Confidentiel",
+                "drawer": "Déposant",
+                "drawerSelf": "Moi (l’Archiviste)",
+                "drawerNpc": "Un PNJ…",
+                "npcName": "Nom du PNJ",
+                "npcPlaceholder": "ex. Jonah Magnus",
+                "grant": "ACCORDER LE TIRAGE",
+                "regrant": "NOUVEAU TIRAGE",
+                "stickyIdle": "Aucune déposition en cours. Attendez l’Archiviste.",
+                "stickyDrawer": "{name} — appuie sur REC pour chaque carte. Une à la fois.",
+                "stickyDrawerDone": "C’est enregistré. Ne touche plus à rien.",
+                "stickySecret": "Tirage confidentiel en cours. Ne pas interrompre.",
+                "stickyWatch": "{player} enregistre sa déposition. Silence.",
+                "tableLabel": "Cartes tirées",
+                "tableEmpty": "Rien sur le bureau pour l’instant.",
+                "slotEmpty": "ici",
+                "reversedNote": "à l’envers ?!",
+                "stamp": "INST. MAGNUS · {code}",
+                "backInstitute": "INSTITUT MAGNUS",
+                "backSlip": "FICHE DE CONSULTATION",
+                "confidential": "CONFIDENTIEL",
+                "stampArchived": "VERSÉ AUX ARCHIVES",
+                "cardAria": "{position} : {name}",
+                "cardAriaReversed": "{position} : {name}, à l’envers",
+                "cardAriaHidden": "{position} : carte confidentielle",
+                "sheetEmptyTitle": "AUCUNE DÉPOSITION",
+                "sheetEmptyMj": "Accordez un tirage depuis le formulaire 7-B : le déposant retourne lui-même ses cartes.",
+                "sheetEmptyPlayer": "La bande est vierge. L’Archiviste vous fera signe.",
+                "statementPending": "DÉPOSITION EN ATTENTE",
+                "sheetWaiting": "{player} n’a pas encore retourné de carte.",
+                "statementNo": "DÉPOSITION Nº {code}",
+                "page": "p. 1",
+                "cardLine": "Lame : {name}",
+                "cardLineReversed": "Lame : {name} (à l’envers)",
+                "regarding": "Au sujet {of}",
+                "deponent": "Déposant : {player}",
+                "click": "[CLIC]",
+                "intro": "ARCHIVISTE : Déposition de {player}, au sujet {of}. Début de la déposition.",
+                "outro": "Fin de la déposition.",
+                "attached": "Note jointe · si {orientation} :",
+                "upright": "à l’endroit",
+                "reversed": "à l’envers",
+                "redactedNote": "Pas pour toi.",
+                "redactedDest": "Tirage confidentiel : seuls le MJ et {player} entendent cette bande.",
+                "msgDrew": "{player} tire {count, plural, one {une carte} other {# cartes}}.",
+                "msgStatic": "[bruit statique]",
+                "msgAltered": "BANDE ALTÉRÉE",
+                "msgAuthorized": "ÉCOUTE AUTORISÉE",
+                "positions": {
+                    "conseil": "Conseil",
+                    "passe": "Passé",
+                    "present": "Présent",
+                    "avenir": "Avenir",
+                    "pour": "1 · Pour",
+                    "contre": "2 · Contre",
+                    "jugement": "3 · Jugement",
+                    "issue": "4 · Issue",
+                    "synthese": "5 · Synthèse"
+                },
+                "positionsOf": {
+                    "conseil": "du Conseil",
+                    "passe": "du Passé",
+                    "present": "du Présent",
+                    "avenir": "de l’Avenir",
+                    "pour": "de ce qui aide",
+                    "contre": "de ce qui s’oppose",
+                    "jugement": "du jugement",
+                    "issue": "de l’issue",
+                    "synthese": "de la synthèse"
+                },
+                "cards": {
+                    "archiviste": {
+                        "name": "L’Archiviste",
+                        "up": "Tout sera noté. Vous devenez le témoin de ce qui arrive, et rien ne pourra être oublié.",
+                        "kwUp": "témoin. mémoire. trop tard pour ignorer.",
+                        "rev": "Le témoin se tait. Une vérité dort dans les archives, et personne ne viendra la lire.",
+                        "kwRev": "silence — dossier perdu"
+                    },
+                    "oeil": {
+                        "name": "L’Œil",
+                        "up": "Savoir, et ne plus pouvoir détourner le regard. Une réponse vous sera donnée ; elle aura un prix.",
+                        "kwUp": "connaissance, aveu… surveillance ?",
+                        "rev": "Ce que vous refusez de voir vous regarde déjà. Un secret étouffé, une question qu’on ne pose pas : l’ignorance vous protège encore, pour l’instant.",
+                        "kwRev": "déni — secret — qui regarde qui ?"
+                    },
+                    "spirale": {
+                        "name": "La Spirale",
+                        "up": "Rien n’est ce qu’il semble. Un couloir de trop, un souvenir qui ment. Doutez de ce que vous croyez savoir.",
+                        "kwUp": "la porte n’était PAS là hier",
+                        "rev": "La géométrie se stabilise. Une vérité simple perce le brouillard — si vous osez la croire.",
+                        "kwRev": "clarté, ancrage"
+                    },
+                    "etranger": {
+                        "name": "L’Étranger",
+                        "up": "Un visage familier, presque. Quelqu’un parmi vous n’est pas ce qu’il prétend être.",
+                        "kwUp": "masque. imposture. qui est-ce ?",
+                        "rev": "Le masque glisse. Ce qui imitait l’humain se trahit par un détail.",
+                        "kwRev": "regarde ses mains."
+                    },
+                    "enseveli": {
+                        "name": "L’Enseveli",
+                        "up": "La pression monte, l’air manque. Une obligation vous enterre lentement.",
+                        "kwUp": "étouffement. poids. profondeur.",
+                        "rev": "Une issue s’ouvre dans la roche. Remontez tant qu’il reste de l’air.",
+                        "kwRev": "respirer. remonter."
+                    },
+                    "vaste": {
+                        "name": "Le Vaste",
+                        "up": "Vous êtes minuscule face à l’immensité. Le vertige guette celui qui lève les yeux.",
+                        "kwUp": "vertige. chute. démesure.",
+                        "rev": "Le sol se raffermit sous vos pieds. L’horizon redevient une ligne.",
+                        "kwRev": "ancrage — ne pas regarder en bas"
+                    },
+                    "solitaire": {
+                        "name": "Le Solitaire",
+                        "up": "Vous êtes seul, même au milieu des autres. Le brouillard se lève entre vous et ceux qui comptent.",
+                        "kwUp": "isolement. appeler quelqu’un.",
+                        "rev": "Une main tendue dans le brouillard. Quelqu’un vous cherche encore ; répondez-lui.",
+                        "kwRev": "réponds-lui."
+                    },
+                    "tenebres": {
+                        "name": "Les Ténèbres",
+                        "up": "Ce qui se cache dans le noir vous voit très bien. N’éteignez pas la lampe.",
+                        "kwUp": "obscurité. aveuglement. présence.",
+                        "rev": "Une lueur perce. Ce qui était caché se laisse entrevoir, un instant.",
+                        "kwRev": "garder une lampe allumée"
+                    },
+                    "traque": {
+                        "name": "La Traque",
+                        "up": "Quelque chose a flairé votre piste. Courir ne servira qu’à rendre la chasse plus belle.",
+                        "kwUp": "poursuite. proie. instinct.",
+                        "rev": "Le chasseur perd votre trace — ou c’est vous qui devenez chasseur.",
+                        "kwRev": "inverser les rôles ?"
+                    },
+                    "carnage": {
+                        "name": "Le Carnage",
+                        "up": "La violence est proche, brutale, sans raison. Quelqu’un saignera.",
+                        "kwUp": "violence. guerre. sang.",
+                        "rev": "La lame reste au fourreau. La colère gronde mais ne frappe pas encore.",
+                        "kwRev": "désamorcer. vite."
+                    },
+                    "chair": {
+                        "name": "La Chair",
+                        "up": "Le corps n’est que matière, et la matière se travaille. Quelqu’un vous regarde comme on regarde un morceau de viande.",
+                        "kwUp": "corps. appétit. transformation.",
+                        "rev": "Le corps résiste. Vous êtes davantage qu’un morceau de chair.",
+                        "kwRev": "rester entier"
+                    },
+                    "corruption": {
+                        "name": "La Corruption",
+                        "up": "Quelque chose pourrit lentement, de l’intérieur. Un lien d’amour devient un lien de dépendance.",
+                        "kwUp": "contagion. ruche. emprise.",
+                        "rev": "La gangrène est circonscrite. Coupez ce qui est atteint pendant qu’il en est temps.",
+                        "kwRev": "assainir. brûler ?"
+                    },
+                    "desolation": {
+                        "name": "La Désolation",
+                        "up": "Tout ce que vous chérissez peut brûler. La perte est l’offrande qu’on exige de vous.",
+                        "kwUp": "perte. feu. douleur.",
+                        "rev": "La braise s’éteint. Ce qui devait brûler est épargné, pour cette fois.",
+                        "kwRev": "épargné — pour l’instant"
+                    },
+                    "toile": {
+                        "name": "La Toile",
+                        "up": "Une main invisible a tissé ce chemin. Quelqu’un vous a conduit ici — et vous l’avez remercié.",
+                        "kwUp": "manipulation. dette. qui tire le fil ?",
+                        "rev": "Un fil cède. Vous apercevez la trame : celui qui tire les ficelles peut, pour un temps, être défié.",
+                        "kwRev": "emprise rompue — enfin"
+                    },
+                    "fin": {
+                        "name": "La Fin",
+                        "up": "Tout s’achève. Ce n’est pas une menace : c’est une promesse, et elle sera tenue.",
+                        "kwUp": "inéluctable. ne pas paniquer.",
+                        "rev": "Un sursis. La fin recule d’un pas, mais elle a noté votre nom.",
+                        "kwRev": "sursis — pour combien de temps ?"
+                    },
+                    "extinction": {
+                        "name": "L’Extinction",
+                        "up": "Un monde sans vous se prépare. Ce qui vient ne laissera personne pour s’en souvenir.",
+                        "kwUp": "fin du monde ? peur nouvelle.",
+                        "rev": "L’avenir hésite. Rien n’est encore écrit, même par l’Archiviste.",
+                        "kwRev": "existe-t-elle vraiment ?"
+                    },
+                    "deposition": {
+                        "name": "La Déposition",
+                        "up": "Une histoire demande à être racontée. Quelqu’un viendra témoigner, et sa parole aura un prix.",
+                        "kwUp": "témoignage. récit. ça enregistre.",
+                        "rev": "La bande s’arrête. Ce qui n’est pas raconté reste dans l’ombre.",
+                        "kwRev": "éteindre le magnétophone"
+                    }
+                }
             }
         },
         "hydre": {
@@ -458,6 +671,276 @@
                 "verdict": {
                     "critSuccess": "Succès critique",
                     "critFailure": "Échec critique"
+                }
+            },
+            "tarot": {
+                "deckLabel": "Le paquet",
+                "remaining": "{count} lames à tirer",
+                "shuffle": "Ramasser et battre",
+                "formTitle": "ORDONNANCE",
+                "formSub": "du maître du jeu",
+                "spreadLegend": "Disposition",
+                "spreads": {
+                    "unique": "Une lame",
+                    "trois": "Trois lames",
+                    "croix": "La croix"
+                },
+                "spreadsLower": {
+                    "unique": "une lame",
+                    "trois": "trois lames",
+                    "croix": "la croix"
+                },
+                "allowReversed": "Lames renversées admises",
+                "secret": "Sous pli scellé",
+                "drawer": "Consultant",
+                "drawerSelf": "Moi (maître du jeu)",
+                "drawerNpc": "Un PNJ…",
+                "npcName": "Nom du PNJ",
+                "npcPlaceholder": "ex. Madame Roux",
+                "grant": "Accorder le tirage",
+                "regrant": "Nouveau tirage",
+                "noteTitle": "Billet du maître du jeu",
+                "noteIdle": "Aucune séance ouverte. Le maître du jeu vous fera signe.",
+                "noteDrawer": "{name}, tirez les lames une à une. Le club vous regarde.",
+                "noteDrawerDone": "C’est tiré. Le résultat part au carnet.",
+                "noteSecret": "Séance sous pli scellé. Patience.",
+                "noteWatch": "{player} consulte les lames.",
+                "draw": "Tirer une lame · {next}/{total}",
+                "tableLabel": "Lames tirées",
+                "tableEmpty": "Le sous-main est vide.",
+                "sealed": "SCELLÉE",
+                "cardAria": "{position} : {name}",
+                "cardAriaReversed": "{position} : {name}, renversée",
+                "cardAriaHidden": "{position} : lame scellée",
+                "positions": {
+                    "conseil": "Conseil",
+                    "passe": "Passé",
+                    "present": "Présent",
+                    "avenir": "Avenir",
+                    "pour": "I · Pour",
+                    "contre": "II · Contre",
+                    "jugement": "III · Jugement",
+                    "issue": "IV · Issue",
+                    "synthese": "V · Synthèse"
+                },
+                "emptyTitle": "AUCUNE SÉANCE",
+                "emptyMj": "Accordez un tirage depuis l’ordonnance : le consultant tirera lui-même ses lames.",
+                "emptyPlayer": "Le sous-main attend.",
+                "pendingTitle": "SÉANCE OUVERTE",
+                "waiting": "{player} n’a pas encore tiré de lame.",
+                "readingTitle": "LAME {num} · {position}",
+                "upright": "Droite",
+                "reversed": "Renversée",
+                "uprightLower": "droite",
+                "reversedLower": "renversée",
+                "gibierLabel": "Gibier présagé",
+                "otherLabel": "Si la lame tombe {orientation}",
+                "sealAria": "Cachet de l’Hydre",
+                "sealedTitle": "PLI SCELLÉ",
+                "sealedDest": "Réservé au maître du jeu et à {player}. Au carnet de chasse, la table ne verra que ce cachet.",
+                "msgHeader": "{player} · {spread}",
+                "msgOmen": "gibier présagé : {gibier}",
+                "msgOpened": "Pli scellé · ouvert pour vous",
+                "msgSealedTo": "remis à {player}",
+                "cards": {
+                    "mat": {
+                        "name": "Le Mat",
+                        "sub": "Le vagabond du rail",
+                        "gibier": "les feux follets",
+                        "up": "Un départ sans carte ni boussole. L’élan est bon, la prudence absente : le chasseur novice suit une lueur dans les marais.",
+                        "hUp": "Ne pas suivre les lumières.",
+                        "rev": "La lueur mène au gouffre. L’imprudence se paie, et quelqu’un devra vous repêcher.",
+                        "hRev": "Corde. Lanterne. Quelqu’un qui sait nager."
+                    },
+                    "bateleur": {
+                        "name": "Le Bateleur",
+                        "sub": "L’inventeur",
+                        "gibier": "les changelins",
+                        "up": "Tout est sur l’établi : il suffit d’oser assembler les pièces. Une ruse, un appareil, un tour de passe-passe ouvrira la voie.",
+                        "hUp": "Bricoler un piège.",
+                        "rev": "L’illusion se retourne contre son auteur. Méfiez-vous de celui qui vous ressemble un peu trop.",
+                        "hRev": "Lequel est le vrai ?"
+                    },
+                    "papesse": {
+                        "name": "La Papesse",
+                        "sub": "La bibliothécaire",
+                        "gibier": "la sibylle",
+                        "up": "La réponse dort dans un livre que personne n’a ouvert depuis un siècle. Lisez avant de tirer.",
+                        "hUp": "Archives du club, rayon interdit.",
+                        "rev": "Un savoir gardé trop jalousement. Quelqu’un tait ce qu’il sait — peut-être vous.",
+                        "hRev": "Elle ment par omission."
+                    },
+                    "imperatrice": {
+                        "name": "L’Impératrice",
+                        "sub": "La mécène",
+                        "gibier": "les dryades",
+                        "up": "Une protection puissante s’offre, pour peu qu’on la ménage. La forêt elle-même peut devenir alliée.",
+                        "hUp": "Demander, ne pas prendre.",
+                        "rev": "La générosité se fait chantage. Ce qui pousse vite étouffe tout autour.",
+                        "hRev": "Les racines bougent."
+                    },
+                    "empereur": {
+                        "name": "L’Empereur",
+                        "sub": "Le maître de forges",
+                        "gibier": "le Minotaure",
+                        "up": "L’ordre, la force, le plan. Frappez le fer tant qu’il est chaud : l’autorité vous suivra.",
+                        "hUp": "Tenir la ligne.",
+                        "rev": "Le tyran s’enferme dans son labyrinthe. La rigidité devient une prison.",
+                        "hRev": "Le fil d’Ariane !"
+                    },
+                    "pape": {
+                        "name": "Le Pape",
+                        "sub": "Le grand maître du club",
+                        "gibier": "les sphinx",
+                        "up": "La tradition du club a une réponse. Écoutez l’ancien, respectez le rite.",
+                        "hUp": "Consulter le grand maître.",
+                        "rev": "La règle sert d’excuse. Une énigme mal résolue coûtera cher.",
+                        "hRev": "Relire l’énigme."
+                    },
+                    "amoureux": {
+                        "name": "L’Amoureux",
+                        "sub": "Le serment",
+                        "gibier": "les sirènes",
+                        "up": "Un choix du cœur engage la chasse. Un serment lie deux chasseurs, pour le meilleur.",
+                        "hUp": "Choisir. Vite.",
+                        "rev": "Le chant est trop beau pour être vrai. Une promesse vous attire vers l’écueil.",
+                        "hRev": "De la cire dans les oreilles."
+                    },
+                    "chariot": {
+                        "name": "Le Chariot",
+                        "sub": "La roue ailée",
+                        "gibier": "ce qui voyage par le rail",
+                        "up": "En avant, à toute vapeur. La traque prend de la vitesse et le chasseur tient sa machine.",
+                        "hUp": "Prendre le train de nuit.",
+                        "rev": "La chaudière s’emballe. Trop vite, trop loin : le convoi déraille.",
+                        "hRev": "Freiner. Maintenant."
+                    },
+                    "justice": {
+                        "name": "La Justice",
+                        "sub": "La balance de précision",
+                        "gibier": "les Érinyes",
+                        "up": "Chaque acte sera pesé au gramme près. La traque est juste ; restez-le aussi.",
+                        "hUp": "Peser avant de frapper.",
+                        "rev": "Une dette ancienne réclame son dû. Les furies n’oublient jamais un crime.",
+                        "hRev": "Qu’avons-nous fait ?"
+                    },
+                    "hermite": {
+                        "name": "L’Hermite",
+                        "sub": "La lanterne du pisteur",
+                        "gibier": "ce qui fuit la lumière",
+                        "up": "La piste se suit seul, lanterne basse. Patience et observation : la vérité attend au bout d’une longue traque.",
+                        "hUp": "Suivre la lumière, pas le bruit.",
+                        "rev": "Isolement dangereux. Le chasseur s’est trop éloigné du club ; revenez avant que le gaz ne s’éteigne.",
+                        "hRev": "Ne jamais partir seul."
+                    },
+                    "roue": {
+                        "name": "La Roue de Fortune",
+                        "sub": "Le grand rouage",
+                        "gibier": "les automates déréglés",
+                        "up": "Le mécanisme tourne. Une occasion se présente : saisissez-la avant que les dents ne se referment.",
+                        "hUp": "Agir vite, le sort tourne.",
+                        "rev": "Un rouage grippe. Le plan le mieux huilé se bloque au pire moment.",
+                        "hRev": "Vérifier l’équipement."
+                    },
+                    "force": {
+                        "name": "La Force",
+                        "sub": "Le dompteur",
+                        "gibier": "le lion de Némée",
+                        "up": "La volonté l’emporte sur la griffe. Comme le fondateur face au lion de Némée, domptez la bête plutôt que de la fuir.",
+                        "hUp": "La main ferme, le cœur calme.",
+                        "rev": "La bête prend le dessus : colère, imprudence, blessure.",
+                        "hRev": "Garder son sang-froid."
+                    },
+                    "pendu": {
+                        "name": "Le Pendu",
+                        "sub": "La grue de levage",
+                        "gibier": "les goules",
+                        "up": "Suspendu, immobile : il faut attendre et voir le monde à l’envers pour comprendre la proie.",
+                        "hUp": "Patienter. Observer.",
+                        "rev": "L’attente devient piège. Ceux qui rôdent sous le gibet n’attendent que votre chute.",
+                        "hRev": "Ne pas rester là."
+                    },
+                    "sansnom": {
+                        "name": "L’Arcane sans nom",
+                        "sub": "Le sablier ailé",
+                        "gibier": "les morts qui marchent",
+                        "up": "Une fin nécessaire. Ce qui doit mourir mourra — la bête, peut-être, ou un vieux serment.",
+                        "hUp": "Couper net.",
+                        "rev": "Ce qui devait mourir refuse de tomber. La bête se relève.",
+                        "hRev": "Elle n’est pas morte."
+                    },
+                    "temperance": {
+                        "name": "Tempérance",
+                        "sub": "L’alambic",
+                        "gibier": "les ondines",
+                        "up": "Doser, mêler, distiller. La juste mesure change le poison en remède.",
+                        "hUp": "Une goutte, pas deux.",
+                        "rev": "Le mélange tourne. Les eaux calmes cachent ce qui veut vous noyer.",
+                        "hRev": "Ne pas boire l’eau."
+                    },
+                    "diable": {
+                        "name": "Le Diable",
+                        "sub": "La chaudière",
+                        "gibier": "le satyre",
+                        "up": "Le désir et la vapeur font tourner la machine. Un marché tentant vous est proposé ; il a des chaînes.",
+                        "hUp": "Lire le contrat.",
+                        "rev": "Les chaînes se relâchent. Ce qui vous tenait par le ventre perd prise.",
+                        "hRev": "Briser la chaîne."
+                    },
+                    "maisondieu": {
+                        "name": "La Maison Dieu",
+                        "sub": "La tour de fer foudroyée",
+                        "gibier": "le dieu évadé",
+                        "up": "La foudre frappe ce qui se croyait solide. Une prison s’ouvre — et ce qui en sort est très ancien.",
+                        "hUp": "Évacuer la tour.",
+                        "rev": "La catastrophe est évitée de justesse. La fissure reste, quelque part.",
+                        "hRev": "Surveiller les fissures."
+                    },
+                    "etoile": {
+                        "name": "L’Étoile",
+                        "sub": "La lanterne céleste",
+                        "gibier": "la vouivre",
+                        "up": "Une lumière guide la traque. L’espoir est permis, et la pierre au front de la bête brille pour vous.",
+                        "hUp": "Suivre l’étoile.",
+                        "rev": "La lumière était un leurre. Ce qui brille au loin veut être suivi.",
+                        "hRev": "Ce n’est pas une étoile."
+                    },
+                    "lune": {
+                        "name": "La Lune",
+                        "sub": "La nuit des métamorphoses",
+                        "gibier": "le loup-garou",
+                        "up": "Illusions et faux-semblants. Sous la fumée des usines, la bête porte un visage d’homme, et ses traces mènent ailleurs.",
+                        "hUp": "Des yeux dans la futaie. Balles d’argent.",
+                        "rev": "Le voile se déchire : la créature se trahit, une vieille peur remonte à la surface.",
+                        "hRev": "Elle se montre enfin. Préparer les fusils."
+                    },
+                    "soleil": {
+                        "name": "Le Soleil",
+                        "sub": "Le soleil-engrenage",
+                        "gibier": "le phénix",
+                        "up": "Grand jour : la bête n’a plus d’ombre où se cacher. Succès, chaleur, compagnons fidèles.",
+                        "hUp": "Chasser à midi.",
+                        "rev": "Trop de lumière aveugle. Ce qui renaît de ses cendres se relève plus fort.",
+                        "hRev": "Il revient. Toujours."
+                    },
+                    "jugement": {
+                        "name": "Le Jugement",
+                        "sub": "La sirène d’usine",
+                        "gibier": "les revenants",
+                        "up": "L’appel retentit et les morts se lèvent. Un passé enterré revient demander justice.",
+                        "hUp": "Répondre à l’appel.",
+                        "rev": "La sirène se tait trop tôt. Ce qui devait revenir reste sous terre — ou se trompe de porte.",
+                        "hRev": "Qui a frappé ?"
+                    },
+                    "monde": {
+                        "name": "Le Monde",
+                        "sub": "L’Hydre de Lerne",
+                        "gibier": "l’Hydre elle-même",
+                        "up": "La chasse s’accomplit, le cercle se ferme. Le club se souviendra de ce nom.",
+                        "hUp": "Rentrer au club.",
+                        "rev": "Coupez une tête, deux repoussent. Rien n’est encore achevé.",
+                        "hRev": "Cautériser !"
+                    }
                 }
             }
         }

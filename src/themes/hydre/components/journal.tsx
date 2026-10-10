@@ -10,7 +10,7 @@ import { GearMedallion } from "./ornaments";
 // Carnet de chasse : chaque échange est une entrée du journal de l'expédition,
 // le MJ narre en italique, les jets s'inscrivent dans un médaillon de laiton.
 
-function TimeStamp({ iso }: { iso: string }) {
+export function TimeStamp({ iso }: { iso: string }) {
     const format = useFormatter();
     return (
         <time dateTime={iso} className="pt-0.5 text-xs text-muted-foreground">
@@ -19,7 +19,7 @@ function TimeStamp({ iso }: { iso: string }) {
     );
 }
 
-const ROW = "grid grid-cols-[3rem_minmax(0,1fr)] gap-2 border-b border-[color:var(--hydre-brass-dark)]/25 pb-2";
+export const ROW = "grid grid-cols-[3rem_minmax(0,1fr)] gap-2 border-b border-[color:var(--hydre-brass-dark)]/25 pb-2";
 
 export function HydreTextMessage({ message, isGm }: ChatMessageProps) {
     const t = useTranslations("skins.hydre.chat");

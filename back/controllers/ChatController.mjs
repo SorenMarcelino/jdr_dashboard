@@ -1,6 +1,7 @@
 import { Message } from "../models/MessageModel.mjs";
 import { Game } from "../models/GameModel.mjs";
 import { asyncHandler } from "../utils/asyncHandler.mjs";
+import { tarotMessageFor } from "../services/tarotService.mjs";
 
 export const getMessages = asyncHandler(async (req, res) => {
     const { gameId } = req.params;
@@ -35,8 +36,13 @@ export const getMessages = asyncHandler(async (req, res) => {
         .limit(Math.min(parseInt(limit) || 50, 100))
         .lean();
 
+    // Les tirages de tarot secrets sont brouillés pour qui n'y a pas droit.
+    const visible = messages.map((m) =>
+        m.type === "tarot" ? tarotMessageFor(m, req.user._id, game.createdBy) : m
+    );
+
     res.json({
         success: true,
-        messages: messages.reverse(),
+        messages: visible.reverse(),
     });
 });

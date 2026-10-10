@@ -3,7 +3,10 @@ import { User } from "../models/UserModel.mjs";
 import { Game } from "../models/GameModel.mjs";
 import { Message } from "../models/MessageModel.mjs";
 import { GameStage } from "../models/GameStageModel.mjs";
+import { TarotSession } from "../models/TarotSessionModel.mjs";
 import { DICE_REGISTRY, rollDice } from "../config/diceRegistry.mjs";
+import { TAROT_SPREADS, drawCard, getTarotDeck, shuffleDeck } from "../config/tarotRegistry.mjs";
+import { tarotMessageFor, tarotStateFor } from "../services/tarotService.mjs";
 import logger from "../utils/logger.mjs";
 
 // Longueur maximale d'un message de chat (le canal socket n'est pas couvert par
@@ -73,6 +76,8 @@ async function getGameIfMJ(gameId, userId) {
 const STAGE_KINDS = ["audio", "image", "video", "model3d"];
 const MAX_MEDIA_URL_LENGTH = 2048;
 const MAX_MEDIA_TITLE_LENGTH = 200;
+// Nom d'un PNJ pour qui le MJ tire le tarot.
+const MAX_NPC_NAME_LENGTH = 60;
 
 // Valide une URL de média : absolue, http(s), et si MEDIA_ALLOWED_HOSTS est
 // renseigné (CSV d'hôtes), l'hôte doit y figurer. Vide (dev) = tout hôte
@@ -114,6 +119,29 @@ function stageToPayload(gameId, stage) {
     };
 }
 
+// Le tarot se diffuse socket par socket : un tirage secret n'est révélé qu'au
+// MJ et au tireur (cf. services/tarotService.mjs).
+async function emitTarotState(io, game, session) {
+    const sockets = await io.in(`game:${game._id}`).fetchSockets();
+    for (const s of sockets) {
+        s.emit("tarot:state", {
+            gameId: game._id.toString(),
+            ...tarotStateFor(session, s.data.userId, game.createdBy),
+        });
+    }
+}
+
+async function emitTarotMessage(io, game, message) {
+    const sockets = await io.in(`game:${game._id}`).fetchSockets();
+    for (const s of sockets) {
+        s.emit("chat-message", tarotMessageFor(message, s.data.userId, game.createdBy));
+    }
+}
+
+const isGameMember = (game, userId) =>
+    game.createdBy.toString() === userId.toString() ||
+    game.players.some((p) => p.toString() === userId.toString());
+
 export function setupSocketHandlers(io) {
     // Auth middleware
     io.use(async (socket, next) => {
@@ -136,6 +164,8 @@ export function setupSocketHandlers(io) {
             }
 
             socket.user = user;
+            // Exposé via fetchSockets() (diffusion du tarot socket par socket).
+            socket.data.userId = user._id.toString();
             next();
         } catch (err) {
             next(new Error("Authentication failed"));
@@ -165,6 +195,15 @@ export function setupSocketHandlers(io) {
                 const stage = await GameStage.findOne({ gameId });
                 if (stage?.media) {
                     socket.emit("stage:update", stageToPayload(gameId, stage));
+                }
+
+                // Late-join du tarot : la table telle que ce membre peut la voir.
+                if (getTarotDeck(game.characterSheet)) {
+                    const session = await TarotSession.findOne({ gameId });
+                    socket.emit("tarot:state", {
+                        gameId: game._id.toString(),
+                        ...tarotStateFor(session, socket.user._id, game.createdBy),
+                    });
                 }
             } catch (err) {
                 logger.error({ err }, "[Socket] join-game error");
@@ -414,6 +453,158 @@ export function setupSocketHandlers(io) {
             } catch (err) {
                 logger.error({ err }, "[Socket] stage:control error");
                 socket.emit("error", { message: "Failed to control stage playback" });
+            }
+        });
+
+        // ── Tarot (tirage accordé par le MJ, lames tirées par le serveur) ──
+
+        // Un panneau qui (re)monte demande l'état courant de la table.
+        socket.on("tarot:get", async ({ gameId } = {}) => {
+            try {
+                const game = await getGameIfMember(gameId, socket.user._id);
+                if (!game || !getTarotDeck(game.characterSheet)) return;
+                const session = await TarotSession.findOne({ gameId });
+                socket.emit("tarot:state", {
+                    gameId: game._id.toString(),
+                    ...tarotStateFor(session, socket.user._id, game.createdBy),
+                });
+            } catch (err) {
+                logger.error({ err }, "[Socket] tarot:get error");
+            }
+        });
+
+        // Le MJ ouvre un tirage : disposition, inversées, secret et tireur
+        // (un joueur, lui-même, ou un PNJ pour qui il tire). Le paquet est
+        // mélangé côté serveur ; un nouveau tirage remplace le précédent.
+        socket.on("tarot:grant", async ({ gameId, spread, allowReversed, secret, drawerId, npcName } = {}) => {
+            try {
+                if (!consumeRate()) {
+                    return socket.emit("error", { message: "Rate limit exceeded, slow down." });
+                }
+                const game = await getGameIfMJ(gameId, socket.user._id);
+                if (!game) {
+                    return socket.emit("error", { message: "Only the GM can grant a tarot reading" });
+                }
+                const deck = getTarotDeck(game.characterSheet);
+                if (!deck) {
+                    return socket.emit("error", { message: "No tarot deck for this game" });
+                }
+                if (!Object.hasOwn(TAROT_SPREADS, spread)) {
+                    return socket.emit("error", { message: "Invalid tarot spread" });
+                }
+                // PNJ : le MJ retourne les lames, le tirage porte le nom du PNJ.
+                const npc = typeof npcName === "string" ? npcName.trim().slice(0, MAX_NPC_NAME_LENGTH) : "";
+                let drawer = socket.user;
+                if (!npc) {
+                    if (typeof drawerId !== "string" || !isGameMember(game, drawerId)) {
+                        return socket.emit("error", { message: "The drawer must be a member of this game" });
+                    }
+                    drawer = await User.findById(drawerId).select("username");
+                    if (!drawer) {
+                        return socket.emit("error", { message: "Drawer not found" });
+                    }
+                }
+
+                const session = await TarotSession.findOneAndUpdate(
+                    { gameId },
+                    {
+                        status: "open",
+                        spread,
+                        allowReversed: allowReversed !== false,
+                        secret: secret === true,
+                        drawerId: drawer._id,
+                        drawerName: npc || drawer.username,
+                        npc: !!npc,
+                        deck: shuffleDeck(deck),
+                        cards: [],
+                        messageId: null,
+                        grantedBy: socket.user._id,
+                    },
+                    { new: true, upsert: true }
+                );
+
+                await emitTarotState(io, game, session);
+            } catch (err) {
+                logger.error({ err }, "[Socket] tarot:grant error");
+                socket.emit("error", { message: "Failed to grant tarot reading" });
+            }
+        });
+
+        // Le tireur retourne la lame suivante. Une fois le tirage complet, il
+        // est consigné au chat (brouillé pour la table s'il est secret).
+        socket.on("tarot:draw", async ({ gameId } = {}) => {
+            try {
+                if (!consumeRate()) {
+                    return socket.emit("error", { message: "Rate limit exceeded, slow down." });
+                }
+                const game = await getGameIfMember(gameId, socket.user._id);
+                if (!game) {
+                    return socket.emit("error", { message: "Not a member of this game" });
+                }
+                const session = await TarotSession.findOne({ gameId });
+                if (!session || session.status !== "open") {
+                    return socket.emit("error", { message: "No tarot reading in progress" });
+                }
+                if (session.drawerId.toString() !== socket.user._id.toString()) {
+                    return socket.emit("error", { message: "Only the designated player can draw" });
+                }
+
+                const total = TAROT_SPREADS[session.spread];
+                const drawn = drawCard(session.deck, session.allowReversed);
+                if (!drawn || session.cards.length >= total) return;
+
+                const complete = session.cards.length + 1 === total;
+                // Mise à jour conditionnée au nombre de lames déjà tirées : deux
+                // clics simultanés ne tirent pas deux fois la même place.
+                const updated = await TarotSession.findOneAndUpdate(
+                    { _id: session._id, status: "open", cards: { $size: session.cards.length } },
+                    {
+                        $set: { deck: drawn.deck, ...(complete ? { status: "done" } : {}) },
+                        $push: { cards: drawn.card },
+                    },
+                    { new: true }
+                );
+                if (!updated) return;
+
+                if (complete) {
+                    const message = await Message.create({
+                        gameId,
+                        userId: socket.user._id,
+                        username: socket.user.username,
+                        type: "tarot",
+                        tarot: {
+                            spread: updated.spread,
+                            secret: updated.secret,
+                            drawerId: updated.drawerId,
+                            drawerName: updated.drawerName,
+                            npc: updated.npc,
+                            cards: updated.cards,
+                        },
+                    });
+                    updated.messageId = message._id;
+                    await updated.save();
+                    await emitTarotMessage(io, game, message.toObject());
+                }
+
+                await emitTarotState(io, game, updated);
+            } catch (err) {
+                logger.error({ err }, "[Socket] tarot:draw error");
+                socket.emit("error", { message: "Failed to draw a card" });
+            }
+        });
+
+        // Le MJ ramasse les lames : la table redevient vide.
+        socket.on("tarot:reset", async ({ gameId } = {}) => {
+            try {
+                const game = await getGameIfMJ(gameId, socket.user._id);
+                if (!game) {
+                    return socket.emit("error", { message: "Only the GM can reset the tarot table" });
+                }
+                await TarotSession.deleteOne({ gameId });
+                await emitTarotState(io, game, null);
+            } catch (err) {
+                logger.error({ err }, "[Socket] tarot:reset error");
+                socket.emit("error", { message: "Failed to reset the tarot table" });
             }
         });
 

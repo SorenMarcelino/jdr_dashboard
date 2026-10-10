@@ -12,6 +12,7 @@ import { BentoGrid } from "@/components/bento/BentoGrid";
 import { SocketProvider } from "@/contexts/SocketContext";
 import { ChatPanel } from "@/components/chat/ChatPanel";
 import { StagePanel } from "@/components/stage/StagePanel";
+import { TarotPanel } from "@/components/tarot/TarotPanel";
 import { resolveSystemId } from "@/lib/system-id";
 import { getGameTheme } from "@/config/gameThemes";
 import { useGameTheme } from "@/hooks/use-game-theme";
@@ -143,26 +144,45 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
         />
     ) : undefined;
 
+    // Univers avec un tarot : la table prend place entre la fiche et la colonne
+    // scène / chat.
+    const hasTarot = !!skin.TarotTable;
+
     const bentoItems = [
         {
             id: "sheet",
             title: isMJ
                 ? t("sheetTitleFor", { username: selectedPlayer?.username ?? t("selectPlayer") })
                 : t("sheetTitleDefault"),
-            defaultLayout: { x: 0, y: 0, w: 8, h: 10, minW: 3, minH: 4 },
+            defaultLayout: { x: 0, y: 0, w: hasTarot ? 5 : 8, h: 10, minW: 3, minH: 4 },
             content: sheetContent,
             headerRight: sheetHeaderRight,
         },
+        ...(hasTarot
+            ? [{
+                id: "tarot",
+                title: t("tarotTitle"),
+                defaultLayout: { x: 5, y: 0, w: 4, h: 10, minW: 3, minH: 5 },
+                content: (
+                    <TarotPanel
+                        gameId={gameId}
+                        isMJ={isMJ}
+                        currentUserId={currentUser._id}
+                        players={game.players}
+                    />
+                ),
+            }]
+            : []),
         {
             id: "stage",
             title: t("stageTitle"),
-            defaultLayout: { x: 8, y: 0, w: 4, h: 5, minW: 2, minH: 3 },
+            defaultLayout: { x: hasTarot ? 9 : 8, y: 0, w: hasTarot ? 3 : 4, h: 5, minW: 2, minH: 3 },
             content: <StagePanel gameId={gameId} isMJ={isMJ} />,
         },
         {
             id: "chat",
             title: t("chatTitle"),
-            defaultLayout: { x: 8, y: 5, w: 4, h: 5, minW: 2, minH: 2 },
+            defaultLayout: { x: hasTarot ? 9 : 8, y: 5, w: hasTarot ? 3 : 4, h: 5, minW: 2, minH: 2 },
             content: <ChatPanel gameId={gameId} currentUserId={currentUser._id} gmUserId={game.createdBy._id} />,
         },
     ];

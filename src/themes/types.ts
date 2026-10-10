@@ -2,6 +2,7 @@ import type { ComponentType, ReactNode } from "react";
 import type { ChatMessage } from "@/contexts/SocketContext";
 import type { DiceType } from "@/config/diceConfig";
 import type { SheetInstance, Template } from "@/components/character-sheet/GenericCharacterSheet";
+import type { TarotGrant, TarotState } from "@/config/tarot";
 
 /** Infos de la partie dont l'en-tête de session a besoin. */
 export type SessionGame = {
@@ -59,6 +60,19 @@ export type CharacterSheetProps = {
     onSave: (values: Record<string, unknown>) => Promise<void>;
 };
 
+export type TarotTableProps = {
+    /** null tant que le serveur n'a pas répondu. */
+    state: TarotState | null;
+    connected: boolean;
+    isMJ: boolean;
+    currentUserId: string;
+    /** Joueurs à qui le MJ peut accorder le tirage. */
+    players: { _id: string; username: string }[];
+    onGrant: (grant: TarotGrant) => void;
+    onDraw: () => void;
+    onReset: () => void;
+};
+
 /**
  * Skin d'un univers de jeu : remplace tout ou partie des composants du
  * tableau de bord de partie. Chaque emplacement laissé vide retombe sur le
@@ -78,4 +92,8 @@ export type GameSkin = {
     DiceBar?: ComponentType<DiceBarProps>;
     ChatInput?: ComponentType<ChatInputProps>;
     CharacterSheet?: ComponentType<CharacterSheetProps>;
+    /** Table de tarot : son absence retire le widget du tableau de bord. */
+    TarotTable?: ComponentType<TarotTableProps>;
+    /** Tirage de tarot consigné au chat. */
+    TarotMessage?: ComponentType<ChatMessageProps>;
 };
