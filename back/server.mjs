@@ -121,9 +121,10 @@ app.use("/character-sheets", characterSheetRoute);
 
 app.use(errorHandler);
 
-// Les seeds ne tournent qu'en dev (données de démonstration).
+// Synchronise les templates de fiche (référentiel des systèmes de jeu).
+// Upserts idempotents : ils tournent aussi en prod pour que tout nouveau
+// système ou changement de champs y soit appliqué au démarrage.
 async function runSeeds() {
-    if (isProd) return;
     await seedMagnusArchives();
     await seedCallOfCthulhu();
     await seedHydre();
