@@ -183,7 +183,14 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
             id: "chat",
             title: t("chatTitle"),
             defaultLayout: { x: hasTarot ? 9 : 8, y: 5, w: hasTarot ? 3 : 4, h: 5, minW: 2, minH: 2 },
-            content: <ChatPanel gameId={gameId} currentUserId={currentUser._id} gmUserId={game.createdBy._id} />,
+            content: (
+                <ChatPanel
+                    gameId={gameId}
+                    currentUserId={currentUser._id}
+                    gmUserId={game.createdBy._id}
+                    members={[game.createdBy, ...game.players]}
+                />
+            ),
         },
     ];
 

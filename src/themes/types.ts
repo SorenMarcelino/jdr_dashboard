@@ -43,6 +43,15 @@ export type ChatMessageProps = {
     isGm: boolean;
 };
 
+export type RecipientSelectProps = {
+    /** Destinataires possibles (les autres membres de la partie). */
+    members: { _id: string; username: string; isGm: boolean }[];
+    /** undefined = tout le monde. */
+    value?: string;
+    onChange: (recipientId?: string) => void;
+    disabled?: boolean;
+};
+
 export type DiceBarProps = {
     onRoll: (diceType: DiceType, quantity: number) => void;
     disabled?: boolean;
@@ -90,6 +99,8 @@ export type GameSkin = {
     TextMessage?: ComponentType<ChatMessageProps>;
     DiceRollMessage?: ComponentType<ChatMessageProps>;
     DiceBar?: ComponentType<DiceBarProps>;
+    /** Choix du destinataire (tout le monde ou un membre) des messages et des jets. */
+    RecipientSelect?: ComponentType<RecipientSelectProps>;
     ChatInput?: ComponentType<ChatInputProps>;
     CharacterSheet?: ComponentType<CharacterSheetProps>;
     /** Table de tarot : son absence retire le widget du tableau de bord. */

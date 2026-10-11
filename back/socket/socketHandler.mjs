@@ -7,6 +7,7 @@ import { TarotSession } from "../models/TarotSessionModel.mjs";
 import { DICE_REGISTRY, rollDice } from "../config/diceRegistry.mjs";
 import { TAROT_SPREADS, drawCard, getTarotDeck, shuffleDeck } from "../config/tarotRegistry.mjs";
 import { tarotMessageFor, tarotStateFor } from "../services/tarotService.mjs";
+import { canSeeMessage, messageAudience, privacyFields } from "../services/messageService.mjs";
 import logger from "../utils/logger.mjs";
 
 // Longueur maximale d'un message de chat (le canal socket n'est pas couvert par
@@ -142,6 +143,29 @@ const isGameMember = (game, userId) =>
     game.createdBy.toString() === userId.toString() ||
     game.players.some((p) => p.toString() === userId.toString());
 
+// Un message privé n'est émis qu'aux sockets de son auteur et de son
+// destinataire ; un message public à toute la room.
+async function emitToAudience(io, gameId, message, event, payload) {
+    const audience = messageAudience(message);
+    if (!audience) {
+        io.to(`game:${gameId}`).emit(event, payload);
+        return;
+    }
+    const sockets = await io.in(`game:${gameId}`).fetchSockets();
+    for (const s of sockets) {
+        if (audience.includes(s.data.userId)) s.emit(event, payload);
+    }
+}
+
+// Destinataire d'un message privé : un autre membre de la partie.
+// Retourne undefined pour un message public, null si le destinataire est invalide.
+async function resolveRecipient(game, senderId, recipientId) {
+    if (recipientId === undefined || recipientId === null || recipientId === "") return undefined;
+    if (typeof recipientId !== "string") return null;
+    if (recipientId === senderId.toString() || !isGameMember(game, recipientId)) return null;
+    return User.findById(recipientId).select("username");
+}
+
 export function setupSocketHandlers(io) {
     // Auth middleware
     io.use(async (socket, next) => {
@@ -217,7 +241,7 @@ export function setupSocketHandlers(io) {
         });
 
         // Chat message
-        socket.on("chat-message", async ({ gameId, content }) => {
+        socket.on("chat-message", async ({ gameId, content, recipientId }) => {
             try {
                 if (!consumeRate()) {
                     return socket.emit("error", { message: "Rate limit exceeded, slow down." });
@@ -237,15 +261,22 @@ export function setupSocketHandlers(io) {
                     });
                 }
 
+                const recipient = await resolveRecipient(game, socket.user._id, recipientId);
+                if (recipient === null) {
+                    return socket.emit("error", { message: "Invalid recipient" });
+                }
+
                 const message = await Message.create({
                     gameId,
                     userId: socket.user._id,
                     username: socket.user.username,
                     type: "text",
                     content: trimmed,
+                    recipientId: recipient?._id,
+                    recipientUsername: recipient?.username,
                 });
 
-                io.to(`game:${gameId}`).emit("chat-message", {
+                await emitToAudience(io, gameId, message, "chat-message", {
                     _id: message._id,
                     gameId: message.gameId,
                     userId: message.userId,
@@ -253,6 +284,7 @@ export function setupSocketHandlers(io) {
                     type: "text",
                     content: message.content,
                     createdAt: message.createdAt,
+                    ...privacyFields(message),
                 });
             } catch (err) {
                 logger.error({ err }, "[Socket] chat-message error");
@@ -262,7 +294,7 @@ export function setupSocketHandlers(io) {
 
         // Dice roll — le serveur génère ET persiste les résultats, puis diffuse
         // l'animation. Les résultats ne sont jamais fournis par le client.
-        socket.on("dice-roll", async ({ gameId, diceType, quantity }) => {
+        socket.on("dice-roll", async ({ gameId, diceType, quantity, recipientId }) => {
             try {
                 if (!consumeRate()) {
                     return socket.emit("error", { message: "Rate limit exceeded, slow down." });
@@ -279,6 +311,11 @@ export function setupSocketHandlers(io) {
 
                 const qty = Math.max(1, Math.min(quantity || 1, config.maxQuantity));
 
+                const recipient = await resolveRecipient(game, socket.user._id, recipientId);
+                if (recipient === null) {
+                    return socket.emit("error", { message: "Invalid recipient" });
+                }
+
                 // Génération autoritative côté serveur.
                 const { results, total } = rollDice(diceType, qty);
 
@@ -290,11 +327,14 @@ export function setupSocketHandlers(io) {
                     username: socket.user.username,
                     type: "dice-roll",
                     diceRoll: { diceType, quantity: qty, results, total },
+                    recipientId: recipient?._id,
+                    recipientUsername: recipient?.username,
                 });
 
-                // Diffuse le départ de l'animation à TOUS les joueurs, avec les
-                // résultats serveur et l'id du message persisté.
-                io.to(`game:${gameId}`).emit("dice-roll-start", {
+                // Diffuse le départ de l'animation à tous les joueurs (ou au
+                // seul destinataire d'un jet privé), avec les résultats serveur
+                // et l'id du message persisté.
+                await emitToAudience(io, gameId, message, "dice-roll-start", {
                     messageId: message._id.toString(),
                     gameId,
                     userId: socket.user._id.toString(),
@@ -325,11 +365,12 @@ export function setupSocketHandlers(io) {
                     gameId,
                     type: "dice-roll",
                 });
-                if (!message) {
+                // Un jet privé est introuvable pour qui ne peut pas le voir.
+                if (!message || !canSeeMessage(message, socket.user._id)) {
                     return socket.emit("error", { message: "Dice roll not found" });
                 }
 
-                io.to(`game:${gameId}`).emit("dice-roll-result", {
+                await emitToAudience(io, gameId, message, "dice-roll-result", {
                     _id: message._id,
                     gameId: message.gameId,
                     userId: message.userId,
@@ -337,10 +378,36 @@ export function setupSocketHandlers(io) {
                     type: "dice-roll",
                     diceRoll: message.diceRoll,
                     createdAt: message.createdAt,
+                    ...privacyFields(message),
                 });
             } catch (err) {
                 logger.error({ err }, "[Socket] dice-roll-complete error");
                 socket.emit("error", { message: "Failed to finalize dice roll" });
+            }
+        });
+
+        // Le MJ supprime un message qu'il voit (texte, jet ou tirage) : il
+        // disparaît de l'historique et donc des statistiques de la partie.
+        socket.on("message:delete", async ({ gameId, messageId }) => {
+            try {
+                const game = await getGameIfMJ(gameId, socket.user._id);
+                if (!game) {
+                    return socket.emit("error", { message: "Only the GM can delete messages" });
+                }
+
+                const message = await Message.findOne({ _id: messageId, gameId });
+                if (!message || !canSeeMessage(message, socket.user._id)) {
+                    return socket.emit("error", { message: "Message not found" });
+                }
+
+                await message.deleteOne();
+                await emitToAudience(io, gameId, message, "message:deleted", {
+                    gameId: gameId.toString(),
+                    messageId: message._id.toString(),
+                });
+            } catch (err) {
+                logger.error({ err }, "[Socket] message:delete error");
+                socket.emit("error", { message: "Failed to delete message" });
             }
         });
 

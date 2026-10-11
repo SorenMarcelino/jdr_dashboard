@@ -19,7 +19,15 @@ export type ChatMessage = {
         total: number;
     };
     tarot?: TarotDrawData;
+    /** Message privé : seuls l'auteur et ce destinataire le voient. */
+    recipientId?: string;
+    recipientUsername?: string;
     createdAt: string;
+};
+
+export type MessageDeletedData = {
+    gameId: string;
+    messageId: string;
 };
 
 export type DiceRollStartData = {
@@ -68,8 +76,10 @@ type SocketContextValue = {
     connected: boolean;
     joinGame: (gameId: string) => void;
     leaveGame: (gameId: string) => void;
-    sendMessage: (gameId: string, content: string) => void;
-    rollDice: (gameId: string, diceType: string, quantity: number) => void;
+    /** recipientId : destinataire d'un message privé (absent = public). */
+    sendMessage: (gameId: string, content: string, recipientId?: string) => void;
+    rollDice: (gameId: string, diceType: string, quantity: number, recipientId?: string) => void;
+    deleteMessage: (gameId: string, messageId: string) => void;
     completeDiceRoll: (gameId: string, messageId: string) => void;
     setStage: (gameId: string, media: { kind: StageMediaKind; url: string; title: string }) => void;
     clearStage: (gameId: string) => void;
@@ -81,6 +91,7 @@ type SocketContextValue = {
     onChatMessage: (cb: (msg: ChatMessage) => void) => () => void;
     onDiceRollStart: (cb: (data: DiceRollStartData) => void) => () => void;
     onDiceRollResult: (cb: (msg: ChatMessage) => void) => () => void;
+    onMessageDeleted: (cb: (data: MessageDeletedData) => void) => () => void;
     onStageUpdate: (cb: (state: StageState) => void) => () => void;
     onStageControl: (cb: (control: StageControl) => void) => () => void;
     onTarotState: (cb: (state: TarotState) => void) => () => void;
@@ -118,12 +129,16 @@ export function SocketProvider({ children }: { children: ReactNode }) {
         socketRef.current?.emit("leave-game", gameId);
     }, []);
 
-    const sendMessage = useCallback((gameId: string, content: string) => {
-        socketRef.current?.emit("chat-message", { gameId, content });
+    const sendMessage = useCallback((gameId: string, content: string, recipientId?: string) => {
+        socketRef.current?.emit("chat-message", { gameId, content, recipientId });
     }, []);
 
-    const rollDice = useCallback((gameId: string, diceType: string, quantity: number) => {
-        socketRef.current?.emit("dice-roll", { gameId, diceType, quantity });
+    const rollDice = useCallback((gameId: string, diceType: string, quantity: number, recipientId?: string) => {
+        socketRef.current?.emit("dice-roll", { gameId, diceType, quantity, recipientId });
+    }, []);
+
+    const deleteMessage = useCallback((gameId: string, messageId: string) => {
+        socketRef.current?.emit("message:delete", { gameId, messageId });
     }, []);
 
     const completeDiceRoll = useCallback((gameId: string, messageId: string) => {
@@ -185,6 +200,13 @@ export function SocketProvider({ children }: { children: ReactNode }) {
         return () => { socket.off("dice-roll-result", cb); };
     }, []);
 
+    const onMessageDeleted = useCallback((cb: (data: MessageDeletedData) => void) => {
+        const socket = socketRef.current;
+        if (!socket) return () => {};
+        socket.on("message:deleted", cb);
+        return () => { socket.off("message:deleted", cb); };
+    }, []);
+
     const onStageUpdate = useCallback((cb: (state: StageState) => void) => {
         const socket = socketRef.current;
         if (!socket) return () => {};
@@ -214,6 +236,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
             leaveGame,
             sendMessage,
             rollDice,
+            deleteMessage,
             completeDiceRoll,
             setStage,
             clearStage,
@@ -225,6 +248,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
             onChatMessage,
             onDiceRollStart,
             onDiceRollResult,
+            onMessageDeleted,
             onStageUpdate,
             onStageControl,
             onTarotState,

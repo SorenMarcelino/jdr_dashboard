@@ -165,7 +165,16 @@
         "messagePlaceholder": "Message...",
         "rolled": "a lancé",
         "tarotDrawn": "{username} a tiré {count, plural, one {une carte} other {# cartes}}",
-        "tarotSecret": "{username} a tiré des cartes en secret"
+        "tarotSecret": "{username} a tiré des cartes en secret",
+        "recipientLabel": "À :",
+        "everyone": "Tout le monde",
+        "gmSuffix": "{username} (MJ)",
+        "privateTo": "Privé → {username}",
+        "privateForYou": "Privé · pour vous",
+        "delete": "Supprimer le message",
+        "confirmDelete": "Supprimer définitivement ?",
+        "confirm": "Supprimer",
+        "cancel": "Annuler"
     },
     "scenario": {
         "workspace": {

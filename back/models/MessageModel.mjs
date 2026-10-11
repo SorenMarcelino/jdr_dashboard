@@ -48,6 +48,14 @@ const messageSchema = new mongoose.Schema({
         type: tarotDrawSchema,
         default: undefined,
     },
+    // Message privé : seuls l'auteur et le destinataire le voient
+    // (cf. services/messageService.mjs). Absent = message public.
+    recipientId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: undefined,
+    },
+    recipientUsername: String,
 }, {
     timestamps: true,
 });

@@ -165,7 +165,16 @@
         "messagePlaceholder": "Message...",
         "rolled": "rolled",
         "tarotDrawn": "{username} drew {count, plural, one {one card} other {# cards}}",
-        "tarotSecret": "{username} drew cards in secret"
+        "tarotSecret": "{username} drew cards in secret",
+        "recipientLabel": "To:",
+        "everyone": "Everyone",
+        "gmSuffix": "{username} (GM)",
+        "privateTo": "Private → {username}",
+        "privateForYou": "Private · for you",
+        "delete": "Delete message",
+        "confirmDelete": "Delete permanently?",
+        "confirm": "Delete",
+        "cancel": "Cancel"
     },
     "scenario": {
         "workspace": {

@@ -7,6 +7,7 @@ import { type DiceType } from "@/config/diceConfig";
 import { MessageList } from "./MessageList";
 import { ChatInput } from "./ChatInput";
 import { DiceBar } from "./DiceBar";
+import { RecipientSelect } from "./RecipientSelect";
 import { API_URL } from "@/lib/api";
 import { useGameSkin } from "@/themes/game-skin-context";
 
@@ -17,16 +18,29 @@ type Props = {
     currentUserId: string;
     /** userId du MJ : ses messages peuvent être rendus comme de la narration. */
     gmUserId?: string;
+    /** Membres de la partie (MJ compris), destinataires possibles d'un message privé. */
+    members: { _id: string; username: string }[];
 };
 
-export function ChatPanel({ gameId, currentUserId, gmUserId }: Props) {
-    const { connected, joinGame, leaveGame, sendMessage, rollDice, onChatMessage, onDiceRollResult } = useSocket();
+export function ChatPanel({ gameId, currentUserId, gmUserId, members }: Props) {
+    const {
+        connected, joinGame, leaveGame, sendMessage, rollDice, deleteMessage,
+        onChatMessage, onDiceRollResult, onMessageDeleted,
+    } = useSocket();
     const [messages, setMessages] = useState<ChatMessage[]>([]);
+    // Destinataire des messages et jets : undefined = tout le monde.
+    const [recipientId, setRecipientId] = useState<string>();
+    const isMJ = !!gmUserId && gmUserId === currentUserId;
     const [hasMore, setHasMore] = useState(false);
     const loadingRef = useRef(false);
     const skin = useGameSkin();
     const SkinDiceBar = skin.DiceBar ?? DiceBar;
     const SkinChatInput = skin.ChatInput ?? ChatInput;
+    const SkinRecipientSelect = skin.RecipientSelect ?? RecipientSelect;
+
+    const recipients = members
+        .filter((m) => m._id !== currentUserId)
+        .map((m) => ({ ...m, isGm: m._id === gmUserId }));
 
     // Load message history
     const loadMessages = useCallback(async (before?: string) => {
@@ -76,8 +90,15 @@ export function ChatPanel({ gameId, currentUserId, gmUserId }: Props) {
             }
         });
 
-        return () => { unsub1(); unsub2(); };
-    }, [gameId, onChatMessage, onDiceRollResult]);
+        // Message supprimé par le MJ : retiré de tous les fils.
+        const unsub3 = onMessageDeleted(({ gameId: id, messageId }) => {
+            if (id === gameId) {
+                setMessages((prev) => prev.filter((m) => m._id !== messageId));
+            }
+        });
+
+        return () => { unsub1(); unsub2(); unsub3(); };
+    }, [gameId, onChatMessage, onDiceRollResult, onMessageDeleted]);
 
     const handleLoadMore = () => {
         if (messages.length > 0) {
@@ -86,11 +107,15 @@ export function ChatPanel({ gameId, currentUserId, gmUserId }: Props) {
     };
 
     const handleSend = (content: string) => {
-        sendMessage(gameId, content);
+        sendMessage(gameId, content, recipientId);
     };
 
     const handleRoll = (diceType: DiceType, quantity: number) => {
-        rollDice(gameId, diceType, quantity);
+        rollDice(gameId, diceType, quantity, recipientId);
+    };
+
+    const handleDelete = (messageId: string) => {
+        deleteMessage(gameId, messageId);
     };
 
     return (
@@ -99,9 +124,18 @@ export function ChatPanel({ gameId, currentUserId, gmUserId }: Props) {
                 messages={messages}
                 currentUserId={currentUserId}
                 gmUserId={gmUserId}
+                onDelete={isMJ ? handleDelete : undefined}
                 onLoadMore={handleLoadMore}
                 hasMore={hasMore}
             />
+            {recipients.length > 0 && (
+                <SkinRecipientSelect
+                    members={recipients}
+                    value={recipientId}
+                    onChange={setRecipientId}
+                    disabled={!connected}
+                />
+            )}
             <SkinDiceBar onRoll={handleRoll} disabled={!connected} />
             <SkinChatInput onSend={handleSend} disabled={!connected} />
         </div>

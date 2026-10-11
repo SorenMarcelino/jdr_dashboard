@@ -5,17 +5,20 @@ import type { ChatMessage } from "@/contexts/SocketContext";
 import { TextMessage } from "./TextMessage";
 import { DiceRollMessage } from "./DiceRollMessage";
 import { TarotMessage } from "./TarotMessage";
+import { MessageFrame } from "./MessageFrame";
 import { useGameSkin } from "@/themes/game-skin-context";
 
 type Props = {
     messages: ChatMessage[];
     currentUserId: string;
     gmUserId?: string;
+    /** Présent pour le MJ : supprime un message. */
+    onDelete?: (messageId: string) => void;
     onLoadMore?: () => void;
     hasMore?: boolean;
 };
 
-export function MessageList({ messages, currentUserId, gmUserId, onLoadMore, hasMore }: Props) {
+export function MessageList({ messages, currentUserId, gmUserId, onDelete, onLoadMore, hasMore }: Props) {
     const bottomRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const prevLengthRef = useRef(0);
@@ -61,9 +64,21 @@ export function MessageList({ messages, currentUserId, gmUserId, onLoadMore, has
                     isOwn: msg.userId === currentUserId,
                     isGm: !!gmUserId && msg.userId === gmUserId,
                 };
-                if (msg.type === "text") return <Text key={msg._id} {...props} />;
-                if (msg.type === "tarot") return <Tarot key={msg._id} {...props} />;
-                return <Roll key={msg._id} {...props} />;
+                const content =
+                    msg.type === "text" ? <Text {...props} />
+                    : msg.type === "tarot" ? <Tarot {...props} />
+                    : <Roll {...props} />;
+                return (
+                    <MessageFrame
+                        key={msg._id}
+                        message={msg}
+                        isOwn={props.isOwn}
+                        ownOnRight={!skin.TextMessage}
+                        onDelete={onDelete && (() => onDelete(msg._id))}
+                    >
+                        {content}
+                    </MessageFrame>
+                );
             })}
             <div ref={bottomRef} />
         </div>

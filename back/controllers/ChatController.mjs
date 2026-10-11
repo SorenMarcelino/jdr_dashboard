@@ -2,6 +2,7 @@ import { Message } from "../models/MessageModel.mjs";
 import { Game } from "../models/GameModel.mjs";
 import { asyncHandler } from "../utils/asyncHandler.mjs";
 import { tarotMessageFor } from "../services/tarotService.mjs";
+import { visibleMessagesFilter } from "../services/messageService.mjs";
 
 export const getMessages = asyncHandler(async (req, res) => {
     const { gameId } = req.params;
@@ -22,7 +23,8 @@ export const getMessages = asyncHandler(async (req, res) => {
         return res.status(403).json({ success: false, message: "Not a member of this game" });
     }
 
-    const query = { gameId };
+    // Les messages privés ne sont renvoyés qu'à leur auteur et leur destinataire.
+    const query = { gameId, ...visibleMessagesFilter(req.user._id) };
     if (before) {
         const beforeDate = new Date(before);
         if (Number.isNaN(beforeDate.getTime())) {
