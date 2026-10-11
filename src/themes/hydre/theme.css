@@ -257,3 +257,36 @@ body[data-game-theme="hydre"] {
 [data-game-theme="hydre"] .hydre-paper :focus-visible {
     outline-color: var(--hydre-slate);
 }
+
+/* Fil d'Ariane : capitales des titres, losanges de laiton entre les niveaux,
+   filet de laiton en guise de bordure. */
+[data-game-theme="hydre"] .app-breadcrumb {
+    position: relative;
+    border-bottom-width: 0;
+    padding-bottom: 0.625rem;
+    font-family: var(--hydre-font-display);
+    font-size: 0.9rem;
+}
+
+[data-game-theme="hydre"] .app-breadcrumb::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--hydre-brass) 12%, var(--hydre-brass-light) 50%, var(--hydre-brass) 88%, transparent);
+}
+
+[data-game-theme="hydre"] .app-breadcrumb__sep svg {
+    display: none;
+}
+
+[data-game-theme="hydre"] .app-breadcrumb__sep::before {
+    content: "◆";
+    color: var(--hydre-brass);
+    font-size: 0.55em;
+}
+
+[data-game-theme="hydre"] .app-breadcrumb__current {
+    color: var(--hydre-brass-light);
+    font-weight: 400;
+}

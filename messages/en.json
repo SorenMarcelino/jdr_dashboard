@@ -19,6 +19,13 @@
         "login": "Log in",
         "logout": "Log out"
     },
+    "breadcrumb": {
+        "ariaLabel": "Breadcrumb",
+        "myGames": "My games",
+        "rules": "Rules",
+        "lore": "Lore",
+        "scenarios": "Scenarios"
+    },
     "auth": {
         "login": {
             "title": "Welcome back",
@@ -178,7 +185,6 @@
     },
     "scenario": {
         "workspace": {
-            "backToList": "Back to the scenario list",
             "hideSidebar": "Hide sidebar",
             "showSidebar": "Show sidebar",
             "edit": "Edit",
@@ -289,13 +295,11 @@
         "rule": {
             "newEntryTitle": "New chapter",
             "addEntry": "Add a chapter",
-            "heading": "Rules",
             "loading": "Loading..."
         },
         "lore": {
             "newEntryTitle": "New lore entry",
             "addEntry": "Add a lore entry",
-            "heading": "Lore",
             "loading": "Loading..."
         },
         "reader": {

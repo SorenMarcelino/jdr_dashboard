@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useTranslations } from "next-intl";
 import { Navbar } from "@/components/navbar";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { CharacterSheetViewer } from "@/components/character-sheet/CharacterSheetViewer";
 import { BentoGrid } from "@/components/bento/BentoGrid";
 import { SocketProvider } from "@/contexts/SocketContext";
@@ -50,6 +51,7 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
     const [selectedPlayer, setSelectedPlayer] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const t = useTranslations("game.session");
+    const tb = useTranslations("breadcrumb");
 
     useEffect(() => {
         const load = async () => {
@@ -86,10 +88,13 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
     const SkinSessionHeader = skin.SessionHeader ?? SessionHeader;
     const SkinPlayerSelector = skin.PlayerSelector ?? PlayerSelector;
 
+    const myGamesCrumb = { label: tb("myGames"), href: "/user" };
+
     if (loading) {
         return (
             <>
                 <Navbar />
+                <Breadcrumb items={[myGamesCrumb, {}]} />
                 <main className="min-h-svh bg-muted flex items-center justify-center">
                     <p className="text-muted-foreground">{t("loading")}</p>
                 </main>
@@ -101,6 +106,7 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
         return (
             <>
                 <Navbar />
+                <Breadcrumb items={[myGamesCrumb]} />
                 <main className="min-h-svh bg-muted flex items-center justify-center">
                     <p className="text-muted-foreground">{t("notFound")}</p>
                 </main>
@@ -199,6 +205,7 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
             <GameSkinProvider skin={skin}>
                 <div className={cn("flex flex-col h-svh overflow-hidden bg-muted", skin.pageClassName)}>
                     <Navbar game={game} />
+                    <Breadcrumb items={[myGamesCrumb, { label: game.name }]} />
 
                     {/* Barre de contexte */}
                     <SkinSessionHeader game={game} gameId={gameId} isMJ={isMJ} />

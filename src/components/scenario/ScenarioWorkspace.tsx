@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Link from "next/link";
-import { BookOpen, PenLine, GitBranch, PanelLeftClose, PanelLeft, Users, ArrowLeft } from "lucide-react";
+import { BookOpen, PenLine, GitBranch, PanelLeftClose, PanelLeft, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ScenarioProvider, useScenario } from "@/contexts/ScenarioContext";
 import { ScenarioSidebar } from "./sidebar/ScenarioSidebar";
@@ -11,6 +10,7 @@ import { ScenarioEditor } from "./editor/ScenarioEditor";
 import { ScenarioReader } from "./reader/ScenarioReader";
 import { ScenarioGraph } from "./graph/ScenarioGraph";
 import { NpcManager } from "./editor/npc-manager";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { resolveSystemId } from "@/lib/system-id";
 import { getGameTheme } from "@/config/gameThemes";
 import { useGameTheme } from "@/hooks/use-game-theme";
@@ -21,11 +21,14 @@ const API = API_URL;
 type Props = {
     gameId: string;
     scenarioId: string;
+    /** Nom de la partie pour le fil d'Ariane (absent pendant le chargement). */
+    gameName?: string;
 };
 
-function WorkspaceContent({ gameId, scenarioId }: Props) {
+function WorkspaceContent({ gameId, scenarioId, gameName }: Props) {
     const { scenario, setScenario, setPages, navigateToPage, mode, setMode } = useScenario();
     const t = useTranslations("scenario.workspace");
+    const tb = useTranslations("breadcrumb");
     const [loading, setLoading] = useState(true);
     const [showSidebar, setShowSidebar] = useState(true);
     const [showGraph, setShowGraph] = useState(false);
@@ -70,34 +73,45 @@ function WorkspaceContent({ gameId, scenarioId }: Props) {
     // Thème visuel propre au système de jeu (posé sur <html> le temps de l'édition)
     useGameTheme(getGameTheme(systemId));
 
+    const breadcrumb = (
+        <Breadcrumb
+            items={[
+                { label: tb("myGames"), href: "/user" },
+                { label: gameName, href: `/game/${gameId}` },
+                { label: tb("scenarios"), href: `/game/${gameId}/scenario` },
+                ...(loading || scenario ? [{ label: scenario?.title }] : []),
+            ]}
+        />
+    );
+
     if (loading) {
         return (
-            <div className="flex-1 flex items-center justify-center text-muted-foreground">
-                <p className="text-sm">{t("loading")}</p>
-            </div>
+            <>
+                {breadcrumb}
+                <div className="flex-1 flex items-center justify-center text-muted-foreground">
+                    <p className="text-sm">{t("loading")}</p>
+                </div>
+            </>
         );
     }
 
     if (!scenario) {
         return (
-            <div className="flex-1 flex items-center justify-center text-muted-foreground">
-                <p className="text-sm">{t("notFound")}</p>
-            </div>
+            <>
+                {breadcrumb}
+                <div className="flex-1 flex items-center justify-center text-muted-foreground">
+                    <p className="text-sm">{t("notFound")}</p>
+                </div>
+            </>
         );
     }
 
     return (
         <div className="flex-1 flex flex-col min-h-0">
+            {breadcrumb}
             {/* Top bar */}
             <div className="shrink-0 flex items-center justify-between px-4 py-2 border-b bg-background">
                 <div className="flex items-center gap-2">
-                    <Link
-                        href={`/game/${gameId}/scenario`}
-                        className="p-1.5 rounded hover:bg-muted transition-colors"
-                        title={t("backToList")}
-                    >
-                        <ArrowLeft size={16} />
-                    </Link>
                     <button
                         onClick={() => setShowSidebar(!showSidebar)}
                         className="p-1.5 rounded hover:bg-muted transition-colors"
@@ -177,10 +191,10 @@ function WorkspaceContent({ gameId, scenarioId }: Props) {
     );
 }
 
-export function ScenarioWorkspace({ gameId, scenarioId }: Props) {
+export function ScenarioWorkspace({ gameId, scenarioId, gameName }: Props) {
     return (
         <ScenarioProvider>
-            <WorkspaceContent gameId={gameId} scenarioId={scenarioId} />
+            <WorkspaceContent gameId={gameId} scenarioId={scenarioId} gameName={gameName} />
         </ScenarioProvider>
     );
 }

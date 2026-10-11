@@ -259,3 +259,27 @@ body[data-game-theme="magnus_archives"] {
         animation: none;
     }
 }
+
+/* Fil d'Ariane : capitales étroites des onglets de dossier, barre oblique
+   couleur fil, page courante en vert signal. */
+[data-game-theme="magnus_archives"] .app-breadcrumb {
+    font-family: var(--archives-font-label);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+[data-game-theme="magnus_archives"] .app-breadcrumb__sep svg {
+    display: none;
+}
+
+[data-game-theme="magnus_archives"] .app-breadcrumb__sep::before {
+    content: "/";
+    color: var(--archives-thread);
+    font-weight: 700;
+}
+
+[data-game-theme="magnus_archives"] .app-breadcrumb__current {
+    color: var(--archives-signal);
+    font-weight: 700;
+}

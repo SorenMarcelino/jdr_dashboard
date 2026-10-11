@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Navbar } from "@/components/navbar";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { ProfileForm } from "@/components/game/create-game-form";
 import { CurrentGamesCards } from "@/components/game/current-games-cards";
 import { JoinGameDialog } from "@/components/game/join-game-dialog";
@@ -11,10 +12,12 @@ export default function UserPage() {
     const [refreshKey, setRefreshKey] = useState(0);
     const refresh = () => setRefreshKey(k => k + 1);
     const t = useTranslations("game");
+    const tb = useTranslations("breadcrumb");
 
     return (
         <>
             <Navbar />
+            <Breadcrumb items={[{ label: tb("myGames") }]} />
             <main className="min-h-svh bg-muted">
                 <div className="max-w-5xl mx-auto p-6 md:p-10 space-y-10">
                     <section className="space-y-4">

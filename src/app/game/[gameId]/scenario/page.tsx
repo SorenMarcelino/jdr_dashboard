@@ -4,7 +4,9 @@ import { use } from "react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { useTranslations } from "next-intl";
 import { Navbar, type NavbarGame } from "@/components/navbar";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { ScenarioList } from "@/components/scenario/ScenarioList";
 import { getGameTheme } from "@/config/gameThemes";
 import { useGameTheme } from "@/hooks/use-game-theme";
@@ -16,6 +18,7 @@ export default function ScenarioListPage({ params }: { params: Promise<{ gameId:
     const { gameId } = use(params);
     const router = useRouter();
     const [game, setGame] = useState<NavbarGame | null>(null);
+    const tb = useTranslations("breadcrumb");
 
     useEffect(() => {
         axios
@@ -36,6 +39,13 @@ export default function ScenarioListPage({ params }: { params: Promise<{ gameId:
     return (
         <div className="flex flex-col min-h-svh bg-muted">
             <Navbar game={game ?? undefined} />
+            <Breadcrumb
+                items={[
+                    { label: tb("myGames"), href: "/user" },
+                    { label: game?.name, href: `/game/${gameId}` },
+                    { label: tb("scenarios") },
+                ]}
+            />
             <main className="flex-1 py-4">
                 <ScenarioList gameId={gameId} />
             </main>

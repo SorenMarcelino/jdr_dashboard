@@ -3,13 +3,15 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { Navbar, type NavbarGame } from "@/components/navbar";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { KnowledgeProvider, useKnowledge } from "@/contexts/KnowledgeContext";
 import { KnowledgeSidebar } from "./sidebar/KnowledgeSidebar";
 import { KnowledgeEditor } from "./editor/KnowledgeEditor";
 import { KnowledgeReader } from "./reader/KnowledgeReader";
+import { getGameTheme } from "@/config/gameThemes";
+import { useGameTheme } from "@/hooks/use-game-theme";
 import { API_URL } from "@/lib/api";
 
 const API = API_URL;
@@ -67,7 +69,9 @@ function MJWorkspaceContent({ gameId, type }: Props) {
 
 export function KnowledgeWorkspace({ gameId, type }: Props) {
     const [isMJ, setIsMJ] = useState<boolean | null>(null);
+    const [game, setGame] = useState<NavbarGame | null>(null);
     const t = useTranslations(`knowledge.${type}`);
+    const tb = useTranslations("breadcrumb");
 
     useEffect(() => {
         Promise.all([
@@ -78,30 +82,32 @@ export function KnowledgeWorkspace({ gameId, type }: Props) {
                 if (userRes.data.success && gameRes.data.success) {
                     const userId = userRes.data.user._id;
                     const game = gameRes.data.game;
+                    setGame(game);
                     setIsMJ(game.createdBy._id?.toString() === userId?.toString());
                 }
             })
             .catch((err) => console.error("Erreur chargement:", err));
     }, [gameId]);
 
-    if (isMJ === null) {
-        return (
-            <div className="flex flex-col h-svh items-center justify-center text-muted-foreground bg-muted">
-                <p className="text-sm">{t("loading")}</p>
-            </div>
-        );
-    }
+    // Thème visuel propre au système de jeu (posé sur <html> le temps de la consultation)
+    useGameTheme(getGameTheme(game?.characterSheet));
 
     return (
         <div className="flex flex-col h-svh overflow-hidden bg-muted">
-            <div className="shrink-0 flex items-center gap-2 px-4 py-2 border-b bg-background">
-                <Link href={`/game/${gameId}`} className="p-1.5 rounded hover:bg-muted transition-colors">
-                    <ArrowLeft size={16} />
-                </Link>
-                <h1 className="text-sm font-bold">{t("heading")}</h1>
-            </div>
+            <Navbar game={game ?? undefined} />
+            <Breadcrumb
+                items={[
+                    { label: tb("myGames"), href: "/user" },
+                    { label: game?.name, href: `/game/${gameId}` },
+                    { label: tb(type === "rule" ? "rules" : "lore") },
+                ]}
+            />
             <div className="flex-1 flex min-h-0">
-                {isMJ ? (
+                {isMJ === null ? (
+                    <div className="flex-1 flex items-center justify-center text-muted-foreground">
+                        <p className="text-sm">{t("loading")}</p>
+                    </div>
+                ) : isMJ ? (
                     <KnowledgeProvider>
                         <MJWorkspaceContent gameId={gameId} type={type} />
                     </KnowledgeProvider>

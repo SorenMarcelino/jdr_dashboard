@@ -35,7 +35,7 @@ export default function ScenarioPage({
     return (
         <div className="flex flex-col h-svh bg-muted">
             <Navbar game={game ?? undefined} />
-            <ScenarioWorkspace gameId={gameId} scenarioId={scenarioId} />
+            <ScenarioWorkspace gameId={gameId} scenarioId={scenarioId} gameName={game?.name} />
         </div>
     );
 }

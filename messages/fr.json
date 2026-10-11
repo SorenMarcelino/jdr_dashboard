@@ -19,6 +19,13 @@
         "login": "Connexion",
         "logout": "Déconnexion"
     },
+    "breadcrumb": {
+        "ariaLabel": "Fil d'Ariane",
+        "myGames": "Mes parties",
+        "rules": "Règles",
+        "lore": "Lore",
+        "scenarios": "Scénarios"
+    },
     "auth": {
         "login": {
             "title": "Bon retour",
@@ -178,7 +185,6 @@
     },
     "scenario": {
         "workspace": {
-            "backToList": "Retour à la liste des scénarios",
             "hideSidebar": "Masquer la sidebar",
             "showSidebar": "Afficher la sidebar",
             "edit": "Édition",
@@ -289,13 +295,11 @@
         "rule": {
             "newEntryTitle": "Nouveau chapitre",
             "addEntry": "Ajouter un chapitre",
-            "heading": "Règles",
             "loading": "Chargement..."
         },
         "lore": {
             "newEntryTitle": "Nouveau point de lore",
             "addEntry": "Ajouter un point de lore",
-            "heading": "Lore",
             "loading": "Chargement..."
         },
         "reader": {
